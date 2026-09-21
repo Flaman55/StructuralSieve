@@ -1,8 +1,7 @@
 # StructuralSieve — Lean 4 formalization
 
 Machine-checked formalization accompanying the paper
-**"A Structural Sieve for Bertrand's Postulate: The Deterministic Reach of the
-Prime Base and its Newton Closure"** (A. Flamandzki).
+**"The Structural Sieve"** (A. Flamandzki).
 
 **Status: fully verified — zero `sorry`, no extra axioms beyond Mathlib.**
 The entire chain, from the definition of the complete generative base (Def. 2.1)
@@ -97,7 +96,7 @@ bertrand_chebyshev  ←  prime_in_window  ←  structural_sieve_survivor
 
 ### Module dependency graph
 
-![Module dependency graph](docs/dependency_graph.png)
+![Module dependency graph](docs/dependency_graph.svg)
 
 The graph (regenerate with `scripts/dependency_graph.py`, which also prints a
 non-circularity audit) makes the import structure explicit. `Main` reaches the

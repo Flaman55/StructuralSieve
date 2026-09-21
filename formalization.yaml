@@ -37,9 +37,9 @@ classification:
   msc2020: ["11A41", "11N05", "03B35"]
 
 sources:
-  - title: "A Structural Sieve for Bertrand's Postulate"
+  - title: "The Structural Sieve"
     authors: ["Artur Flamandzki"]
-    id: "https://github.com/Flaman55/StructuralSieve/blob/main/LaTex/A%20Structural%20Sieve%20for%20Bertrands%20Postulate.pdf"
+    id: "https://github.com/Flaman55/StructuralSieve/blob/main/LaTex/The%20Structural%20Sieve.pdf"
     type: "preprint"
     license: "Apache-2.0"
     author_endorsement: "n/a"

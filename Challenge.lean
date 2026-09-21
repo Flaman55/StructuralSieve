@@ -33,8 +33,7 @@ of fame:
 All three are discharged in `Solution.lean` by invoking the fully independent structural
 development in this repository's `StructuralSieve/` directory. That development does
 **not** import `Mathlib.NumberTheory.Bertrand`; the quantitative core for (3) is an original
-structural sieve described in the accompanying paper (`LaTex/A Structural Sieve for Bertrands
-Postulate.pdf`).
+structural sieve described in the accompanying paper (`LaTex/The Structural Sieve.pdf`).
 -/
 
 /-- **Original question: is every composite in the window covered by the preceding base?**

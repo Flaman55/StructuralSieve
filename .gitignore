@@ -13,6 +13,10 @@
 docs/dependency_graph
 docs/dependency_graph.png
 
+# Python
+__pycache__/
+*.pyc
+
 # Editor / OS
 .DS_Store
 *.swp

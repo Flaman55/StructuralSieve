@@ -1,31 +1,35 @@
 cff-version: 1.2.0
 message: "If you use this formalization, please cite the accompanying paper and this repository."
-title: "StructuralSieve: a Lean 4 / Mathlib formalization of the structural sieve for Bertrand's postulate"
+title: "StructuralSieve: a Lean 4 / Mathlib formalization of an exact sieve-coverage characterization of primality"
 abstract: >-
-  A machine-checked (zero-`sorry`) Lean 4 development that reduces the
-  Bertrand–Chebyshev theorem to a single positivity statement about an exact
-  window count, derives the window and its endpoint from the prime base, and closes
-  the residual quantitative atom with a self-contained argument on the central
-  binomial coefficient. The main theorem does not import Mathlib's proof of
-  Bertrand's postulate.
+  A machine-checked (zero-`sorry`) Lean 4 development proving two exact,
+  unconditional characterizations of primality via sieve-coverage: on a prime
+  base's own window (P_k, 2*P_k], and generalized to the base's full
+  deterministic reach, the zone (P_k, P_k^2), with the reach shown exact.
+  Bertrand's postulate is not the target of this development; it converges
+  with it only as a corollary, since the base's window always contains a
+  prime -- the same classical fact proved by Chebyshev (1852) and, via a
+  different route, Erdos (1932). The corollary's own closure does not import
+  Mathlib's proof of Bertrand's postulate.
 type: software
 authors:
   - family-names: Flamandzki
     given-names: Artur
     email: flamandzki.artur@gmail.com
 version: 0.1.0
-date-released: 2026-07-10
+date-released: 2026-09-21
 license: Apache-2.0
 keywords:
   - Lean 4
   - Mathlib
+  - sieve theory
+  - primality characterization
   - Bertrand's postulate
-  - Bertrand-Chebyshev theorem
   - number theory
   - formal verification
 references:
   - type: article
-    title: "A Structural Sieve for Bertrand's Postulate: The Deterministic Reach of the Prime Base and its Newton Closure"
+    title: "The Structural Sieve"
     authors:
       - family-names: Flamandzki
         given-names: Artur
