@@ -1,0 +1,339 @@
+version: "v0.4"
+
+license: "Apache-2.0"
+
+project:
+  name: "StructuralSieve"
+  description: >
+    Two structural, exact characterizations of primality via sieve-coverage -- proved for
+    a prime base's own window (P_k, 2*P_k] (StructuralSieve.prime_iff_uncovered_by_prev)
+    and generalized to the base's full deterministic reach, the zone (P_k, P_k^2)
+    (StructuralSieve.void_iff_prime_in_deterministic_zone, with the reach shown exact by
+    determinism_breaks_above) -- plus Bertrand's postulate (Chebyshev's strengthened form:
+    for every N > 1 there is a prime p with N < p <= 2N) as a corollary of the first. The
+    originating question is not Bertrand's ("is there a prime here?") but a different one:
+    "up to where can sieve-coverage certify primality without appeal to counting?" The
+    corollary closes by showing the window is not entirely covered, via a
+    coprimality/counting argument whose quantitative core bottoms out in the central
+    binomial coefficient -- the same object Erdos used for his own, differently-motivated
+    proof of the same postulate. In Lean 4, avoiding Mathlib's existing Bertrand
+    development entirely. The corollary's quantitative closure is a finite oracle over
+    small windows (n < 512, chunked kernel-checked `decide`) and, for n >= 512, a
+    self-contained factorization-based upper bound on the central binomial coefficient
+    combined with a threshold inequality (adapted from Mathlib's Bertrand development) and
+    Mathlib's own lower bound on the central binomial coefficient — no `native_decide`
+    anywhere in this closure. Zero sorries; depends only on the three standard Lean axioms.
+  authors: ["Artur Flamandzki"]
+  license: "Apache-2.0"
+  responsible_maintainers: ["Artur Flamandzki"]
+  result_type: "source-based"
+  repository_role: >
+    Substantive development: this repository contains the complete, self-contained
+    proof development. It is not a thin wrapper pointing to formalization work hosted
+    elsewhere.
+
+classification:
+  arxiv: ["math.NT", "cs.LO"]
+  msc2020: ["11A41", "11N05", "03B35"]
+
+sources:
+  - title: "A Structural Sieve for Bertrand's Postulate"
+    authors: ["Artur Flamandzki"]
+    id: "https://github.com/Flaman55/StructuralSieve/blob/main/LaTex/A%20Structural%20Sieve%20for%20Bertrands%20Postulate.pdf"
+    type: "preprint"
+    license: "Apache-2.0"
+    author_endorsement: "n/a"
+    relationship: "formalizes"
+    note: >
+      This entry records the Lean development's relationship to its accompanying
+      manuscript, not to the classical theorem — that is a separate source entry
+      below (Bertrand 1845 / Chebyshev 1852, relationship `independently-proves`).
+      The Lean formalizes the proof strategy presented in this manuscript: a
+      from-scratch structural sieve against the primorial of preceding primes,
+      avoiding Mathlib.NumberTheory.Bertrand entirely (see `project.description`).
+      `author_endorsement: n/a` because the manuscript's author and the
+      formalization's author are the same person — there is no separate third
+      party to endorse. The LaTeX prose itself was drafted by the AI agent under
+      the author's direction, formatted to match Ramanujan Journal conventions;
+      the author reviewed the draft at the level of overall structure, scope, and
+      format compliance (not sentence-by-sentence) and directed that no
+      unnecessary content be included. See `automation` below for the same
+      disclosure applied to the Lean formalization. The manuscript's novelty
+      claims (Introduction, "three things are new here") are qualified as "to the
+      author's knowledge" rather than asserted as absolute: the manuscript's
+      "Remarks and provenance" section now documents a literature comparison
+      against Jacobsthal's function and its primorial-restricted gap bounds
+      (Jacobsthal 1960/61; Iwaniec 1978) and against generalized
+      Bertrand-postulate window results (Das & Paul, arXiv:1710.09891), explicitly
+      stating the search is bounded to indexed literature and cannot rule out
+      unindexed sources.
+  - title: "Bertrand's postulate (Chebyshev's strengthened form)"
+    authors: ["Joseph Bertrand", "Pafnuty Chebyshev"]
+    id: "https://en.wikipedia.org/wiki/Bertrand%27s_postulate"
+    type: "classical-result"
+    license: "n/a"
+    author_endorsement: "n/a"
+    relationship: "independently-proves"
+    note: >
+      The classical result itself (conjectured by Bertrand in 1845 from tables,
+      first proved by Chebyshev in 1852; the strengthened form N < p <= 2N used
+      here is the standard modern statement) — not original to this project, and
+      distinct from the entry above, which records the Lean's relationship to its
+      own accompanying manuscript. Under the Palomar source-classification rule
+      this makes the submission source-based, not an original-proof entry: the
+      Lean development independently proves this known theorem via a proof
+      strategy (the structural sieve of the manuscript above) that does not import
+      or invoke Mathlib's own proof of it (`Nat.bertrand`). `author_endorsement:
+      n/a` and `license: n/a` because there is no single canonical modern source
+      document for a 19th-century result to endorse or license.
+  - title: "real_main_inequality (Mathlib.NumberTheory.Bertrand)"
+    authors: ["The Mathlib Community"]
+    id: "https://leanprover-community.github.io/mathlib4_docs/Mathlib/NumberTheory/Bertrand.html"
+    type: "formalization"
+    license: "Apache-2.0"
+    author_endorsement: "n/a"
+    relationship: "adapts"
+    note: >
+      `StructuralSieve/Threshold.lean`'s real-valued threshold inequality is
+      adapted verbatim from Mathlib's `Bertrand.real_main_inequality` (see that
+      module's own docstring), reproved from
+      `Mathlib.Analysis.Convex.SpecificFunctions.*` primitives rather than imported
+      directly, so this development does not depend on
+      `Mathlib.NumberTheory.Bertrand` itself. The other Mathlib lemma the
+      quantitative closure uses — the central-binomial-coefficient lower bound
+      `Nat.four_pow_lt_mul_centralBinom` — is standard general-purpose Mathlib
+      content, not part of Mathlib's own Bertrand development, so it is not listed
+      as a separate adapted source.
+
+status:
+  scope: >
+    Three declarations are proved, presented in the order that reflects the project's own
+    history rather than fame — see Challenge.lean's header for the full account of why
+    these are different questions with a shared answer.
+
+    (1) StructuralSieve.prime_iff_uncovered_by_prev (ZeroForce.lean) — the originating
+    result. For a prime P_k, on the window (P_k, 2*P_k], n is prime iff n is not covered by
+    the base of primes below P_k (n.minFac <= P_k). Proved directly from divisibility (Zero
+    Effective Force plus the least-prime-factor bound); no counting, no central binomial
+    coefficient.
+
+    (2) StructuralSieve.void_iff_prime_in_deterministic_zone (Rings.lean) — the same
+    equivalence generalized from the window (P_k, 2*P_k] to the base's full deterministic
+    reach, the zone (P_k, P_k^2). StructuralSieve.determinism_breaks_above (same file)
+    shows this reach is exact: the equivalence genuinely fails once n >= P_k^2.
+
+    (3) StructuralSieve.bertrand_chebyshev (Main.lean) — Bertrand's postulate
+    (Chebyshev's strengthened form: for every N > 1 there is a prime p with N < p <= 2N), a
+    corollary of (1), avoiding Mathlib.NumberTheory.Bertrand entirely.
+    `StructuralSieve.Main` reduces every window (P_k, 2*P_k] for P_k prime to a
+    coprimality condition against the primorial of primes below P_k. The quantitative
+    closure that discharges this condition (`StructuralSieve.GPS_StateMachine.prime_in_window`,
+    via `StructuralSieve.BinomialCertificate.binomial_contradiction`) is: a finite oracle
+    over small windows (n < 512, sixteen chunks of kernel-checked `decide`, no
+    `native_decide`); and for n >= 512, a self-contained factorization-based upper bound on
+    the central binomial coefficient (`StructuralSieve.BinomialBound`, via Legendre/Kummer
+    primorial primitives) combined with a threshold inequality adapted from Mathlib's own
+    Bertrand development (`StructuralSieve.Threshold`, see the `sources` entry for
+    `real_main_inequality`) and Mathlib's own lower bound on the central binomial coefficient
+    (`Nat.four_pow_lt_mul_centralBinom`) — the same object Erdos used for his own,
+    differently-motivated proof of the same postulate. `StructuralSieve.Rings`'s
+    Jacobsthal-gap reduction (`jacobsthal_210`/`jacobsthal_2310`, `windowHasVoid_of_jacobsthal`)
+    and the `Newton`/`SelfContained` modules are independent alternative closures explored in
+    this repository, kept for reference — they are NOT part of the proof term for (3); see
+    their own module docstrings and `StructuralSieve.Certificate`'s two named
+    `WindowCertificate` instances.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "StructuralSieve.prime_iff_uncovered_by_prev"
+      file: "StructuralSieve/ZeroForce.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+      note: >
+        The originating result (see project.description and status.scope). Exact
+        equivalence "prime iff not covered by the preceding base" on the window
+        (P_k, 2*P_k]. Proved by divisibility (Zero Effective Force + least-prime-factor
+        bound), independent of counting or the central binomial coefficient. Axioms
+        assumed identical to the rest of this development (built from the same elementary
+        primitives); Artur to confirm via `#print axioms` in the real build.
+    - declaration: "StructuralSieve.void_iff_prime_in_deterministic_zone"
+      file: "StructuralSieve/Rings.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+      note: >
+        Generalization of the equivalence above from the window (P_k, 2*P_k] to the full
+        deterministic zone (P_k, P_k^2). StructuralSieve.determinism_breaks_above (same
+        file) shows this reach is exact -- the equivalence fails at P_k^2. Axioms assumed
+        identical to the rest of this development; Artur to confirm via `#print axioms` in
+        the real build.
+    - declaration: "StructuralSieve.bertrand_chebyshev"
+      file: "StructuralSieve/Main.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+      note: >
+        Corollary of prime_iff_uncovered_by_prev: given the equivalence, existence of a
+        prime in the window follows once the window is shown not entirely covered, closed
+        via the central binomial coefficient (see status.scope, item 3). This is the
+        classical Bertrand-Chebyshev theorem (Bertrand 1845, Chebyshev 1852) -- not
+        original to this project; see the `sources` entry for it.
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["claude-sonnet-5"]
+      framework: "Claude Code"
+      tool_setup: >
+        Single iterative agentic session (VS Code + Lean 4 infoview). Author directed
+        proof strategy and reviewed every Lean build; the agent wrote/edited Lean
+        source, diagnosed kernel stack-depth and elaboration-heartbeat failures on
+        native decision procedures, and restructured proofs into chunked `decide`
+        calls to eliminate all `native_decide` usages from the theorem's import
+        closure.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked (subscription-based usage)"
+        hardware: "author's laptop"
+      prompting_notes: >
+        Precise division of labor, disclosed for the record: the mathematical
+        strategy (the structural sieve itself: reduction against the primorial of
+        preceding primes, and the quantitative closure via a small-window oracle
+        plus the central-binomial-coefficient bound for larger n — see
+        `status.scope` for the exact decisive chain) is the author's original work,
+        conceived and specified prior to and independent of any AI assistance. The
+        Jacobsthal-gap reduction explored in `Rings.lean` is a kept-for-reference
+        alternative closure, not part of the proof term for the main theorem. The
+        agent's contribution was implementation-level: (1)
+        translating already-specified mathematical statements into Lean 4 tactics and
+        syntax; (2) diagnosing and fixing Lean-specific technical failures (parser
+        errors, kernel stack-depth overflows, elaboration heartbeat timeouts); (3)
+        proposing and implementing the specific engineering technique of splitting
+        bounded-quantifier `decide` calls into sub-range chunks glued by an auxiliary
+        lemma, adopted to replace `native_decide` with kernel-checked `decide` after
+        empirically discovering the native stack-depth ceiling. Every Lean change was
+        build-verified and reviewed by the author before acceptance; per the author's
+        working principle, the agent translates mathematics into Lean/code but does
+        not itself judge mathematical correctness — the Lean kernel is the sole
+        arbiter of every proof step.
+    - method: "agent"
+      models: ["claude-sonnet-5"]
+      framework: "Claude Code"
+      tool_setup: >
+        Same session as the Lean work above, applied to drafting the accompanying
+        LaTeX paper.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked (subscription-based usage)"
+        hardware: "author's laptop"
+      prompting_notes: >
+        Disclosure for the paper text specifically: the author wrote none of the
+        LaTeX prose. The agent drafted the full paper, formatted to match Ramanujan
+        Journal conventions per the author's instruction. The author's review was at
+        the level of overall structure and scope (not sentence-by-sentence editing)
+        and consisted of directing that unnecessary content be omitted. The
+        mathematical content the paper describes is, independent of who wrote the
+        prose, the author's own original work (see the `sources` entry's authorship
+        note above). A separate, mechanical cross-check was performed matching every
+        `\lean{...}` citation in the paper against actual declaration names in this
+        repository, to verify paper-to-Lean fidelity.
+  spend_usd: "not tracked (subscription-based usage)"
+  notes: >
+    Development combined author-directed mathematical design (the structural sieve
+    itself, prior to and independent of any AI assistance) with agent-drafted LaTeX
+    prose and agent-assisted Lean formalization, debugging, and one specific
+    proof-engineering technique (chunked `decide` + glue lemma) proposed by the agent
+    to resolve native-decision-procedure resource limits.
+
+fidelity:
+  divergences: >
+    No known divergences between the LaTeX paper and the Lean development; all
+    \lean{...} citations in the paper were cross-checked against declaration names in
+    this repository. Note that the LaTeX prose itself was agent-drafted (see
+    `automation` above); this check verifies citation accuracy, not independent
+    authorship of the text.
+
+review:
+  status: "self-assessed"
+  reviewers: ["Artur Flamandzki"]
+  notes: >
+    Author directed the mathematical strategy throughout and verified every Lean
+    change via successful kernel-checked builds (including confirming
+    axiom-cleanliness of the main theorem via `#print axioms
+    StructuralSieve.bertrand_chebyshev`), rather than by independent line-by-line
+    reading of agent-written Lean source. The LaTeX paper was reviewed by the author
+    at the level of overall structure, scope, and format compliance with Ramanujan
+    Journal conventions, not sentence-by-sentence; the paper-to-Lean citation mapping
+    was checked mechanically (see `fidelity`).
+
+alignment:
+  namespace: "StructuralSieve"
+  statements:
+    - source: "Theorem 5.1 (Structural Bertrand-Chebyshev Bound)"
+      lean: "StructuralSieve.structural_bertrand_chebyshev"
+      module: "StructuralSieve/Main.lean"
+      status: "proved"
+      note: >
+        The signature carries three explicit hypotheses (_hprev_wt, _hphi_mult, _hphi_pos)
+        characterizing the average-density/weight setting; they are underscore-prefixed
+        because this theorem's own proof does not use them (it derives everything through
+        exists_coprime_in_window instead, which recomputes the needed facts internally via
+        GPS_StateMachine.weight_density_bridge). The weight chain they name is real,
+        proved content (Weight.lean), but not load-bearing for this version of the proof --
+        do not read their presence as the argument depending on them.
+    - source: "Corollary 6.1 (Classical Bertrand-Chebyshev)"
+      lean: "StructuralSieve.bertrand_chebyshev"
+      module: "StructuralSieve/Main.lean"
+      status: "proved"
+      note: >
+        Corollary of prime_iff_uncovered_by_prev (see status.scope); the classical
+        Bertrand-Chebyshev theorem, not the project's originating result. Also restated
+        in Challenge.lean/Solution.lean as Submission.bertrand_chebyshev.
+    - source: "Originating result: prime iff uncovered by preceding base"
+      lean: "StructuralSieve.prime_iff_uncovered_by_prev"
+      module: "StructuralSieve/ZeroForce.lean"
+      status: "proved"
+      note: >
+        The project's starting question and its answer (see project.description). Also
+        restated in Challenge.lean/Solution.lean as
+        Submission.prime_iff_uncovered_by_prev.
+    - source: "Generalization: prime iff void, throughout the deterministic zone (P_k, P_k^2)"
+      lean: "StructuralSieve.void_iff_prime_in_deterministic_zone"
+      module: "StructuralSieve/Rings.lean"
+      status: "proved"
+      note: >
+        Generalizes the entry above from the window (P_k, 2*P_k] to the full
+        deterministic reach (P_k, P_k^2); StructuralSieve.determinism_breaks_above
+        (same file) shows the reach is exact. Also restated in
+        Challenge.lean/Solution.lean as Submission.void_iff_prime_in_deterministic_zone.
+    - source: "Jacobsthal gap bound, g(210) = 10"
+      lean: "StructuralSieve.jacobsthal_210"
+      module: "StructuralSieve/Rings.lean"
+      status: "proved"
+      note: >
+        Chunked kernel-checked decide. Off-path: part of Rings.lean's small-anchor
+        closure, an alternative derivation kept for reference (see status.scope) -- not
+        invoked by bertrand_chebyshev's proof term.
+    - source: "Jacobsthal gap bound, g(2310) = 14"
+      lean: "StructuralSieve.jacobsthal_2310"
+      module: "StructuralSieve/Rings.lean"
+      status: "proved"
+      note: >
+        11 chunks of width 210, glued; replaces an earlier native_decide. Off-path, same
+        basis as the g(210) entry above -- not invoked by bertrand_chebyshev's proof term.
+    - source: "Small-window oracle (n < 512)"
+      lean: "StructuralSieve.small_window_oracle"
+      module: "StructuralSieve/BinomialCertificate.lean"
+      status: "proved"
+      note: "16 chunks of width 32, each closed by explicit witness search; replaces an earlier native_decide"
+
+acknowledgements: >
+  This work builds on the classical results of Bertrand (1845), Chebyshev (1852),
+  Ramanujan (1919), Erdos (1932), and Nair (1982), cited throughout the accompanying
+  paper for historical and comparative context; none of their original texts were
+  themselves formalized here.
