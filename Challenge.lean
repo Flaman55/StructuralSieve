@@ -1,6 +1,5 @@
-import StructuralSieve.ZeroForce
-import StructuralSieve.Rings
 import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.Data.Finset.Basic
 
 /-!
 # Advertised statements
@@ -34,6 +33,14 @@ All three are discharged in `Solution.lean` by invoking the fully independent st
 development in this repository's `StructuralSieve/` directory. That development does
 **not** import `Mathlib.NumberTheory.Bertrand`; the quantitative core for (3) is an original
 structural sieve described in the accompanying paper (`LaTex/The Structural Sieve.pdf`).
+
+This file itself deliberately imports nothing from `StructuralSieve/` — only Mathlib. A
+canonical challenge file must be checkable in isolation, independent of the submitter's own
+library, so (1) and (2) below state the two project-specific predicates unfolded to what they
+literally mean rather than by name: `StructuralSieve.SieveCovered P n` is `n.minFac ≤ P`
+(`Defs.lean`), and `StructuralSieve.isVoid S n` is `∀ p ∈ S, ¬ p ∣ n` (`Rings.lean`, via
+`aligned`). `Solution.lean`'s statements use the named versions from the real development;
+the two forms are definitionally equal, so the comparator's type check goes through unchanged.
 -/
 
 /-- **Original question: is every composite in the window covered by the preceding base?**
@@ -42,7 +49,7 @@ primes below `P_k` (`n.minFac ≤ P_k`). Proved by exact divisibility, not by co
 theorem Submission.prime_iff_uncovered_by_prev
     {P_k : ℕ} (hP : Nat.Prime P_k) {n : ℕ}
     (hn_lo : P_k < n) (hn_hi : n ≤ 2 * P_k) (hn2 : 2 ≤ n) :
-    n.Prime ↔ ¬ StructuralSieve.SieveCovered P_k n := by
+    n.Prime ↔ ¬ (n.minFac ≤ P_k) := by
   sorry
 
 /-- **Generalization: the same equivalence holds throughout the deterministic zone
@@ -51,7 +58,7 @@ primes below `P_k` iff `n` is prime. This reach is exact (see `Rings.lean`'s
 `determinism_breaks_above`: the equivalence fails once `n ≥ P_k²`). -/
 theorem Submission.void_iff_prime_in_deterministic_zone
     {Pk n : ℕ} (hPk3 : 2 < Pk) (hlo : Pk < n) (hhi : n < Pk ^ 2) :
-    StructuralSieve.isVoid ((Finset.range Pk).filter Nat.Prime) n ↔ Nat.Prime n := by
+    (∀ p ∈ (Finset.range Pk).filter Nat.Prime, ¬ p ∣ n) ↔ Nat.Prime n := by
   sorry
 
 /-- **Bertrand–Chebyshev bound** (corollary of the equivalence above). For every `N > 1`
