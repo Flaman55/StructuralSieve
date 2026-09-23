@@ -156,7 +156,7 @@ theorem exists_void_below_primorial (Pk : ℕ) :
     exact hq_prime.one_lt.ne' (Nat.dvd_one.mp h1)
   have hq_gt : Pk < q := by
     by_contra h
-    push_neg at h
+    push Not at h
     apply hq_ndvd_M
     rw [hM, primorial_below]
     exact Finset.dvd_prod_of_mem (fun p => p)
@@ -198,7 +198,7 @@ theorem window_composite_smooth {Pk n : ℕ}
     ∀ q, Nat.Prime q → q ∣ n → q ≤ Pk := by
   intro q hq hqn
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   simp only [gps_window, Finset.mem_Ioc] at hn
   obtain ⟨m, hm⟩ := hqn
   rcases Nat.lt_or_ge m 2 with hm2 | hm2
@@ -219,7 +219,7 @@ theorem rough_composite_smooth {Pmin Pmax n : ℕ} (hPmin : 2 ≤ Pmin) (hn2 : 2
     ∀ q, Nat.Prime q → q ∣ n → q ≤ Pmax := by
   intro q hq hqn
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   obtain ⟨m, hm⟩ := hqn
   have hm_ne1 : m ≠ 1 := by rintro rfl; rw [mul_one] at hm; rw [hm] at hcomp; exact hcomp hq
   have hm_ne0 : m ≠ 0 := by rintro rfl; simp at hm; omega
@@ -420,7 +420,7 @@ lemma gps_window_card (Pk : ℕ) : (gps_window Pk).card = Pk := by
 lemma windowHasVoid_iff_coveredCount_lt {Pk : ℕ} :
     windowHasVoid Pk ↔ coveredCount Pk < Pk := by
   simp only [windowHasVoid, coveredCount]
-  have hsplit := Finset.filter_card_add_filter_neg_card_eq_card
+  have hsplit := Finset.card_filter_add_card_filter_not
     (s := gps_window Pk) (p := fun n => isVoid ((Finset.range Pk).filter Nat.Prime) n)
   rw [gps_window_card] at hsplit
   constructor
@@ -468,7 +468,7 @@ lemma coveredCount_le_sigma (Pk : ℕ) :
   obtain ⟨hnw, hcov⟩ := hn
   rw [Finset.mem_biUnion]
   by_contra hc
-  push_neg at hc
+  push Not at hc
   apply hcov
   intro p hp
   rw [aligned]
@@ -503,7 +503,7 @@ theorem coveredCount_eq_sum_minFac_fiber {Pk : ℕ} (_hPk3 : 2 < Pk) :
     have hmfp : n.minFac.Prime := Nat.minFac_prime hn2
     have hex : ∃ p, p ∈ base ∧ p ∣ n := by
       by_contra hc
-      push_neg at hc
+      push Not at hc
       exact hcov (fun p hp => by rw [aligned]; exact hc p hp)
     obtain ⟨p, hp, hpn⟩ := hex
     rw [hbase, Finset.mem_filter, Finset.mem_range] at hp
@@ -546,7 +546,7 @@ theorem coveredCount_eq_sum_truncated {Pk : ℕ} (hPk3 : 2 < Pk) :
     rw [Finset.mem_filter, Finset.mem_range] at hp
     have hp2 : 2 * Pk < p ^ 2 := by
       by_contra hle
-      push_neg at hle
+      push Not at hle
       exact hp' (Finset.mem_filter.mpr ⟨Finset.mem_range.mpr hp.1, hp.2, hle⟩)
     rw [Finset.card_eq_zero, Finset.filter_eq_empty_iff]
     intro n hn hmf
@@ -605,7 +605,7 @@ theorem coverFiber_eq_scaled {Pk p : ℕ} (hp : Nat.Prime p) :
       · apply le_antisymm
         · exact Nat.minFac_le_of_dvd hp.two_le (dvd_mul_right p m)
         · by_contra hlt
-          push_neg at hlt
+          push Not at hlt
           set r := (p * m).minFac with hr
           have hrp : r.Prime := Nat.minFac_prime (by omega)
           have hrdvd : r ∣ p * m := Nat.minFac_dvd _
@@ -694,7 +694,7 @@ theorem gwindowHasVoid_of_wide {Pmin Pmax : ℕ}
 theorem gwindow_subset {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin') :
     gwindow Pmin Pmax ⊆ gwindow Pmin' Pmax := by
   rw [gwindow, gwindow]
-  exact Finset.Ioc_subset_Ioc_right (mul_le_mul_right' h Pmax)
+  exact Finset.Ioc_subset_Ioc_right (mul_le_mul_left h Pmax)
 
 /-- **Direction of the family: bottom to top.** A void in the window `Pmin` propagates to
     EVERY wider `Pmin' ≥ Pmin` — the narrower window is a subset of the wider, and the base and
@@ -737,7 +737,7 @@ theorem fullCoverage_forces_structure {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2
     intro n hn
     have hcov := hempty n hn
     by_contra hc
-    push_neg at hc
+    push Not at hc
     exact hcov (fun p hp => by rw [aligned]; exact hc p hp)
   · -- (2) Σ_{p<Pk} A_p = Pk  (coverage fills the whole window)
     rw [← coveredCount_eq_sum_minFac_fiber hPk3]
@@ -823,7 +823,7 @@ theorem fullCoverage_means_next_prime_far {Pk : ℕ} (hfull : fullCoverage Pk) :
     ∀ q, Nat.Prime q → Pk < q → 2 * Pk < q := by
   intro q hq hlo
   by_contra hle
-  push_neg at hle
+  push Not at hle
   have hqw : q ∈ gps_window Pk := by
     simp only [gps_window, Finset.mem_Ioc]; exact ⟨hlo, hle⟩
   exact hfull q hqw (prime_isVoid_of_lt hq hlo)
@@ -869,7 +869,7 @@ theorem void_iff_coprime_trunc {Pk n : ℕ} (hPk3 : 2 < Pk) (hn : n ∈ gps_wind
     have hsq : n.minFac ^ 2 ≤ 2 * Pk := window_composite_minFac_sq_le hPk3 hn hncomp
     have hmf_lt : n.minFac < Pk := by
       by_contra hge
-      push_neg at hge
+      push Not at hge
       have h1 : Pk * Pk ≤ n.minFac * n.minFac := Nat.mul_le_mul hge hge
       have h2 : n.minFac * n.minFac ≤ 2 * Pk := by rw [← pow_two]; exact hsq
       have h3 : 3 * Pk ≤ Pk * Pk := Nat.mul_le_mul (by omega) (le_refl Pk)
@@ -988,7 +988,7 @@ theorem void_iff_prime_in_deterministic_zone {Pk n : ℕ} (hPk3 : 2 < Pk)
         _ = n := hcanc
     have hmf_lt : n.minFac < Pk := by
       by_contra hge
-      push_neg at hge
+      push Not at hge
       have h1 : Pk ^ 2 ≤ n.minFac ^ 2 := Nat.pow_le_pow_left hge 2
       omega
     exact (hvoid n.minFac
@@ -1371,11 +1371,11 @@ theorem anchor_idle_in_own_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk
     obtain ⟨k, hk⟩ := hdvd
     have hk1 : 1 < k := by
       by_contra h
-      push_neg at h
+      push Not at h
       interval_cases k <;> omega
     have hk3 : k < 3 := by
       by_contra h
-      push_neg at h
+      push Not at h
       have h3 : 3 * Pk ≤ Pk * k := by
         calc 3 * Pk = Pk * 3 := by ring
           _ ≤ Pk * k := Nat.mul_le_mul_left Pk h
@@ -1406,7 +1406,7 @@ theorem interference_step {p : ℕ} (hp : Nat.Prime p) {S : Finset ℕ}
     intro q hq
     exact (Nat.coprime_primes hp (hS q hq)).mpr (fun h => hpS (h ▸ hq))
   -- Split the survivors of S in (a,b] according to divisibility by p
-  have hsplit := Finset.filter_card_add_filter_neg_card_eq_card
+  have hsplit := Finset.card_filter_add_card_filter_not
     (s := (Finset.Ioc a b).filter (fun n => Nat.Coprime n M))
     (p := fun n => p ∣ n)
   -- (I) those NOT divisible by p = survivors of the system S∪{p}

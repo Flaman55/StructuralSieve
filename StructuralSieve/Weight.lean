@@ -208,7 +208,7 @@ theorem prev_base_cannot_cover_window
   have hPk_pos : 0 < P_k := hPk_prime.pos
   have hPk_ge2 : 2 ≤ P_k := hPk_prime.two_le
   by_contra h_ge
-  push_neg at h_ge
+  push Not at h_ge
   -- h_ge : P_k * M'.totient ≤ M'
   have h1 : P_k * Nat.totient M' * P_k ≤ M' * P_k :=
     Nat.mul_le_mul_right P_k h_ge

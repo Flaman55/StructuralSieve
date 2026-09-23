@@ -64,7 +64,7 @@ lemma gps_free_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
   -- (2) minFac < Pk, since minFac² ≤ n ≤ 2·Pk < Pk² (from Pk > 2).
   have hmf_lt : n.minFac < Pk := by
     by_contra hcon
-    push_neg at hcon                                       -- hcon : Pk ≤ n.minFac
+    push Not at hcon                                       -- hcon : Pk ≤ n.minFac
     have hmf_sq' : n.minFac * n.minFac ≤ n := by rw [← pow_two]; exact hmf_sq
     have hsq    : Pk * Pk ≤ n.minFac * n.minFac := Nat.mul_le_mul hcon hcon
     have hchain : Pk * Pk ≤ 2 * Pk := le_trans hsq (le_trans hmf_sq' hn_hi)

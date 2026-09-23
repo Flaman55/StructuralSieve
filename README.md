@@ -216,8 +216,8 @@ therefore ignore `Erdos.lean` entirely and still have a fully `decide`-only path
 
 | Component | Pin |
 |---|---|
-| Lean toolchain | `leanprover/lean4:v4.28.0` (file `lean-toolchain`) |
-| Mathlib | tag `v4.28.0`, commit `8f9d9cff6bd728b17a24e163c9402775d9e6a365` |
+| Lean toolchain | `leanprover/lean4:v4.35.0-rc2` (file `lean-toolchain`) |
+| Mathlib | tag `v4.35.0-rc2`, commit `065356127b1dc0016f66b7283ce0ce2c4055aa55` |
 
 Transitive dependencies (from `lake-manifest.json`, manifest format `1.1.0`):
 

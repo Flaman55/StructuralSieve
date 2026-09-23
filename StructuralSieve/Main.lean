@@ -59,7 +59,7 @@ private lemma exists_coprime_in_window {P_k M' : ℕ}
   by_cases hle : M' ≤ P_k
   · -- M' ≤ P_k.  Witness n = P_k + M'.
     exact ⟨P_k + M', by omega, by omega, Nat.coprime_add_self_left.mpr hcop⟩
-  · push_neg at hle  -- P_k < M'
+  · push Not at hle  -- P_k < M'
     by_cases hlt : M' < 2 * P_k
     · -- P_k < M' < 2·P_k.  Witness n = M' + 1.
       refine ⟨M' + 1, by omega, by omega, ?_⟩
@@ -97,7 +97,7 @@ theorem structural_bertrand_chebyshev
     refine ⟨3, ?_, ?_, by norm_num⟩ <;> omega
   · -- 2 < P_k.
     by_contra h_no_prime
-    push_neg at h_no_prime
+    push Not at h_no_prime
     obtain ⟨n, hn_lo, hn_hi, hn_cop⟩ :=
       exists_coprime_in_window hPk_prime hPk3 hM'_pos hM'_eq hcop
     have hn_not_prime : ¬ n.Prime := h_no_prime n hn_lo hn_hi
@@ -163,7 +163,7 @@ theorem bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     obtain ⟨q, hq_lo, hq_hi, hq_prime⟩ := prime_in_window hP_prime hP3
     have hqN : N < q := by
       by_contra hqN'
-      push_neg at hqN'
+      push Not at hqN'
       exact hP_max q hq_lo hqN' hq_prime
     exact ⟨q, hqN, by omega, hq_prime⟩
 

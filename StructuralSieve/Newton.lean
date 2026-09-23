@@ -71,7 +71,7 @@ theorem centralBinom_prime_factor_le {n p : ℕ}
   have h2 : p ∣ Nat.factorial (2 * n) := hdvd.trans h1
   have h3 : p ≤ 2 * n := (Nat.Prime.dvd_factorial hp).mp h2
   by_contra hgt
-  push_neg at hgt
+  push Not at hgt
   exact h_no p hgt h3 hp
 
 end StructuralSieve
