@@ -39,8 +39,10 @@ canonical challenge file must be checkable in isolation, independent of the subm
 library, so (1) and (2) below state the two project-specific predicates unfolded to what they
 literally mean rather than by name: `StructuralSieve.SieveCovered P n` is `n.minFac ≤ P`
 (`Defs.lean`), and `StructuralSieve.isVoid S n` is `∀ p ∈ S, ¬ p ∣ n` (`Rings.lean`, via
-`aligned`). `Solution.lean`'s statements use the named versions from the real development;
-the two forms are definitionally equal, so the comparator's type check goes through unchanged.
+`aligned`). The two forms are definitionally equal, so a proof term from the named versions
+still checks against these unfolded statements — but Palomar's comparator does a literal
+statement match rather than a `defeq` check, so `Solution.lean` restates (1) and (2) here
+verbatim, unfolded, and only calls the named versions inside the proof term.
 -/
 
 /-- **Original question: is every composite in the window covered by the preceding base?**
