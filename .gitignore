@@ -25,3 +25,9 @@ __pycache__/
 
 # VS Code multi-root workspace files
 *.code-workspace
+
+# Palomar local preflight: cloned lean4export/comparator toolchains (with
+# their own nested .git dirs), build artifacts, and run reports/logs.
+# Never commit — regenerated per machine/OS by scripts/palomar_preflight.sh.
+/.cache/palomar-comparator/
+/.cache/palomar-editorial/
