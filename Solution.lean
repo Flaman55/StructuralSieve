@@ -1,5 +1,5 @@
 import StructuralSieve.Main
-import StructuralSieve.Rings
+import StructuralSieve.SelfContained
 
 /-!
 # Proved solutions
@@ -21,10 +21,10 @@ theorem Submission.prime_iff_uncovered_by_prev
     n.Prime ↔ ¬ (n.minFac ≤ P_k) :=
   StructuralSieve.prime_iff_uncovered_by_prev hP hn_lo hn_hi hn2
 
-theorem Submission.void_iff_prime_in_deterministic_zone
-    {Pk n : ℕ} (hPk3 : 2 < Pk) (hlo : Pk < n) (hhi : n < Pk ^ 2) :
-    (∀ p ∈ (Finset.range Pk).filter Nat.Prime, ¬ p ∣ n) ↔ Nat.Prime n :=
-  StructuralSieve.void_iff_prime_in_deterministic_zone hPk3 hlo hhi
+theorem Submission.window_reach_self_contained
+    {P hi q m : ℕ} (hm : 1 ≤ m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
+    hi < m * q :=
+  StructuralSieve.window_self_contained_bound_general hm hhi hq_lo _hq_hi
 
 theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime :=

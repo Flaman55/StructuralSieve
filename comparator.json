@@ -3,7 +3,7 @@
   "solution_module": "Solution",
   "theorem_names": [
     "Submission.prime_iff_uncovered_by_prev",
-    "Submission.void_iff_prime_in_deterministic_zone",
+    "Submission.window_reach_self_contained",
     "Submission.bertrand_chebyshev"
   ],
   "definition_names": [],

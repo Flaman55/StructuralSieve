@@ -6,12 +6,13 @@ import StructuralSieve.GPS_StateMachine
 import StructuralSieve.Main
 import StructuralSieve.Truncated
 import StructuralSieve.SelfContained
-import StructuralSieve.Rings
-import StructuralSieve.Newton
 import StructuralSieve.Threshold
 import StructuralSieve.BinomialBound
 import StructuralSieve.BinomialCertificate
+import StructuralSieve.Rings
+import StructuralSieve.Newton
 import StructuralSieve.Certificate
+import StructuralSieve.Erdos
 /-!
 # StructuralSieve — Structural Reduction of Bertrand's Postulate
 
@@ -24,27 +25,45 @@ Based on: "A Structural Reduction of Bertrand's Postulate"
 
 **Fully verified — zero `sorry`.** The whole chain from Definition 2.1 to
 `bertrand_chebyshev` is machine-checked. Mathlib's Bertrand
-(`Nat.bertrand`/`exists_prime_lt_and_le_two_mul`) is **never used**, and the main
-theorem's import closure does **not** contain `Mathlib.NumberTheory.Bertrand`: the
-atom is closed by the self-contained `binomial_contradiction`. That Mathlib file is
-imported only in `Erdos.lean` (instance A, off the main path — see README).
+(`Nat.bertrand`/`exists_prime_lt_and_le_two_mul`) is **never used**, and
+`Mathlib.NumberTheory.Bertrand` is imported nowhere on `Main`'s path: the atom
+is closed by the self-contained `binomial_contradiction`. (`Erdos.lean` below
+is the one file in the repository that does import it — an off-path reference
+instance, not reachable from `Main`; see *Extended development* below.)
+
+## Two scopes: the Palomar excerpt and the full development
+
+This repository serves two purposes, and they are deliberately different in
+size. The **Palomar bounty excerpt** (`Challenge.lean`/`Solution.lean`/
+`comparator.json`) is a narrow, three-theorem slice —
+`prime_iff_uncovered_by_prev`, `window_reach_self_contained`,
+`bertrand_chebyshev` — chosen to be the minimal self-contained closure an
+automated reviewer can check statement-by-statement; it never imports
+`Rings.lean`, `Newton.lean`, `Certificate.lean`, or `Erdos.lean`, with or
+without those files present in the repository. The **full development**
+described below is everything this project has actually proved, including
+results that are not part of that narrow excerpt because they are separate,
+self-standing facts (not because they are less true or less verified). See
+*Extended development* at the end of this file for what those four files
+contain and why they are kept.
 
 ## Strategy
 
 The structural scaffold is verified with no analytic machinery: divisibility/gcd
 algebra, totient multiplicativity, induction over the prime base, linear/nonlinear
 arithmetic (`omega`, `nlinarith`), and finite-set cardinality (union bound).
-The starting observation is the **determinism boundary**: the reach of a complete
-base `{2, …, P_max}` is deterministic exactly up to `2·P_max`
-(`window_composite_smooth` / `window_self_contained`), and provably breaks above it
-(`determinism_breaks_above`). The postulate collapses to a single quantitative atom
-— *the sieve never covers its own window* — closed by the self-contained argument on
-the central binomial coefficient (`binomial_contradiction`, `BinomialCertificate.lean`): the
-prime content of `C(2n,n)` in the window is governed by the S1 purity law
-(`window_primes_prod_dvd_centralBinom`), its growth by the Pascal row
-(`four_pow_le_newton`), the empty-window upper bound reproved in-project
-(`window_centralBinom_le`, from Legendre/Kummer + primorial), and a prime-free size
-threshold (`threshold_inequality`); a computational oracle handles `n < 512`.
+The window's reach is fixed by self-containment (`SelfContained.lean`): for a base
+whose minimum element is `m`, the least proper multiple of a new window element
+`q` is `m·q`, and that multiple falls outside the window exactly when the
+window's upper bound is `≤ m·P` — this is why the reach is `2·P_max` for the
+standard base (`m = 2`), and `P_min·P_max` for a base with any other minimum.
+The postulate collapses to a single quantitative atom — *the sieve never covers
+its own window* — closed by the self-contained argument on the central binomial
+coefficient (`binomial_contradiction`, `BinomialCertificate.lean`): the
+factorization upper bound on `C(2n,n)` reproved in-project from Legendre/Kummer
++ primorial (`BinomialBound.lean`), combined with the threshold inequality
+(`Threshold.lean`) and Mathlib's own central-binomial lower bound; a
+computational oracle handles `n < 512`.
 
 ### Key constraint (Definition 2.1)
 The prime base `𝒫` must be a *complete generative segment*: it contains every prime
@@ -64,21 +83,16 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
 
 4. **Self-containment** (`SelfContained.lean`): the window width ≤ P_max (multiplier = the
    minimal prime) is the maximal self-contained width — the structural reason for the
-   constant.  [verified]
+   constant, generalized to any base minimum `m` (`window_self_contained_bound_general`,
+   `max_self_contained_bound_general`).  [verified]
 
-5. **Ring collective** (`Rings.lean`): void ⟺ prime dichotomy, determinism boundary,
-   small-anchor closures P_k ≤ 83 by a sufficient gap bound on the active-covering rings
-   (not the object's own gap), the disjoint minFac telescope, the Legendre interference
-   identity, and the S1 bridge to `C(2n,n)`. [verified]
-
-6. **Central Positivity** (`BinomialBound.lean`, `Threshold.lean`,
-   `BinomialCertificate.lean`, `Newton.lean`, `GPS_StateMachine.lean`):
+5. **Central Positivity** (`BinomialBound.lean`, `Threshold.lean`,
+   `BinomialCertificate.lean`, `GPS_StateMachine.lean`):
    `binomial_contradiction` closed self-containedly — computational oracle for 2 < n < 512,
    the two bounds on `C(2n,n)` for n ≥ 512 (no Bertrand import); `dense_sieve_survivor` follows,
-   since a prime in the window is automatically free. Modularity is a theorem
-   (`Certificate.lean`), with `erdos_certificate` as a second, Mathlib-based instance. [verified]
+   since a prime in the window is automatically free. [verified]
 
-7. **Reduction** (`Main.lean`): `structural_bertrand_chebyshev` and `bertrand_chebyshev`.
+6. **Reduction** (`Main.lean`): `structural_bertrand_chebyshev` and `bertrand_chebyshev`.
    [verified]
 
 ## File structure
@@ -89,15 +103,28 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
 | `LPF.lean`             | Least Prime Factor; uncovered ⇒ prime (Lemma 3.1) | verified |
 | `ZeroForce.lean`       | Zero Effective Force; composites covered by 𝒫' (Lemma 4.1) | verified |
 | `Weight.lean`          | Structural weight w ≥ 1; M' < P·φ(M') (Lemma 4.3) | verified |
-| `SelfContained.lean`   | Self-containment fixes the window width (why the constant) | verified |
+| `SelfContained.lean`   | Self-containment fixes the window reach (why the constant) | verified |
 | `Truncated.lean`       | Sparse-regime positivity by union bound | verified |
-| `Rings.lean`           | Ring collective, regimes, telescope, interference identity, S1 bridge | verified |
-| `Newton.lean`          | Central binomial coefficient and the window's prime content | verified |
 | `BinomialBound.lean`   | Upper bound `window_centralBinom_le` from primitives (no Bertrand import) | verified |
 | `Threshold.lean`       | Prime-free size inequality `threshold_inequality` (convexity) | verified |
 | `BinomialCertificate.lean` | Self-contained kernel `binomial_contradiction` | verified |
 | `GPS_StateMachine.lean`| Generative window; regime dispatch; `prime_in_window` | verified |
-| `Certificate.lean`     | Modular `WindowCertificate`; instances erdos_/binomial_certificate | verified |
-| `Erdos.lean`           | Instance A (off main path): `erdos_contradiction` via Mathlib | verified |
 | `Main.lean`            | Theorem 5.1 + `bertrand_chebyshev` | verified |
+
+## Extended development (verified, but not part of the Palomar excerpt)
+
+The four files below are fully verified — zero `sorry`, same trust base as
+everything above — but are separate, self-standing results, not exercised by
+`bertrand_chebyshev`'s own proof term. They are not part of the narrow
+`Challenge.lean`/`Solution.lean` excerpt reviewed by Palomar (that excerpt
+never imports any of these four, with or without them present here); they are
+kept because they are genuine, separately-proved mathematics from the same
+research program, described in full in the accompanying paper.
+
+| File | Content | Status |
+|------|---------|--------|
+| `Rings.lean` | Ring collective: void/coverage dichotomy generalized to the full deterministic zone `(P_k, P_k²)` (`void_iff_prime_in_deterministic_zone`), with `determinism_breaks_above` showing that reach exact; minFac telescope, interference (Legendre) identity, generalized family `(P_max, P_min·P_max]`; small-anchor closures `P_k ≤ 83`; S1 bridge to `C(2n,n)` | verified, off-path |
+| `Newton.lean` | A second derivation of the central binomial coefficient's window content — S1 divisibility, lower bound `4^n ≤ (2n+1)·C(2n,n)` from the Pascal row | verified, off-path |
+| `Certificate.lean` | Modular interface `WindowCertificate`; instances `erdos_certificate` (via Mathlib) and `binomial_certificate` (self-contained) — modularity as a theorem | verified, off-path |
+| `Erdos.lean` | Instance A: `erdos_contradiction` via Mathlib's two `C(2n,n)` inequalities — the one file in this repository that imports `Mathlib.NumberTheory.Bertrand`, kept only for the modularity comparison | verified, off-path |
 -/

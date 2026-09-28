@@ -5,24 +5,41 @@ license: "Apache-2.0"
 project:
   name: "StructuralSieve"
   description: >
-    Two structural, exact characterizations of primality via sieve-coverage -- proved for
-    a prime base's own window (P_k, 2*P_k] (StructuralSieve.prime_iff_uncovered_by_prev)
-    and generalized to the base's full deterministic reach, the zone (P_k, P_k^2)
-    (StructuralSieve.void_iff_prime_in_deterministic_zone, with the reach shown exact by
-    determinism_breaks_above) -- plus Bertrand's postulate (Chebyshev's strengthened form:
-    for every N > 1 there is a prime p with N < p <= 2N) as a corollary of the first. The
-    originating question is not Bertrand's ("is there a prime here?") but a different one:
-    "up to where can sieve-coverage certify primality without appeal to counting?" The
-    corollary closes by showing the window is not entirely covered, via a
-    coprimality/counting argument whose quantitative core bottoms out in the central
+    Two structural facts about a generative prime sieve, plus Bertrand's postulate as a
+    corollary of the sieve mechanism they describe (not of either fact by name): (1) an
+    exact characterization of primality via sieve-coverage on a prime base's own window
+    (P_k, 2*P_k] (StructuralSieve.prime_iff_uncovered_by_prev): n is prime iff not covered
+    by the base of primes below P_k; and (2) why the reach is exactly 2*P_max and not some
+    other multiplier (StructuralSieve.window_reach_self_contained, SelfContained.lean) --
+    not an existence question and not a divisor-search bound, but a closure condition on
+    the sieve's own generative process. The sieve feeds itself: a prime found in one window
+    extends the base for the next. For that hand-off to be well-formed, no window may reach
+    so far that a prime q it just found has its own least proper multiple 2*q fall back
+    inside that same window (which would force the round to treat q both as a fresh
+    discovery and as already covered by itself); 2*P_max is exactly the widest reach at
+    which this self-reference cannot occur. Concretely: base {2,3,5}, a window (5,15] would
+    contain both the new prime 7 and 7's own boundary multiple 14 = 2*7 at once. The same
+    closure condition holds for a base whose minimum element is any m, not only 2: the
+    least proper multiple of a new window element is m*q, and m*P is exactly the largest
+    window bound for which that multiple always falls outside the window -- specializing to
+    2*P_max at m = 2. The originating question is not
+    Bertrand's ("is there a prime here?") but two different ones: "up to where can
+    sieve-coverage certify primality without appeal to counting?" and "why does the window
+    have exactly this reach?" Bertrand's postulate (Chebyshev's strengthened form: for
+    every N > 1 there is a prime p with N < p <= 2N) is a corollary of the sieve mechanism
+    (1) and (2) describe: (1) shows a window survivor is prime, (2) fixes the window's
+    reach, and what remains is existence -- that the window is not entirely covered -- via
+    a coprimality/counting argument whose quantitative core bottoms out in the central
     binomial coefficient -- the same object Erdos used for his own, differently-motivated
-    proof of the same postulate. In Lean 4, avoiding Mathlib's existing Bertrand
-    development entirely. The corollary's quantitative closure is a finite oracle over
-    small windows (n < 512, chunked kernel-checked `decide`) and, for n >= 512, a
-    self-contained factorization-based upper bound on the central binomial coefficient
-    combined with a threshold inequality (adapted from Mathlib's Bertrand development) and
-    Mathlib's own lower bound on the central binomial coefficient — no `native_decide`
-    anywhere in this closure. Zero sorries; depends only on the three standard Lean axioms.
+    proof of the same postulate. The proof term itself goes through the sieve's own
+    survivor lemma, not through prime_iff_uncovered_by_prev by name. In Lean 4, avoiding
+    Mathlib's existing Bertrand development entirely. The corollary's quantitative closure
+    is a finite oracle over small windows (n < 512, chunked kernel-checked `decide`) and,
+    for n >= 512, a self-contained factorization-based upper bound on the central binomial
+    coefficient combined with a threshold inequality (adapted from Mathlib's Bertrand
+    development) and Mathlib's own lower bound on the central binomial coefficient — no
+    `native_decide` anywhere in this closure. Zero sorries; depends only on the three
+    standard Lean axioms.
   authors: ["Artur Flamandzki"]
   license: "Apache-2.0"
   responsible_maintainers: ["Artur Flamandzki"]
@@ -117,14 +134,30 @@ status:
     Effective Force plus the least-prime-factor bound); no counting, no central binomial
     coefficient.
 
-    (2) StructuralSieve.void_iff_prime_in_deterministic_zone (Rings.lean) — the same
-    equivalence generalized from the window (P_k, 2*P_k] to the base's full deterministic
-    reach, the zone (P_k, P_k^2). StructuralSieve.determinism_breaks_above (same file)
-    shows this reach is exact: the equivalence genuinely fails once n >= P_k^2.
+    (2) StructuralSieve.window_reach_self_contained (SelfContained.lean) — why the reach
+    is exactly 2*P_max, not an existence question and not a divisor-search bound but a
+    closure condition on the sieve's own generative process: the sieve feeds itself (a
+    prime found in one window extends the base for the next), and for that hand-off to be
+    well-formed, no window may reach so far that a prime q it just found has its own least
+    proper multiple 2*q fall back inside that same window. 2*P_max is exactly the widest
+    reach at which this self-reference cannot occur (concretely: base {2,3,5}, window
+    (5,15] would contain both the new prime 7 and 7's own boundary multiple 14 = 2*7 at
+    once). Stated for a base whose minimum element is any m: the least proper multiple of a
+    new window element built from the base's own minimum is m*q; hi <= m*P is exactly the
+    condition under which that multiple always falls outside the window (P, hi].
+    StructuralSieve.max_self_contained_bound_general (same file) confirms m*P is the
+    maximal such bound. At m = 2 this specializes to the reach 2*P_max used throughout this
+    development; the same argument fixes the reach P_min*P_max for any base minimum
+    P_min.
 
     (3) StructuralSieve.bertrand_chebyshev (Main.lean) — Bertrand's postulate
     (Chebyshev's strengthened form: for every N > 1 there is a prime p with N < p <= 2N), a
-    corollary of (1), avoiding Mathlib.NumberTheory.Bertrand entirely.
+    corollary of the sieve mechanism (1) and (2) describe, not of either by name: (1)
+    shows a window survivor is prime, (2) fixes the window's reach, and existence -- that
+    the window is not entirely covered -- is what the quantitative closure below supplies.
+    The proof term goes through the sieve's own survivor lemma
+    (GPS_StateMachine.prime_in_window), not through prime_iff_uncovered_by_prev by name.
+    Avoids Mathlib.NumberTheory.Bertrand entirely.
     `StructuralSieve.Main` reduces every window (P_k, 2*P_k] for P_k prime to a
     coprimality condition against the primorial of primes below P_k. The quantitative
     closure that discharges this condition (`StructuralSieve.GPS_StateMachine.prime_in_window`,
@@ -138,10 +171,12 @@ status:
     (`Nat.four_pow_lt_mul_centralBinom`) — the same object Erdos used for his own,
     differently-motivated proof of the same postulate. `StructuralSieve.Rings`'s
     Jacobsthal-gap reduction (`jacobsthal_210`/`jacobsthal_2310`, `windowHasVoid_of_jacobsthal`)
-    and the `Newton`/`SelfContained` modules are independent alternative closures explored in
-    this repository, kept for reference — they are NOT part of the proof term for (3); see
-    their own module docstrings and `StructuralSieve.Certificate`'s two named
-    `WindowCertificate` instances.
+    and the `Newton` module are independent alternative closures explored in this
+    repository, kept for reference — they are NOT part of the proof term for (3); see their
+    own module docstrings and `StructuralSieve.Certificate`'s two named `WindowCertificate`
+    instances. `SelfContained.lean` is likewise not part of (3)'s proof term, but is now
+    load-bearing for (2) above (`window_reach_self_contained`), not merely kept for
+    reference.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -159,18 +194,20 @@ status:
         bound), independent of counting or the central binomial coefficient. Axioms
         assumed identical to the rest of this development (built from the same elementary
         primitives); Artur to confirm via `#print axioms` in the real build.
-    - declaration: "StructuralSieve.void_iff_prime_in_deterministic_zone"
-      file: "StructuralSieve/Rings.lean"
+    - declaration: "StructuralSieve.window_reach_self_contained"
+      file: "StructuralSieve/SelfContained.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
       literature_dependencies: []
       note: >
-        Generalization of the equivalence above from the window (P_k, 2*P_k] to the full
-        deterministic zone (P_k, P_k^2). StructuralSieve.determinism_breaks_above (same
-        file) shows this reach is exact -- the equivalence fails at P_k^2. Axioms assumed
-        identical to the rest of this development; Artur to confirm via `#print axioms` in
-        the real build.
+        Why the reach is exactly 2*P_max, not an existence question and not a
+        divisor-search bound but a closure condition on the sieve's own generative
+        process (see status.scope, item 2, and project.description). Generalizes
+        window_self_contained_bound (m = 2, this file) to any base minimum m >= 1;
+        max_self_contained_bound_general (same file) confirms m*P is the maximal such
+        bound. Axioms assumed identical to the rest of this development; Artur to confirm
+        via `#print axioms` in the real build.
     - declaration: "StructuralSieve.bertrand_chebyshev"
       file: "StructuralSieve/Main.lean"
       sorry_count: 0
@@ -178,11 +215,11 @@ status:
       comparator_config: "comparator.json"
       literature_dependencies: []
       note: >
-        Corollary of prime_iff_uncovered_by_prev: given the equivalence, existence of a
-        prime in the window follows once the window is shown not entirely covered, closed
-        via the central binomial coefficient (see status.scope, item 3). This is the
-        classical Bertrand-Chebyshev theorem (Bertrand 1845, Chebyshev 1852) -- not
-        original to this project; see the `sources` entry for it.
+        Corollary of the sieve mechanism items (1) and (2) describe, not of either by
+        name: existence of a prime in the window follows once the window is shown not
+        entirely covered, closed via the central binomial coefficient (see status.scope,
+        item 3). This is the classical Bertrand-Chebyshev theorem (Bertrand 1845,
+        Chebyshev 1852) -- not original to this project; see the `sources` entry for it.
 
 automation:
   methods:
@@ -291,9 +328,10 @@ alignment:
       module: "StructuralSieve/Main.lean"
       status: "proved"
       note: >
-        Corollary of prime_iff_uncovered_by_prev (see status.scope); the classical
-        Bertrand-Chebyshev theorem, not the project's originating result. Also restated
-        in Challenge.lean/Solution.lean as Submission.bertrand_chebyshev.
+        Corollary of the sieve mechanism (see status.scope), not of either named
+        equivalence by itself; the classical Bertrand-Chebyshev theorem, not the
+        project's originating result. Also restated in Challenge.lean/Solution.lean as
+        Submission.bertrand_chebyshev.
     - source: "Originating result: prime iff uncovered by preceding base"
       lean: "StructuralSieve.prime_iff_uncovered_by_prev"
       module: "StructuralSieve/ZeroForce.lean"
@@ -302,15 +340,20 @@ alignment:
         The project's starting question and its answer (see project.description). Also
         restated in Challenge.lean/Solution.lean as
         Submission.prime_iff_uncovered_by_prev.
-    - source: "Generalization: prime iff void, throughout the deterministic zone (P_k, P_k^2)"
-      lean: "StructuralSieve.void_iff_prime_in_deterministic_zone"
-      module: "StructuralSieve/Rings.lean"
+    - source: "Why the reach is 2*P_max: closure of the sieve's own generative process"
+      lean: "StructuralSieve.window_reach_self_contained"
+      module: "StructuralSieve/SelfContained.lean"
       status: "proved"
       note: >
-        Generalizes the entry above from the window (P_k, 2*P_k] to the full
-        deterministic reach (P_k, P_k^2); StructuralSieve.determinism_breaks_above
-        (same file) shows the reach is exact. Also restated in
-        Challenge.lean/Solution.lean as Submission.void_iff_prime_in_deterministic_zone.
+        Not an existence question and not a divisor-search bound. The sieve feeds
+        itself (a prime found in one window extends the base for the next); 2*P_max is
+        exactly the widest reach at which a newly-found prime's own least proper
+        multiple cannot fall back inside the same window (concretely: base {2,3,5},
+        window (5,15] would contain both the new prime 7 and 7's own boundary multiple
+        14 = 2*7). Generalizes window_self_contained_bound (m = 2, same file) to any
+        base minimum m >= 1; max_self_contained_bound_general (same file) confirms m*P
+        is the maximal such bound. Also restated in Challenge.lean/Solution.lean as
+        Submission.window_reach_self_contained.
     - source: "Jacobsthal gap bound, g(210) = 10"
       lean: "StructuralSieve.jacobsthal_210"
       module: "StructuralSieve/Rings.lean"

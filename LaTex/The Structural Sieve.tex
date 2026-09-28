@@ -12,7 +12,7 @@
 \usepackage{float}
 \usepackage{csquotes}
 
-% --- Theorem environments ---
+% Theorem environments
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -39,7 +39,7 @@
 \geometry{margin=2.8cm}
 \emergencystretch=3em
 
-% --- Formalization cross-reference macros ---
+% Formalization cross-reference macros
 \newcommand{\lean}[1]{\begingroup\upshape\ttfamily\def\_{\textunderscore\allowbreak}#1\endgroup}
 \newcommand{\Formal}[1]{\par\smallskip\noindent\begingroup\raggedright\emph{Formalization.} #1\par\endgroup\smallskip}
 
@@ -52,10 +52,11 @@
 
 \begin{abstract}
 We take the prime base, not the interval, as the object of study, and measure the
-deterministic reach of its generative sieve. The Bertrand--Chebyshev theorem is then not
-a goal but a consequence: asking how far the base reaches collapses the postulate to a
-single positivity statement about an exact window count --- the window itself derived from
-the base --- which we close in the natural generality of the construction.
+deterministic reach of its generative sieve. Existence of a prime beyond the base then
+follows as a consequence rather than as the goal: asking how far the base reaches turns
+the question into a single positivity statement about an exact window count, the window
+itself derived from the base, and we close that statement in the natural generality of
+the construction.
 
 Starting from a complete prime base $\mathcal{B}=\{q\ \text{prime}: q<P_{\max}\}$ we
 separate two determinisms of the generative sieve. The base is \emph{self-contained}
@@ -63,14 +64,14 @@ exactly up to $P_{\min}\cdot P_{\max}$, where $P_{\min}$ is the smallest prime t
 participates in the sieve: every composite in the window $(P_{\max}, P_{\min}P_{\max}]$ is
 built entirely from the base, and immediately beyond the edge the first composite requiring
 a prime \emph{outside} the base appears, namely $P_{\min}\cdot\operatorname{nextprime}(P_{\max})$.
-Its \emph{generative decision} --- a survivor is void $\Leftrightarrow$ prime --- reaches
+Its \emph{generative decision} (a survivor is void $\Leftrightarrow$ prime) reaches
 further, throughout the zone $(P_{\max}, P_{\max}^2)$, and only there does it break. Inside the
 self-contained window this decision forces every survivor to be a new prime, so the base
-cannot cover its own window and a prime outside it is necessary: this forcing is the
-\emph{atom}. The self-contained edge is thus \emph{derived} from the base, not assumed. This yields a generalized window
+cannot cover its own window and a prime outside it is necessary; this forcing is the
+\emph{atom}, and the self-contained edge is derived from the base rather than assumed. This yields a generalized window
 family $(P_{\max}, P_{\min}P_{\max}]$ obtained by \emph{truncated arithmetic}
-(sieving with a reduced base); the classical Bertrand window $(n, 2n]$ is the
-\emph{tightest} member, $P_{\min}=2$, and every wider member follows from it by
+(sieving with a reduced base); its \emph{tightest} member, $P_{\min}=2$, is the window
+$(P_{\max}, 2P_{\max}]$, and every wider member follows from it by
 monotonicity. The whole construction is invariant under dilation of scale: the pair
 (window, base) is a single self-similar object, and this self-similarity is what the
 window count inherits.
@@ -78,21 +79,24 @@ window count inherits.
 The reduction sends non-emptiness of the window to a single positivity statement (the
 \emph{atom}), which the proof settles in two regimes of different character. In the
 \emph{constructive} regime the mechanism is generative: at every concrete scale it decides the
-window outright --- the sieve is finite and its evaluation decidable, so no counterexample can
-arise at any fixed step --- and there the theorem is closed by structure alone. What a
-generative process cannot produce is a single finite object for the completed infinite, the
-uniform statement over all scales at once; that statement is settled not by construction but
-existentially. It is exactly here that the central binomial coefficient $\binom{2n}{n}$
-supplies closure. It enters not as an external estimate but as the object whose prime
+window outright, since the sieve is finite and its evaluation decidable, so no counterexample
+can arise at any fixed step, and there the theorem is closed by structure alone. A generative
+process, however, cannot produce a single finite object for the completed infinite: the
+uniform statement over all scales at once has to be settled existentially rather than by
+construction. This is exactly where the central binomial coefficient $\binom{2n}{n}$ supplies
+closure. Rather than serving as an external estimate, it functions as the object whose prime
 factorization records the window's new sources: a source $q\in(n,2n]$ divides $\binom{2n}{n}$
-exactly once. It is present not for any fixed window but because the proof must quantify over
-all windows at once, and it is reached from the paper's own purity law, not borrowed. The
+exactly once. Its presence has nothing to do with any single fixed window: the proof needs
+to quantify over every window at once, and the coefficient enters for that reason, following
+from the paper's own purity law rather than being imported for the occasion. The
 extremal window ($P_{\min}=2$) is then closed by comparing the growth bound
 $4^{n}\le (2n+1)\binom{2n}{n}$ with the old-source upper bound; both bounds are reproved within
-the development, so its main theorem imports no Mathlib Bertrand theorem. These are the same
-two inequalities Erd\H{o}s used in 1932: reaching the same object by a different route is a
-convergence, with historical priority but not exclusivity. The entire development is
-machine-checked in Lean~4 / Mathlib with no \texttt{sorry} and no appeal to Mathlib's proof of
+the development. These are the same two inequalities Erd\H{o}s used in 1932: reaching the same
+object by a different route is a convergence, with historical priority but not exclusivity. As
+an immediate corollary, the extremal window recovers Chebyshev's strengthened form of
+Bertrand's 1845 postulate, a different question (existence of a prime, not the reach of a
+base) that happens to converge on the same object. The development is machine-verified in
+Lean~4 / Mathlib, and its main theorem does not rely on Mathlib's own formalization of
 Bertrand's postulate.
 \end{abstract}
 
@@ -111,57 +115,53 @@ binomial coefficient $\binom{2n}{n}$ \cite{erdos1932}. Nair later observed that 
 bounds follow from $\operatorname{lcm}(1,\dots,2n)$ \cite{nair1982}. Each of these proofs
 stands on its predecessors; none discards the tools it inherits.
 
-The present work stands on the same lineage, and is explicit about where. Its
-contribution is not a new inequality but a new \emph{architecture}: we show that
-Bertrand's postulate is the tightest instance of a self-similar family of window
-statements, that the window and its right endpoint are \emph{forced by the prime base}
-rather than posited, and that the entire theorem localizes to a single positivity
-statement about an exact count. What remains at that one point is quantitative, and there
-we insert the lightest classical certificate --- which turns out to be Erd\H{o}s's pair of
-inequalities.
+The present work stands on the same lineage, and says plainly where. Its contribution is
+a new \emph{architecture} rather than a new inequality: Bertrand's postulate turns out to
+be the tightest instance of a self-similar family of window statements, the window and
+its right endpoint are \emph{forced by the prime base} rather than posited, and the whole
+theorem localizes to a single positivity statement about an exact count. What is left at
+that one point is purely quantitative, and there we insert the lightest classical
+certificate, which turns out to be Erd\H{o}s's pair of inequalities.
 
-To the author's knowledge, following a literature comparison against the closest related
-material --- Jacobsthal's function and its primorial-restricted gap bounds
+To the author's knowledge, and after comparing against the closest related material
+(Jacobsthal's function and its primorial-restricted gap bounds
 \cite{jacobsthal1961,iwaniec1978}, and the generalized Bertrand-type window results of
-\cite{daspaul2019} --- three things distinguish this construction; \S\ref{sec:provenance}
-records the comparison this claim rests on and its limits. First, the window $(P_{\max},2P_{\max}]$ and, more generally,
-$(P_{\max},P_{\min}P_{\max}]$, together with the right endpoint $P_{\min}P_{\max}$, are
-\emph{derived} from the base $\mathcal{B}=\{q\ \text{prime}: q<P_{\max}\}$: the endpoint
-is exactly the buildability edge of the base, and self-containment provably fails one step
-beyond it, while the generative decision (void $\Leftrightarrow$ prime) reaches to the square
-of the anchor (\S\ref{sec:reach}, \S\ref{sec:edge}). Second, the statements assemble into a
-generalized family indexed by the smallest participating prime $P_{\min}$, in which
-Bertrand is the tightest ($P_{\min}=2$) and every wider member is a corollary by
-monotonicity (\S\ref{sec:family}); the family is obtained by \emph{truncated arithmetic},
-i.e.\ sieving with a reduced base, and is manifestly invariant under dilation of scale
+\cite{daspaul2019}), three things set this construction apart; \S\ref{sec:provenance}
+records the comparison this claim rests on, and its limits. First, the window
+$(P_{\max},2P_{\max}]$, and more generally $(P_{\max},P_{\min}P_{\max}]$, is
+\emph{derived} together with its right endpoint from the base
+$\mathcal{B}=\{q\ \text{prime}: q<P_{\max}\}$ rather than posited: the endpoint is exactly
+the buildability edge of the base, self-containment fails provably one step beyond it, and
+the generative decision (void $\Leftrightarrow$ prime) reaches all the way to the square
+of the anchor (\S\ref{sec:reach}, \S\ref{sec:edge}). Second, the statements assemble into
+a generalized family indexed by the smallest participating prime $P_{\min}$: Bertrand is
+its tightest member ($P_{\min}=2$), every wider member follows from it by monotonicity
+(\S\ref{sec:family}), the family arises from \emph{truncated arithmetic} (sieving with
+a reduced base), and it is manifestly invariant under dilation of scale
 (\S\ref{sec:trunc}). Third, non-emptiness of the window collapses to a single exact-count
-statement (the atom), and entire regimes of it close with no counting at all
-(\S\ref{sec:atom}); the residual case is closed on the central binomial coefficient, whose
-prime factorization records the window's content (\S\ref{sec:newton}, \S\ref{sec:erdos}).
+statement, the atom, and whole regimes of it close with no counting at all
+(\S\ref{sec:atom}); what is left closes on the central binomial coefficient, whose prime
+factorization records the window's content (\S\ref{sec:newton}, \S\ref{sec:erdos}).
 
-We are careful about provenance. The development is neither independent of Erd\H{o}s nor a
-disguised copy of him. The structural reduction is independent and shows \emph{why} the
-postulate collapses to one atom; the object on which the atom is finally settled --- the
-central binomial --- is reached from the internal purity law of the construction, and
-would be reached here regardless of the historical record. That Erd\H{o}s settled the same
-object in 1932 is a convergence on one mathematical object; he holds the historical
-priority of use, but no exclusivity over it. Every claim below is machine-checked in
-Lean~4 with Mathlib; the closing certificate is the sole place a Mathlib import about
-$\binom{2n}{n}$ is used, and Mathlib's own proof of Bertrand's postulate is never
-invoked.
+A word on provenance belongs here too, if only briefly: this development does not simply
+repeat Erd\H{o}s's argument under new names, nor does it claim to owe him nothing.
+\S\ref{sec:provenance} works that relationship out in full. For now it is enough to say
+that every claim below is machine-checked in Lean~4 with Mathlib, that the closing
+certificate is the only place a Mathlib fact about $\binom{2n}{n}$ enters, and that
+Mathlib's own proof of Bertrand's postulate is never invoked.
 
 \paragraph{Origin of the construction.}
 The construction did not begin from Bertrand's postulate, and it is worth recording the
 observation from which it did begin, since that observation fixes the natural home of the
 statement. Consider the prime-factor incidence of the integers: for each $n$, record which
 primes divide it (Table~\ref{tab:incidence}). Read by rows, the primes are exactly the
-positions carrying no mark --- the survivors of the factorization. Read by columns the table
+positions carrying no mark, the survivors of the factorization. Read by columns the table
 is more telling: a prime $p$ makes its first appearance as a factor at $2p$, its first even
 multiple, and only from there does it begin to eliminate positions. Consequently the base of
 primes below a scale $P$ already accounts for every composite up to $2P$: inside $(P,2P]$
 every eliminated position is struck by a prime $<P$, so every survivor there is a new prime.
-What the observation measures is thus the \emph{reach of deterministic factorization} --- how
-far a fixed base generates the integers before a genuinely new prime is required --- and that
+What the observation measures is thus the \emph{reach of deterministic factorization}: how
+far a fixed base generates the integers before a genuinely new prime is required. That
 reach is exactly $2P$. Whether the interval $(P,2P]$ happens to contain a prime was not the
 starting point; it is a corollary of the reach, read off afterwards.
 
@@ -199,7 +199,7 @@ the empty rows ($n=2,3,5,7,11,13,17,19,23$) are the primes, the survivors of the
 factorization. Each prime $p$ first appears as a factor at $2p$, so the primes $\ge 13$ carry
 no mark below $2\cdot13=26$: the rule at $P_{\max}=11$ separates the emerged base from the
 primes not yet required. The base of primes $<P$ thus covers every composite in $(P,2P]$, and
-the reach of the fixed base is exactly $2P$ --- the endpoint derived in \S\ref{sec:edge}.}
+the reach of the fixed base is exactly $2P$, the endpoint derived in \S\ref{sec:edge}.}
 \label{tab:incidence}
 \end{table}
 
@@ -247,8 +247,8 @@ multiple in the window is $2P$, already divisible by $2$; see
 $(n,2n]$, with $n$ in the role of $P$: the present statement is phrased on a prime scale rather
 than an arbitrary integer, and the two coincide at the extremal member $P_{\min}=2$
 (\S\ref{sec:main}). The quantity that governs the statement is accordingly the local deficiency
-of the base on its own window --- the length of the longest interval of covered positions in
-$W(P)$ --- which external gap functions only bound from above.
+of the base on its own window (the length of the longest interval of covered positions in
+$W(P)$), which external gap functions only bound from above.
 \end{remark}
 
 The one arithmetic fact that governs the window is the least-prime-factor bound: a
@@ -345,14 +345,14 @@ here and must not be conflated. The base's \emph{self-containment} ends at $2P$:
 a composite requiring a prime outside the base appears (Proposition~\ref{prop:first}), and $2P$
 is the largest interval above $P$ in which no element properly divides another
 (Theorem~\ref{thm:self}); this is what fixes the window. The sieve's \emph{generative decision}
---- the equivalence void $\Leftrightarrow$ prime of Theorem~\ref{thm:det} --- reaches much
+(the equivalence void $\Leftrightarrow$ prime of Theorem~\ref{thm:det}) reaches much
 further, throughout the zone $(P,P^2)$, and breaks only at the square of the anchor.
 
 \begin{theorem}[Generative decision reaches the square scale]\label{thm:break}
 Let $P$ be prime, $2<P$. Every $\mathcal{B}(P)$-void $n$ with $P<n<P^2$ is prime, and this
 fails at $n=P^2$: the square $P^2$ is composite yet $\mathcal{B}(P)$-void. Hence the generative
-decision of Theorem~\ref{thm:det} reaches exactly the zone $(P,P^2)$ --- the square of the
-anchor --- far beyond the self-contained edge $2P$.
+decision of Theorem~\ref{thm:det} reaches exactly the zone $(P,P^2)$ (the square of the
+anchor), far beyond the self-contained edge $2P$.
 \end{theorem}
 
 \begin{proof}
@@ -387,10 +387,10 @@ The element $2(P+1)$ is the first proper multiple of an in-window element to exc
 (\lean{Rings.lean}); \lean{window\_self\_contained\_bound},
 \lean{max\_self\_contained\_width} (\lean{SelfContained.lean}).}
 
-Self-containment is not a threshold phenomenon that appears only for large bases; it is
-universal, and a small window is not an exception but merely too narrow to contain such a
-proper multiple. It is a structural property specific to the tightest window; \S\ref{sec:family}
-shows that it is present exactly where the family is most constrained.
+Self-containment holds at every scale, not only for large bases; a small window contains
+no proper multiple simply because it is too narrow, not because the property fails there.
+\S\ref{sec:family} shows this structural property belongs specifically to the tightest
+window, present exactly where the family is most constrained.
 
 %======================================================================
 \section{The generalized window family}
@@ -433,19 +433,20 @@ the window is delivered by elementary means (a Euclid-type witness), with no cou
 
 \Formal{\lean{gwindowHasVoid\_of\_wide}.}
 
-Two points deserve emphasis. The family is \emph{equivalent} to Bertrand, not strictly
-stronger: by Theorem~\ref{thm:mono} the narrow case implies the wide cases, so the content of
-the family is concentrated at $P_{\min}=2$. Moreover the structure is richest there:
-self-containment (Theorem~\ref{thm:self}) holds \emph{only} for $P_{\min}=2$, since any wider
-window already contains $2(P_{\max}+1)$, a proper multiple of an in-window element. The tightest
-window thus carries the most structure --- precisely the case that is hardest to establish.
+Two points are worth spelling out. By Theorem~\ref{thm:mono} the narrow case implies the
+wide ones, so the family carries no more content than Bertrand itself: it is
+\emph{equivalent} to it, not strictly stronger, and everything is concentrated at
+$P_{\min}=2$. The structure is also richest exactly there: self-containment
+(Theorem~\ref{thm:self}) holds \emph{only} at $P_{\min}=2$, since any wider window already
+contains $2(P_{\max}+1)$, a proper multiple of an in-window element. So the tightest
+window carries the most structure, which is also why it is the hardest case to establish.
 
 This is the place to state the scale invariance the family embodies. The invariant is not
 a reflection of coordinates but a dilation: the object is the pair
 $\big((X,2X],\ \{q\ \text{prime}:q<X\}\big)$, and under $X\mapsto\lambda X$ the window and
 the base rescale \emph{together}, the ratio $2$ being preserved. Freezing the base at one
-scale while sliding the window to another is not a configuration of the family at all ---
-it mismatches the two dilations. Bertrand's $(n,2n]$ is simply the unit cell of this scale,
+scale while sliding the window to another does not even belong to the family; it mismatches
+the two dilations. Bertrand's $(n,2n]$ is simply the unit cell of this scale,
 $P_{\min}=2$; motion along $\mathbb{N}$ is the renormalization $n\mapsto\lambda n$ with
 window and base co-scaling. Proposition~\ref{prop:scale} is the invariance of the local
 rule; the count that follows inherits it exactly (\S\ref{sec:atom},
@@ -476,7 +477,7 @@ $M_{\mathrm{tr}}(P)$.
 Coprimality to the full base clearly implies coprimality to the truncated base. Conversely,
 if $n$ is coprime to $M_{\mathrm{tr}}(P)$ but divisible by some prime $p<P$, then $n$ is
 composite, so by Lemma~\ref{lem:lpf} $\operatorname{minFac}(n)^2\le 2P$, and
-$\operatorname{minFac}(n)$ divides $M_{\mathrm{tr}}(P)$ --- contradiction.
+$\operatorname{minFac}(n)$ divides $M_{\mathrm{tr}}(P)$: a contradiction.
 \end{proof}
 
 \Formal{\lean{void\_iff\_coprime\_trunc}, \lean{windowHasVoid\_iff\_trunc\_coprime},
@@ -520,21 +521,21 @@ independently of scale. This weight is structural content about the setting, not
 hypothesis either regime's closure consumes below: the sparse regime closes by a union
 bound (Theorem~\ref{thm:jac} and the paragraph preceding it), and the dense regime closes
 on the central binomial coefficient (\S\ref{sec:erdos}), neither appealing to $w\ge1$. It is
-recorded here because it is the reduction's own by-product, not because the atom's proof
-term invokes it.
+recorded here as a by-product of the reduction, not because the atom's proof term calls on
+it.
 
 \Formal{\lean{zero\_effective\_force} (\lean{ZeroForce.lean}); weight
 $w\ge1$: \lean{WeightGeOne}, \lean{weight\_base}, \lean{weight\_step},
 \lean{structural\_weight\_ge\_one}, \lean{prev\_base\_cannot\_cover\_window}
 (\lean{Weight.lean}); bridge \lean{weight\_density\_bridge}; anchor idle
 \lean{anchor\_idle\_in\_own\_window}. This chain is proved and wired through
-\lean{structural\_sieve\_survivor}'s signature, but \lean{dense\_sieve\_survivor} --- the
-lemma that actually closes the dense regime --- takes the resulting density fact as an
+\lean{structural\_sieve\_survivor}'s signature, but \lean{dense\_sieve\_survivor} (the
+lemma that actually closes the dense regime) takes the resulting density fact as an
 unused parameter (\lean{\_hdensity}) and proves the window nonempty directly from
 \lean{binomial\_contradiction} instead.}
 
 The covered count decomposes disjointly by least prime factor, and each fiber is, by an
-exact bijection, the \emph{same} coprimality count one scale down --- the recursion engine
+exact bijection, the \emph{same} coprimality count one scale down, the recursion engine
 promised by scale invariance.
 
 \begin{theorem}[Disjoint minFac decomposition and self-similar fibers]\label{thm:fiber}
@@ -576,8 +577,8 @@ Entire regimes of the atom close with no analysis. In the \emph{sparse} regime a
 union bound produces a survivor. For small anchors a sufficient condition settles the
 window: only the \emph{active-covering rings} $p^2\le 2P$ can cover a composite in $W(P)$
 (Lemma~\ref{lem:lpf}), so, writing $M_{\mathrm{tr}}(P)=\prod_{p^2\le 2P}p$, if every run of
-$P$ consecutive integers meets a number coprime to $M_{\mathrm{tr}}(P)$ --- i.e.\ the
-coprime-gap $g\big(M_{\mathrm{tr}}(P)\big)\le P$ --- then $W(P)$ contains a coprime, hence a
+$P$ consecutive integers meets a number coprime to $M_{\mathrm{tr}}(P)$ (i.e.\ the
+coprime-gap $g\big(M_{\mathrm{tr}}(P)\big)\le P$), then $W(P)$ contains a coprime, hence a
 void.
 
 \begin{theorem}[Small-anchor closure]\label{thm:jac}
@@ -586,7 +587,7 @@ $g(210)=10$, $g(2310)=14$ close all anchors $P\le 83$ unconditionally.
 \end{theorem}
 
 A caveat on this bound. Here $g\big(M_{\mathrm{tr}}(P)\big)$ is the global coprime-gap of a
-\emph{fixed} modulus --- the product of the active-covering rings, a subcollection that
+\emph{fixed} modulus: the product of the active-covering rings, a subcollection that
 coincides with a smaller, foreign base, not the complete base of the object. It only
 \emph{upper-bounds} the object's own quantity, the local run of covered positions inside
 $W(P)$; the inequality $g\le P$ is therefore a loose sufficient proxy, not the governing
@@ -606,19 +607,18 @@ certificate for these finitely many scales, disjoint in its derivation from
 Theorem~\ref{thm:window}; it is retained to exhibit a regime that closes with no
 counting at all, not because the main theorem's proof term invokes it.
 
-What remains is the \emph{dense} regime at large $P$. Here the structural mechanism has a
-definite reach and a definite limit, and it is worth stating both precisely. At every
-\emph{concrete} scale $P$ the construction decides the window outright: the sieve is
-finite and deterministic, so each finite step is verified and no counterexample can arise
---- the statement \enquote{$W(P)$ has a void} is decidable at every fixed $P$. What the
-generative process cannot deliver is the \emph{uniform} statement over all scales at once:
-to reach \enquote{for every $P$} by generation would mean carrying the construction to
-infinity, an infinite process that no finite computation realizes. The passage from
-\enquote{true at every finite step} to \enquote{true in the infinite} is therefore not
-computational but \emph{existential}. We do not claim a generative closure of this
-existential step, and none is known. It is precisely this closure of the infinite tail ---
-the part beyond any finite computation --- that the central binomial coefficient performs, and
-the next section explains why it is the appropriate object for this step.
+What remains is the \emph{dense} regime at large $P$, where the structural mechanism has
+both a definite reach and a definite limit. At every \emph{concrete} scale $P$ the
+construction decides the window outright: the sieve is finite and deterministic, each
+finite step is verified, and no counterexample can arise, so the statement
+\enquote{$W(P)$ has a void} is decidable at every fixed $P$. Generation alone, though,
+cannot deliver the \emph{uniform} statement over all scales at once: reaching
+\enquote{for every $P$} that way would mean carrying the construction to infinity, and no
+finite computation does that. Going from \enquote{true at every finite step} to
+\enquote{true in the infinite} is an existential step, not a computational one, and we
+make no claim to close it generatively; none is known. The central binomial coefficient
+is what closes this infinite tail, the part beyond any finite computation, and the next
+section explains why it is the right object for the job.
 
 \Formal{Regime dispatch: \lean{structural\_sieve\_survivor}; the residual dense case
 \lean{dense\_sieve\_survivor} (\lean{GPS\_StateMachine.lean}).}
@@ -627,13 +627,11 @@ the next section explains why it is the appropriate object for this step.
 \section{The central binomial coefficient and the window's prime content}
 \label{sec:newton}
 
-The dense regime is closed existentially, and the central binomial coefficient is the
-instrument of that closure. It is invoked for one purpose only: to settle the infinite tail
-that no finite generation can reach --- a uniform argument in place of an unrealizable infinite
-process, not a repair of the finite mechanism, which needs none, since that mechanism already
-decides every concrete scale. The coefficient need not be present for any fixed window; it is
-present because the proof must quantify over all windows at once, and it supplies closure over
-that range.
+Since the dense regime closes existentially, the central binomial coefficient is what does
+the closing. Its only job is to settle the infinite tail that no finite generation
+reaches: a single uniform argument standing in for a process that cannot be run to
+completion, not a fix for the finite mechanism, which already decides every concrete scale
+on its own.
 
 That $\binom{2n}{n}$ is the appropriate object here is itself structural. It is an entry of
 Newton's binomial expansion: $4^n=(1+1)^{2n}$ is the sum of the $2n+1$ entries of the $2n$-th
@@ -657,14 +655,14 @@ Consequently the product of all new sources of the window divides $\binom{2n}{n}
 \lean{window\_primes\_prod\_le\_centralBinom} (\lean{Newton.lean}); the
 divisibility rests on \lean{prod\_primes\_dvd} and
 \lean{Nat.Prime.dvd\_choose\_add}. The purity is the same self-containment property as
-\lean{window\_self\_contained\_dvd} / \lean{window\_composite\_smooth} --- the first proper
-multiple of an in-window source already exceeds $2P_{\max}$ --- with the same role of $2$ and
+\lean{window\_self\_contained\_dvd} / \lean{window\_composite\_smooth} (the first proper
+multiple of an in-window source already exceeds $2P_{\max}$), with the same role of $2$ and
 the same extremal self-contained case $P_{\min}=2$.}
 
-The choice of object is thus forced by the structure, not imported from history: the window's
-new sources are recorded in the prime factorization of $\binom{2n}{n}$. Its role in the proof
-is existential --- it closes what cannot be generated --- while its identity is structural.
-Two bounds close on it. The lower bound is pure combinatorics of the Pascal row.
+So the choice of object is forced by the structure rather than imported from history: the
+window's new sources sit in the prime factorization of $\binom{2n}{n}$. Its role in the
+proof is existential, closing what cannot be generated, even though its identity is purely
+structural. Two bounds close on it. The lower bound is pure combinatorics of the Pascal row.
 
 \begin{theorem}[Lower bound]\label{thm:lower}
 $4^n\le(2n+1)\binom{2n}{n}$, proved directly from
@@ -706,7 +704,7 @@ split at $n=512$.
 
 For $2<n<512$ a kernel-checked decision procedure exhibits a prime in $(n,2n]$ directly: the
 range is split into finitely many blocks, and on each a witness prime is exhibited and
-verified by direct reduction inside Lean's trusted kernel --- no external lemma, and no
+verified by direct reduction inside Lean's trusted kernel: no external lemma, and no
 appeal to compiled evaluation.
 
 \Formal{\lean{small\_window\_oracle}, by \lean{decide} (the range split via
@@ -739,8 +737,8 @@ $4^n<4^n$.
 (\lean{threshold\_inequality}, \lean{Threshold.lean}) from real convexity. Neither imports
 \lean{Mathlib.NumberTheory.Bertrand}, so the main theorem's import closure is free of it.
 The certificate is modular (\lean{WindowCertificate}, \lean{Certificate.lean}): any estimate
-of the same strength --- a Chebyshev-type bound, or Nair's $\operatorname{lcm}(1,\dots,2n)$
-argument \cite{nair1982} --- plugs into the identical slot; a second instance,
+of the same strength (a Chebyshev-type bound, or Nair's $\operatorname{lcm}(1,\dots,2n)$
+argument \cite{nair1982}) plugs into the identical slot; a second instance,
 \lean{erdos\_certificate}, does so through Mathlib's inequalities.}
 
 Non-circularity is by inspection: Mathlib's \lean{Nat.bertrand} and
@@ -791,7 +789,7 @@ the base-consistent structural form is \lean{structural\_bertrand\_chebyshev}.}
 
 The constant $2$ is not arbitrary: it is the smallest prime, hence the smallest admissible
 $P_{\min}$, hence the buildability edge (\S\ref{sec:edge}). Bertrand's window is thus the
-extremal member of the family --- the case $P_{\min}=2$, on which all wider members depend and
+extremal member of the family, the case $P_{\min}=2$, on which all wider members depend and
 at which the self-containment structure is present.
 
 %======================================================================
@@ -812,30 +810,36 @@ buildability edge of a prime base, or reduces the postulate to the single exact-
 of \S\ref{sec:atom}; a search of the literature on Jacobsthal's function, on elementary and
 generalized proofs of Bertrand's postulate, and on primorial-coprimality sieve arguments did
 not surface a prior source assembling these three components in this form. This search is
-necessarily bounded --- it covers indexed literature (arXiv, standard references on
+necessarily bounded: it covers indexed literature (arXiv, standard references on
 Jacobsthal's function and Bertrand's postulate) and cannot rule out unindexed material such
-as course notes or unpublished manuscripts --- so the claim above is offered as a
+as course notes or unpublished manuscripts, so the claim above is offered as a
 literature-grounded "to the author's knowledge," not as an assertion of absolute priority.
 
 \paragraph{Machine verification.}
 The development is checked in Lean~4 with Mathlib (toolchain pinned in the repository);
 there is no \texttt{sorry}, and the main theorem depends on no axiom beyond the three
 standard ones (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}), verified
-directly by \lean{\#print axioms bertrand\_chebyshev} --- in particular
+directly by \lean{\#print axioms bertrand\_chebyshev}: in particular
 \lean{Lean.ofReduceBool} (the axiom \lean{native\_decide} introduces) does not appear
 anywhere in its import closure. The small-window oracle for $n<512$, the base anchors
 $P\le83$, and the Jacobsthal gap values are all discharged by \lean{decide}, fully reduced
-and checked by Lean's own kernel. The two widest of these --- the $n<512$ search and the
-$g(2310)$ gap check --- exceed the kernel's evaluator as a single call and are each split
+and checked by Lean's own kernel. The two widest of these (the $n<512$ search and the
+$g(2310)$ gap check) exceed the kernel's evaluator as a single call and are each split
 into blocks small enough for it to handle, rather than falling back to compiled evaluation.
 (A separate, Mathlib-based comparison instance in \lean{Erdos.lean} does use
 \lean{native\_decide}; it lies outside the main theorem's import closure and does not affect
 this.) A non-circularity audit (a search over uses) confirms that Mathlib's own Bertrand
-theorem is not invoked.
+theorem is not invoked. In addition to the full development described in this paper, the
+repository packages a minimal, self-contained three-theorem excerpt: the window/prime
+equivalence (\S\ref{sec:reach}), the buildability-edge result (\S\ref{sec:edge}), and the
+Bertrand--Chebyshev corollary, for independent automated verification by a third-party
+reviewer; that excerpt is a narrower subset chosen for statement-by-statement checkability,
+not a distinct or differently-scoped result from the one presented here.
 
 \paragraph{Provenance.}
-The development is neither independent of Erd\H{o}s nor Erd\H{o}s in disguise. The
-structural reduction is independent: it derives the window and its edge from the base
+Two easy descriptions of this development are both wrong: it is not independent of
+Erd\H{o}s, and it is not his argument under a different name. The structural reduction
+is independent: it derives the window and its edge from the base
 (\S\ref{sec:reach}--\S\ref{sec:edge}), assembles the scale-invariant family
 (\S\ref{sec:family}--\S\ref{sec:trunc}), and localizes the theorem to one exact-count atom
 whose small, sparse and gap regimes close with no counting (\S\ref{sec:atom}). The atom is
@@ -854,10 +858,11 @@ studied different objects, while converging on one theorem. Bertrand \cite{bertr
 the question of existence, read from tables of the integers; Chebyshev \cite{chebyshev1852}
 answered it through the analytic size of $\vartheta$ and $\psi$; Erd\H{o}s \cite{erdos1932} and
 Nair \cite{nair1982} through the elementary size of $\binom{2n}{n}$ and of
-$\operatorname{lcm}(1,\dots,2n)$. The present treatment asks a fourth question --- the
-deterministic reach of a generating base --- and takes the base, not the window, as its primary
-object; the window and its endpoint are then derived, and the existence of a prime is a
-corollary of the reach rather than the premise. At the single quantitative point all four are
+$\operatorname{lcm}(1,\dots,2n)$. The present treatment asks a fourth question, the
+deterministic reach of a generating base, taking the base rather than the window as its
+primary object; the window and its endpoint are then derived, and existence of a prime
+becomes a corollary of the reach rather than the starting premise. At the single
+quantitative point all four are
 of the same strength, and any of the elementary certificates plugs into the same slot; what the
 structural layer adds is the reduction that makes one such certificate sufficient, together with
 the derivation of the window itself from the base.
@@ -866,7 +871,14 @@ the derivation of the window itself from the base.
 The finite mechanism decides every concrete scale; what a certificate supplies is the
 existential closure of the infinite tail. Whether that closure can be effected without a
 size inequality is open; every method known to the author is quantitative, of the same
-Chebyshev strength.
+Chebyshev strength. Concretely, every certificate available today proceeds by contradiction:
+assume the window has no survivor, and derive an inequality that fails. A direct
+reformulation (computing the base's own combinatorial coverage power over the window and
+showing it falls short of covering the window outright, rather than assuming a survivor's
+absence and deriving a numerical contradiction from that assumption) would replace the
+existential step with a positive one, in keeping with the generative character of the rest
+of the construction. No such argument is known to the author at present; this is left as an
+open direction.
 
 %======================================================================
 \section*{Competing Interests}
@@ -875,6 +887,7 @@ The author declares no competing interests.
 \section*{Funding}
 No funding was received for this work.
 
+\newpage
 \printbibliography
 
 \end{document}

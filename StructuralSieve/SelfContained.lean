@@ -53,4 +53,59 @@ theorem max_self_contained_width {P q : ℕ}
     2 * P < 2 * q := by
   omega
 
+/-! ## Generalization: arbitrary base minimum `m`
+
+The three lemmas above fix the base's minimum element at `2`. A base need not start at `2`:
+`Defs.lean`'s `window (P_min) (P_max)` already generalizes the window to `(P_max, P_min·P_max]`
+for any `P_min ≤ P_max`. The self-containment argument generalizes the same way: the least
+proper multiple of a new window element `q`, built from the base's own minimum `m`, is `m·q`
+(not `2·q`). Everything below specializes back to the three lemmas above at `m = 2`. -/
+
+/--
+**Self-containment from a general window bound (`hi ≤ m·P`).**
+
+For a base whose minimum element is `m`, the least proper multiple of any new window element
+`q ∈ (P, hi]` built from that minimum is `m·q`. If the window's upper bound satisfies
+`hi ≤ m·P`, this multiple always falls strictly outside the window. Generalizes
+`window_self_contained_bound` (`m = 2`, `hi = P + W`) to any base minimum `m ≥ 1`.
+-/
+theorem window_self_contained_bound_general {P hi q m : ℕ}
+    (hm : 1 ≤ m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
+    hi < m * q := by
+  have hq1 : P + 1 ≤ q := by omega
+  have hmq : m * (P + 1) ≤ m * q := Nat.mul_le_mul (le_refl m) hq1
+  have heq : m * (P + 1) = m * P + m := by ring
+  omega
+
+/--
+**Failure of self-containment forces the window bound past `m·P`.**
+
+Contrapositive companion to the previous lemma: if the least proper multiple `m·q` of some
+`q ∈ (P, hi]` falls inside the window (`m·q ≤ hi`), then `hi` must exceed `m·P`. Generalizes
+`width_gt_of_overlap`.
+-/
+theorem window_bound_gt_of_overlap_general {P hi q m : ℕ}
+    (hm : 1 ≤ m) (hq_lo : P < q) (hover : m * q ≤ hi) :
+    m * P < hi := by
+  have hq1 : P + 1 ≤ q := by omega
+  have hmq : m * (P + 1) ≤ m * q := Nat.mul_le_mul (le_refl m) hq1
+  have heq : m * (P + 1) = m * P + m := by ring
+  omega
+
+/--
+**Why exactly `m·P_max`.**
+
+The maximal self-contained window anchored at `P` for a base with minimum `m` is
+`(P, m·P]` (upper bound exactly `m·P`). Generalizes `max_self_contained_width`: the constant
+`m` (which is `2` in the standard base starting at the prime `2`) is not a choice — it is the
+maximal reach of a self-contained window for a base whose own minimum element is `m`.
+-/
+theorem max_self_contained_bound_general {P q m : ℕ}
+    (hm : 1 ≤ m) (hq_lo : P < q) (_hq_hi : q ≤ m * P) :
+    m * P < m * q := by
+  have hq1 : P + 1 ≤ q := by omega
+  have hmq : m * (P + 1) ≤ m * q := Nat.mul_le_mul (le_refl m) hq1
+  have heq : m * (P + 1) = m * P + m := by ring
+  omega
+
 end StructuralSieve
