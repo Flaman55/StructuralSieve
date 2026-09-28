@@ -31,3 +31,9 @@ __pycache__/
 # Never commit — regenerated per machine/OS by scripts/palomar_preflight.sh.
 /.cache/palomar-comparator/
 /.cache/palomar-editorial/
+
+# Palomar local preflight: PalomarPolicy prompts/rubric/schema (+ its pin file),
+# re-synced to upstream latest on every non-mechanical-only run
+# (scripts/palomar_preflight.sh -> policy_sync). Not part of the submission
+# itself, purely a local editorial-audit dependency — never commit.
+/vendor/

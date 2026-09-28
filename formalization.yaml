@@ -181,8 +181,8 @@ status:
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
   main_results:
-    - declaration: "StructuralSieve.prime_iff_uncovered_by_prev"
-      file: "StructuralSieve/ZeroForce.lean"
+    - declaration: "Submission.prime_iff_uncovered_by_prev"
+      file: "Challenge.lean / Solution.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
@@ -191,11 +191,16 @@ status:
         The originating result (see project.description and status.scope). Exact
         equivalence "prime iff not covered by the preceding base" on the window
         (P_k, 2*P_k]. Proved by divisibility (Zero Effective Force + least-prime-factor
-        bound), independent of counting or the central binomial coefficient. Axioms
-        assumed identical to the rest of this development (built from the same elementary
-        primitives); Artur to confirm via `#print axioms` in the real build.
-    - declaration: "StructuralSieve.window_reach_self_contained"
-      file: "StructuralSieve/SelfContained.lean"
+        bound), independent of counting or the central binomial coefficient. This is the
+        Comparator-audited surface for `StructuralSieve.prime_iff_uncovered_by_prev`
+        (StructuralSieve/ZeroForce.lean), the underlying library declaration
+        `Solution.lean` invokes one-for-one -- same statement, restated under the
+        `Submission` namespace so Challenge.lean can state it without importing
+        `StructuralSieve/`. Axioms assumed identical to the rest of this development
+        (built from the same elementary primitives); Artur to confirm via `#print axioms`
+        in the real build.
+    - declaration: "Submission.window_reach_self_contained"
+      file: "Challenge.lean / Solution.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
@@ -206,10 +211,13 @@ status:
         process (see status.scope, item 2, and project.description). Generalizes
         window_self_contained_bound (m = 2, this file) to any base minimum m >= 1;
         max_self_contained_bound_general (same file) confirms m*P is the maximal such
-        bound. Axioms assumed identical to the rest of this development; Artur to confirm
-        via `#print axioms` in the real build.
-    - declaration: "StructuralSieve.bertrand_chebyshev"
-      file: "StructuralSieve/Main.lean"
+        bound. This is the Comparator-audited surface for
+        `StructuralSieve.window_self_contained_bound_general`
+        (StructuralSieve/SelfContained.lean), the underlying library declaration
+        `Solution.lean` invokes one-for-one. Axioms assumed identical to the rest of this
+        development; Artur to confirm via `#print axioms` in the real build.
+    - declaration: "Submission.bertrand_chebyshev"
+      file: "Challenge.lean / Solution.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
@@ -220,6 +228,9 @@ status:
         entirely covered, closed via the central binomial coefficient (see status.scope,
         item 3). This is the classical Bertrand-Chebyshev theorem (Bertrand 1845,
         Chebyshev 1852) -- not original to this project; see the `sources` entry for it.
+        This is the Comparator-audited surface for `StructuralSieve.bertrand_chebyshev`
+        (StructuralSieve/Main.lean), the underlying library declaration `Solution.lean`
+        invokes one-for-one.
 
 automation:
   methods:
