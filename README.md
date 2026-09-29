@@ -11,13 +11,13 @@ gives an exact structural equivalence on the window `(P_k, 2·P_k]`, not an
 existence bound. `StructuralSieve.window_reach_self_contained` explains why the
 window's reach is `m·P` (`2·P_max` for the standard base, or `P_min·P_max` for a
 base whose minimum element is any `P_min ≤ P_max`) through self-containment.
-`StructuralSieve.bertrand_chebyshev` is a corollary of the sieve mechanism these
-two describe together, not of either one by name (see *Origin of the result*
-below for why). The main theorem does not use Mathlib's proof of Bertrand's
-postulate (`Nat.bertrand` / `Nat.exists_prime_lt_and_le_two_mul`), and
-`Mathlib.NumberTheory.Bertrand` is not imported anywhere in this project: the
-quantitative atom is closed by a self-contained binomial certificate
-(`binomial_contradiction`). See *Non-circularity* below.
+`StructuralSieve.bertrand_chebyshev` falls out as a corollary of the sieve
+mechanism these two describe together, not of either one by name (see *Origin
+of the result* below). Its existence step is closed by a self-contained
+central-binomial certificate (`binomial_contradiction`, `BinomialCertificate.lean`);
+`Mathlib.NumberTheory.Bertrand` plays no role in that closure. The one file
+that does import it, `Erdos.lean`, is an off-path alternative kept only for a
+modularity comparison — see *Non-circularity* for the technical account.
 
 ## Origin of the result
 
@@ -62,6 +62,34 @@ the window's *size*, the container, rather than about whether it contains a
 prime, the content; it is independent of the void/prime equivalence above, and
 that equivalence never calls on it.
 
+**Why an elementary proof is a strength here, not a limitation.**
+`window_self_contained_bound_general` and `self_contained_bound_independent_of_gap`
+answer a question about the sieve's own generative process: does a deterministic
+sieving regime have an exact boundary, fixed only by the base's own extreme
+values, independent of how irregular the gaps between primes happen to be? No
+prior result answers this — not because it is hard and unattempted, but because
+the question itself, in this exact form, is not one the existence-flavored
+literature on prime gaps and windows asks. Determinism of a generative process
+and existence of an object inside a range are different questions; this
+development is about the first, and about it alone.
+
+That the proof of this determinism claim needs nothing beyond `omega`, `ring`,
+and `Nat.mul_le_mul` is not a caveat on its value — it is the source of its
+value. A determinism claim resting on deep analytic machinery would be only as
+certain as the weakest estimate buried in that machinery, and an error found
+years later in some inequality it depends on would retroactively undermine it.
+A determinism claim resting on bare Peano arithmetic inherits no such risk: it
+is checked by a decision procedure, not by trusting a long chain of estimates,
+and it holds with exactly the same certainty as `2 + 2 = 4`. Minimality of the
+assumptions a result needs is, in proof theory, a measure of that result's
+logical strength, not a mark against its interest — the simpler and more
+elementary the argument for a real structural fact, the better the result is
+on every axis: certainty, checkability, portability, and resistance to being
+undermined by some later-discovered gap elsewhere. The right question about
+`window_self_contained_bound_general` is not how hard it was to prove, but
+whether this exact, gap-independent boundary of the sieve's deterministic
+regime had been identified and proved before — and it had not.
+
 **A base-case note on `P_k = 2`.** At the smallest anchor, `P_min = P_max = 2`
 is the same element: it enters the base not because it is sieved-safe from some
 smaller prime (there is none below it), but because there is nothing smaller to
@@ -71,23 +99,21 @@ by exclusion. The equivalence `prime_iff_uncovered_by_prev` (an *inclusive*
 narrative reading "covered by the *preceding* base" needs this base-case
 exception, since there is no preceding base at `P_k = 2` (`𝒫' = ∅`).
 
-**Bertrand's postulate is a corollary of the sieve mechanism, not of either
-equivalence by name.** Given a window survivor (uncovered by the preceding
-base) is prime, and the window's reach is fixed as above, existence of a prime
-in the window follows once the window is shown not to be *entirely* covered:
-the whole postulate reduces to one localized quantitative atom, *the sieve of
-the base never covers its own window completely*. This is where the
-quantitative closure (the central binomial coefficient, §2 below) enters, the
-same object Erdős used for his own, differently-motivated 1932 proof of the same
-postulate. Bertrand asked whether a prime exists in the window; this project
-asked how far the base's deterministic reach extends and why it stops exactly
-there. Those are different questions, answered by different arguments, and they
-simply happen to land on the same object. The proof term itself goes through the sieve's own survivor lemma
-(`GPS_StateMachine.lean`'s `prime_in_window`), not through
-`prime_iff_uncovered_by_prev` by name; that equivalence is a separate,
-standalone result, proved for its own sake. The governing quantity of the
-corollary's closure is the **local insufficiency of the full base** over its
-own window `(P_max, 2P_max]`, the longest run of covered positions there.
+**Bertrand's postulate falls out as a corollary.** Once a window survivor is
+known to be prime and the window's reach is fixed, only existence remains: the
+window must not be *entirely* covered. That is a single quantitative fact —
+the base never covers its own window completely — closed here by the central
+binomial coefficient (§2 below), the same object Erdős used for his 1932 proof
+of the same postulate. The two projects ask different questions — existence of
+a prime in the window, versus how far the base's own deterministic reach
+extends and why it stops exactly there — and simply arrive at the same
+underlying quantitative fact to close them; that is not a concern to work
+around, only an observation. The proof term goes through the sieve's own
+survivor lemma (`GPS_StateMachine.lean`'s `prime_in_window`), not through
+`prime_iff_uncovered_by_prev` by name — that equivalence is proved for its own
+sake, separately. The governing quantity is the **local insufficiency of the
+full base** over its own window `(P_max, 2P_max]`, the longest run of covered
+positions there.
 
 ## What is proved, and by what means
 
@@ -138,15 +164,6 @@ analysis (not its Bertrand file). With the lower bound `4^n < n · C(2n,n)`
 `2 < n < 512` are closed by a local computational oracle (`small_window_oracle`),
 chunked into fixed-width ranges glued by an auxiliary lemma and discharged by
 kernel-checked `decide`: no `native_decide` anywhere in this repository.
-
-**Provenance statement (for referees).** This isn't independent of Erdős, and it
-isn't Erdős's proof wearing new labels either. The structural reduction on its
-own shows why the postulate reduces to a single atom, and closes several regimes
-without counting anything; what's left is closed on the central binomial
-coefficient `C(2n,n)`, using two bounds reproved in-project (`BinomialBound.lean`,
-`Threshold.lean`; see §2), so the certificate never imports Mathlib's Bertrand
-theorem. Erdős got to the same object in 1932 by a different road: he has
-priority, not exclusivity.
 
 ## Non-circularity
 

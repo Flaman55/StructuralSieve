@@ -26,13 +26,21 @@ of fame:
    (not yet in the base) and as already covered (by `q` itself, as if it already were). Concrete
    collision at width `3·P_max`: base `{2,3,5}`, window `(5,15]` — this contains both the new
    prime `7` and `7`'s own boundary multiple `14 = 2·7`, at once. `2·P_max` is exactly the
-   widest reach at which this self-reference cannot occur. This is the same closure condition,
-   stated for a base whose minimum element is any `m` (not only `2`): the least proper multiple
-   of a new window element is `m·q`, and `hi ≤ m·P` is exactly the condition under which that
-   multiple always falls outside the window `(P, hi]` — specializing to `2·P_max` at `m = 2`
+   widest reach that stays reachable from the base's own two extreme values alone, `P_min` and
+   `P_max`; going further would mean treating the next prime past `P_max` as if it already
+   belonged to the base. This is the same closure condition, stated for a base whose minimum
+   element is any prime `m` (not only `2`): the least proper multiple of a new window element
+   is `m·q`, and `hi ≤ m·P` is exactly the condition under which that multiple always falls
+   outside the window `(P, hi]` — specializing to `2·P_max` at `m = 2`
    (`SelfContained.lean`'s `window_self_contained_bound_general` and
    `max_self_contained_bound_general`, which specialize to `window_self_contained_bound` and
-   `max_self_contained_width` at `m = 2`).
+   `max_self_contained_width` at `m = 2`). `m` is required to be prime, not merely `≥ 1`: it
+   stands for the base's own minimum element (`PrimeBase.pMin`, `Defs.lean`), which is always
+   prime by construction, so `m = 1` never occurs and carries no sieve-theoretic meaning.
+   `m·P_max` is not "the first value where something breaks" — which value first breaks depends
+   on the irregular gap to the next prime past `P_max` — it is the largest reach fixed by the
+   base's own extremes alone, independent of that gap
+   (`SelfContained.lean`'s `self_contained_bound_independent_of_gap`).
 3. `Submission.bertrand_chebyshev` — Bertrand's postulate in its Chebyshev-strengthened form
    (for every integer `N > 1` there is a prime strictly greater than `N` and at most `2 * N`).
    This is a **corollary of the same sieve mechanism (1) and (2) describe**, not of either
@@ -78,13 +86,13 @@ not an existence bound and not a divisor-search bound.** The sieve feeds itself 
 found in one window extends the base for the next. For that hand-off to be well-formed, no
 window may reach so far that a prime `q` it just found has its own least proper multiple
 `2·q` fall back inside that same window (which would force the round to treat `q` both as a
-fresh discovery and as already covered by itself). `2·P_max` is exactly the widest reach at
-which this self-reference cannot occur: for a base whose minimum element is any `m` (`m = 2`
-is the standard case), the least proper multiple of a new window element `q ∈ (P, hi]` is
-`m·q`, and `hi ≤ m·P` is exactly the condition under which that multiple always falls
-strictly outside the window. -/
+fresh discovery and as already covered by itself). `2·P_max` is the widest reach fixed by the
+base's own two extreme values alone, `P_min` and `P_max`: for a base whose minimum element is
+any prime `m` (`m = 2` is the standard case, always prime since it is `PrimeBase.pMin`), the
+least proper multiple of a new window element `q ∈ (P, hi]` is `m·q`, and `hi ≤ m·P` is exactly
+the condition under which that multiple always falls strictly outside the window. -/
 theorem Submission.window_reach_self_contained
-    {P hi q m : ℕ} (hm : 1 ≤ m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
+    {P hi q m : ℕ} (hm : Nat.Prime m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
     hi < m * q := by
   sorry
 

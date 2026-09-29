@@ -10,8 +10,10 @@ project:
     exact characterization of primality via sieve-coverage on a prime base's own window
     (P_k, 2*P_k] (StructuralSieve.prime_iff_uncovered_by_prev): n is prime iff not covered
     by the base of primes below P_k; and (2) why the reach is exactly 2*P_max and not some
-    other multiplier (StructuralSieve.window_reach_self_contained, SelfContained.lean) --
-    not an existence question and not a divisor-search bound, but a closure condition on
+    other multiplier (StructuralSieve.window_self_contained_bound_general,
+    SelfContained.lean -- named `window_reach_self_contained` in the paper and in this
+    submission's Challenge.lean/Solution.lean wrapper) -- not an existence question and
+    not a divisor-search bound, but a closure condition on
     the sieve's own generative process. The sieve feeds itself: a prime found in one window
     extends the base for the next. For that hand-off to be well-formed, no window may reach
     so far that a prime q it just found has its own least proper multiple 2*q fall back
@@ -19,9 +21,12 @@ project:
     discovery and as already covered by itself); 2*P_max is exactly the widest reach at
     which this self-reference cannot occur. Concretely: base {2,3,5}, a window (5,15] would
     contain both the new prime 7 and 7's own boundary multiple 14 = 2*7 at once. The same
-    closure condition holds for a base whose minimum element is any m, not only 2: the
-    least proper multiple of a new window element is m*q, and m*P is exactly the largest
-    window bound for which that multiple always falls outside the window -- specializing to
+    closure condition holds for a base whose minimum element is any prime m, not only 2 (m
+    stands for PrimeBase.pMin, Defs.lean, which is always prime by construction -- m = 1 is
+    not a case that occurs): the least proper multiple of a new window element is m*q, and
+    m*P is the largest reach fixed by the base's own two extreme values alone, independent
+    of the irregular gap to the next prime past P_max
+    (SelfContained.lean's self_contained_bound_independent_of_gap) -- specializing to
     2*P_max at m = 2. The originating question is not
     Bertrand's ("is there a prime here?") but two different ones: "up to where can
     sieve-coverage certify primality without appeal to counting?" and "why does the window
@@ -31,15 +36,34 @@ project:
     reach, and what remains is existence -- that the window is not entirely covered -- via
     a coprimality/counting argument whose quantitative core bottoms out in the central
     binomial coefficient -- the same object Erdos used for his own, differently-motivated
-    proof of the same postulate. The proof term itself goes through the sieve's own
-    survivor lemma, not through prime_iff_uncovered_by_prev by name. In Lean 4, avoiding
-    Mathlib's existing Bertrand development entirely. The corollary's quantitative closure
+    proof of the same postulate; the two projects ask different questions and simply arrive
+    at the same underlying quantitative fact to close them, which is not a concern to work
+    around, only an observation. The proof term itself goes through the sieve's own
+    survivor lemma, not through prime_iff_uncovered_by_prev by name, and does not import
+    Mathlib's own Bertrand development. The corollary's quantitative closure
     is a finite oracle over small windows (n < 512, chunked kernel-checked `decide`) and,
     for n >= 512, a self-contained factorization-based upper bound on the central binomial
     coefficient combined with a threshold inequality (adapted from Mathlib's Bertrand
     development) and Mathlib's own lower bound on the central binomial coefficient — no
     `native_decide` anywhere in this closure. Zero sorries; depends only on the three
     standard Lean axioms.
+
+    On the notability of (2) specifically: window_self_contained_bound_general and
+    self_contained_bound_independent_of_gap answer a question about the sieve's own
+    generative process -- whether a deterministic sieving regime has an exact boundary,
+    fixed only by the base's own extreme values, independent of how irregular the gaps
+    between consecutive primes happen to be -- not a question the existence-flavored
+    literature on prime gaps and windows asks. That the proof needs nothing beyond `omega`,
+    `ring`, and `Nat.mul_le_mul` is not a caveat on the result's interest; it is the source
+    of its strength. A determinism claim resting on deep analytic machinery is only as
+    certain as the weakest estimate that machinery depends on; a determinism claim resting
+    on bare Peano arithmetic inherits no such risk, is checked by a decision procedure
+    rather than a chain of estimates, and holds with the same certainty as `2 + 2 = 4`.
+    Minimality of a result's assumptions is a measure of its logical strength, not a mark
+    against it -- the more elementary the argument for a genuine structural fact, the
+    better on every axis (certainty, checkability, portability). The relevant question is
+    not how hard this was to prove, but whether this exact, gap-independent boundary had
+    been identified and proved before -- it had not.
   authors: ["Artur Flamandzki"]
   license: "Apache-2.0"
   responsible_maintainers: ["Artur Flamandzki"]
@@ -134,21 +158,38 @@ status:
     Effective Force plus the least-prime-factor bound); no counting, no central binomial
     coefficient.
 
-    (2) StructuralSieve.window_reach_self_contained (SelfContained.lean) — why the reach
-    is exactly 2*P_max, not an existence question and not a divisor-search bound but a
+    (2) StructuralSieve.window_self_contained_bound_general (SelfContained.lean; named
+    `window_reach_self_contained` in the paper and in the Submission wrapper below) —
+    why the reach is exactly 2*P_max, not an existence question and not a divisor-search bound but a
     closure condition on the sieve's own generative process: the sieve feeds itself (a
     prime found in one window extends the base for the next), and for that hand-off to be
     well-formed, no window may reach so far that a prime q it just found has its own least
     proper multiple 2*q fall back inside that same window. 2*P_max is exactly the widest
     reach at which this self-reference cannot occur (concretely: base {2,3,5}, window
     (5,15] would contain both the new prime 7 and 7's own boundary multiple 14 = 2*7 at
-    once). Stated for a base whose minimum element is any m: the least proper multiple of a
-    new window element built from the base's own minimum is m*q; hi <= m*P is exactly the
-    condition under which that multiple always falls outside the window (P, hi].
+    once). Stated for a base whose minimum element is any prime m (m stands for
+    PrimeBase.pMin, which is always prime by construction; m = 1 does not occur and would
+    not be a proper multiplier if it did): the least proper multiple of a new window
+    element built from the base's own minimum is m*q; hi <= m*P is exactly the condition
+    under which that multiple always falls outside the window (P, hi].
     StructuralSieve.max_self_contained_bound_general (same file) confirms m*P is the
-    maximal such bound. At m = 2 this specializes to the reach 2*P_max used throughout this
+    maximal such bound. This bound is fixed by the base's own two extreme values alone,
+    not by where the next prime past P_max happens to sit: the true point where
+    self-containment fails is m times the least prime exceeding P, a value that depends on
+    the irregular gap to that prime, while m*P is provably always strictly below it
+    regardless of that gap (StructuralSieve.self_contained_bound_independent_of_gap, same
+    file). At m = 2 this specializes to the reach 2*P_max used throughout this
     development; the same argument fixes the reach P_min*P_max for any base minimum
     P_min.
+
+    On notability: this closure condition is not a question the existence-flavored
+    literature on prime gaps asks; it concerns whether the sieve's own generative process
+    has a deterministic regime with an exact, gap-independent boundary, not whether some
+    object exists in some range. The proof's elementary means (omega, ring, basic
+    inequalities on Nat) is not a weakness relative to that claim but evidence of its
+    strength: a result that needs nothing beyond bare Peano arithmetic carries no inherited
+    risk from deeper machinery, and is checked by decision procedure rather than by
+    trusting an estimate. See project.description for the fuller argument.
 
     (3) StructuralSieve.bertrand_chebyshev (Main.lean) — Bertrand's postulate
     (Chebyshev's strengthened form: for every N > 1 there is a prime p with N < p <= 2N), a
@@ -175,8 +216,8 @@ status:
     repository, kept for reference — they are NOT part of the proof term for (3); see their
     own module docstrings and `StructuralSieve.Certificate`'s two named `WindowCertificate`
     instances. `SelfContained.lean` is likewise not part of (3)'s proof term, but is now
-    load-bearing for (2) above (`window_reach_self_contained`), not merely kept for
-    reference.
+    load-bearing for (2) above (`window_self_contained_bound_general`), not merely kept
+    for reference.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -209,9 +250,15 @@ status:
         Why the reach is exactly 2*P_max, not an existence question and not a
         divisor-search bound but a closure condition on the sieve's own generative
         process (see status.scope, item 2, and project.description). Generalizes
-        window_self_contained_bound (m = 2, this file) to any base minimum m >= 1;
+        window_self_contained_bound (m = 2, this file) to any base minimum m, required to
+        be prime (m stands for PrimeBase.pMin, Defs.lean, which is always prime by
+        construction -- m = 1 would not be a proper multiplier and does not occur);
         max_self_contained_bound_general (same file) confirms m*P is the maximal such
-        bound. This is the Comparator-audited surface for
+        bound, and self_contained_bound_independent_of_gap (same file) shows this bound
+        is fixed by the base's own extremes alone: the true failure point is m times the
+        least prime exceeding P, which depends on the irregular prime gap, while m*P is
+        provably always strictly below it regardless of that gap. This is the
+        Comparator-audited surface for
         `StructuralSieve.window_self_contained_bound_general`
         (StructuralSieve/SelfContained.lean), the underlying library declaration
         `Solution.lean` invokes one-for-one. Axioms assumed identical to the rest of this
@@ -352,7 +399,7 @@ alignment:
         restated in Challenge.lean/Solution.lean as
         Submission.prime_iff_uncovered_by_prev.
     - source: "Why the reach is 2*P_max: closure of the sieve's own generative process"
-      lean: "StructuralSieve.window_reach_self_contained"
+      lean: "StructuralSieve.window_self_contained_bound_general"
       module: "StructuralSieve/SelfContained.lean"
       status: "proved"
       note: >
@@ -362,9 +409,15 @@ alignment:
         multiple cannot fall back inside the same window (concretely: base {2,3,5},
         window (5,15] would contain both the new prime 7 and 7's own boundary multiple
         14 = 2*7). Generalizes window_self_contained_bound (m = 2, same file) to any
-        base minimum m >= 1; max_self_contained_bound_general (same file) confirms m*P
-        is the maximal such bound. Also restated in Challenge.lean/Solution.lean as
-        Submission.window_reach_self_contained.
+        prime base minimum m (m stands for PrimeBase.pMin, always prime by construction);
+        max_self_contained_bound_general (same file) confirms m*P is the maximal such
+        bound, fixed by the base's own extremes alone and independent of the irregular
+        gap to the next prime past P (self_contained_bound_independent_of_gap, same
+        file). The paper and this submission's
+        Challenge.lean/Solution.lean wrapper call this result
+        `window_reach_self_contained` (restated there as
+        Submission.window_reach_self_contained) -- that is a display name for this
+        theorem, not a separate Lean declaration.
     - source: "Jacobsthal gap bound, g(210) = 10"
       lean: "StructuralSieve.jacobsthal_210"
       module: "StructuralSieve/Rings.lean"

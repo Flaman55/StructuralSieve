@@ -22,7 +22,7 @@ theorem Submission.prime_iff_uncovered_by_prev
   StructuralSieve.prime_iff_uncovered_by_prev hP hn_lo hn_hi hn2
 
 theorem Submission.window_reach_self_contained
-    {P hi q m : ℕ} (hm : 1 ≤ m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
+    {P hi q m : ℕ} (hm : Nat.Prime m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
     hi < m * q :=
   StructuralSieve.window_self_contained_bound_general hm hhi hq_lo _hq_hi
 

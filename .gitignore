@@ -37,3 +37,6 @@ __pycache__/
 # (scripts/palomar_preflight.sh -> policy_sync). Not part of the submission
 # itself, purely a local editorial-audit dependency — never commit.
 /vendor/
+
+# Local secret (CURSOR_API_KEY) read by palomar_editorial_audit.py. Never commit.
+/tokens_ssto.yaml
