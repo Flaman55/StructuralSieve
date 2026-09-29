@@ -9,9 +9,13 @@ to `bertrand_chebyshev`, is machine-checked. Two results head this development,
 in the order that actually motivated it. `StructuralSieve.prime_iff_uncovered_by_prev`
 gives an exact structural equivalence on the window `(P_k, 2·P_k]`, not an
 existence bound. `StructuralSieve.prime_iff_uncovered_by_prev_general` is the
-same equivalence for a base whose minimum element need not be `2` — the same
-invariant, "what the base cannot build is exactly what is prime," restated at
-whatever minimum the base actually starts from; the first is the special case
+same equivalence on a window whose upper reach is scaled by any positive
+factor `P_min` instead of the fixed `2` — coverage is still by the same full
+base, every prime `≤ P_k`, so `P_min` is a window-width multiplier, not a
+lower cutoff on which primes count as covering. The same
+invariant, "what the base cannot build is exactly what is prime," restated on
+a window whose reach is a free parameter instead of fixed at `2·P_k`; the
+first is the special case
 `P_min = 2`. `StructuralSieve.bertrand_chebyshev` falls out as a corollary of the sieve
 mechanism these two describe together, not of either one by name (see *Origin
 of the result* below). Its existence step is closed by a self-contained
@@ -41,24 +45,26 @@ appeal to counting or to the central binomial coefficient.
 
 **Why (2) is a genuine generalization, not exposition on (1).**
 The window `(P_max, P_min·P_max]` is where the equivalence above lives, for
-any base minimum:
+any positive scaling factor `P_min`:
 
-> `StructuralSieve.prime_iff_uncovered_by_prev_general`, for a base whose
-> minimum element is `P_min` (not necessarily `2`): `n` is prime **iff** `n`
-> is not covered by the base below `P_max` (`n.minFac ≤ P_max`). `(1)` is the
+> `StructuralSieve.prime_iff_uncovered_by_prev_general`, on a window whose
+> upper reach is scaled by any positive `P_min ≤ P_max` instead of the fixed
+> factor `2` — coverage is still by the same full base as `(1)`, every prime
+> `≤ P_max` — `n` is prime **iff** `n`
+> is not covered by that base below `P_max` (`n.minFac ≤ P_max`). `(1)` is the
 > special case `P_min = 2`.
 
 Both directions were already available separately before this project
 assembled them into a single equivalence: the forward direction is the same
 `minFac`-of-a-prime fact `ZeroForce.lean` uses for `(1)`; the backward
 direction is `LPF.lean`'s least-prime-factor bound (`uncovered_is_prime`),
-already stated for a general base minimum. So `(2)` is not a restatement of
+already stated for this general window. So `(2)` is not a restatement of
 `(1)` — it extends the range over which the "uncovered = prime" invariant is
-known to hold, from the one case that happens to be the standard base to
-every prime base minimum at once, proved once and holding uniformly.
+known to hold, from the one fixed window reach `2·P_k` to any positively
+scaled reach `P_min·P_max` at once, proved once and holding uniformly.
 
 `SelfContained.lean` separately establishes that a window up to `m·P` (or
-`P_min·P_max` for any other base minimum) is always a self-contained reach,
+`P_min·P_max` for any other positive scaling factor) is always a self-contained reach,
 fixed by the base's own extreme values and independent of how irregular the
 gap to the next prime happens to be — this is a fact about the window's
 *size*, the container, not about whether it contains a prime, the content;
@@ -234,7 +240,7 @@ replayed from Mathlib's own files are expected and harmless).
 | File | Content (paper reference) |
 |---|---|
 | `StructuralSieve/Defs.lean` | Complete generative prime base, sieve coverage, window (Def. 2.1, Prop. 2.2) |
-| `StructuralSieve/LPF.lean` | Least Prime Factor bound; uncovered ⇒ prime (Lemma 3.1, Cor. 3.2); **`prime_iff_uncovered_general`**: headline equivalence for any base minimum (Cor. 3.3) |
+| `StructuralSieve/LPF.lean` | Least Prime Factor bound; uncovered ⇒ prime (Lemma 3.1, Cor. 3.2); **`prime_iff_uncovered_general`**: headline equivalence on any positively-scaled window (Cor. 3.3) |
 | `StructuralSieve/ZeroForce.lean` | Zero Effective Force; composites covered by preceding base; **`prime_iff_uncovered_by_prev`**: headline equivalence (Lemma 4.1, Cor. 4.2) |
 | `StructuralSieve/Weight.lean` | Structural weight `w ≥ 1`; expansion capacity `M' < P·φ(M')` (Lemma 4.3, Cor. 4.5) |
 | `StructuralSieve/SelfContained.lean` | Self-containment boundary, gap-independent; `self_contained_bound_independent_of_gap` (`m·P` always self-contained, generalized to `P_min·P_max`) |

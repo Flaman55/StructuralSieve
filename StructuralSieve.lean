@@ -55,11 +55,13 @@ arithmetic (`omega`, `nlinarith`), and finite-set cardinality (union bound).
 On the window `(P_max, P_min·P_max]`, "uncovered" and "prime" coincide exactly
 (`LPF.lean`'s `prime_iff_uncovered_general`): the forward direction is the
 `minFac`-of-a-prime fact, the backward direction is the least-prime-factor
-bound (Lemma 3.1) — this holds for the standard base (`P_min = 2`) and for any
-other base minimum alike; `SelfContained.lean` separately establishes that
-`P_min·P_max` is always a self-contained reach for the window's *size*, a
-distinct fact about the window's boundary, not about which elements in it are
-prime.
+bound (Lemma 3.1) — coverage is by the full base, every prime `≤ P_max`
+(Definition 2.1), so this holds for the fixed reach `2·P_max` and for any
+other positive scaling `P_min·P_max` alike; `P_min` is a window-width
+multiplier here, not a lower cutoff on which primes count as covering.
+`SelfContained.lean` separately establishes that `P_min·P_max` is always a
+self-contained reach for the window's *size*, a distinct fact about the
+window's boundary, not about which elements in it are prime.
 The postulate collapses to a single quantitative atom — *the sieve never covers
 its own window* — closed by the self-contained argument on the central binomial
 coefficient (`binomial_contradiction`, `BinomialCertificate.lean`): the
@@ -76,7 +78,7 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
 ### Chain
 1. **LPF** (`LPF.lean`): every composite n ∈ (P_max, P_min·P_max] has n.minFac ≤ P_max,
    so uncovered elements must be prime; packaged as the equivalence
-   `prime_iff_uncovered_general`, for any base minimum P_min.  [verified]
+   `prime_iff_uncovered_general`, for any positive window-scaling factor P_min.  [verified]
 
 2. **Zero Effective Force** (`ZeroForce.lean`): P_k's only multiple in (P_k, 2·P_k] is
    2·P_k, already covered by 2 ∈ 𝒫'.  Composites in the window ↔ covered by 𝒫'.  [verified]
@@ -106,7 +108,7 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
 | File | Content | Status |
 |------|---------|--------|
 | `Defs.lean`            | Complete generative base, sieve coverage, window (Def. 2.1) | verified |
-| `LPF.lean`             | Least Prime Factor; uncovered ⇒ prime (Lemma 3.1); uncovered ⇔ prime for any base minimum (Cor. 3.3, `prime_iff_uncovered_general`) | verified |
+| `LPF.lean`             | Least Prime Factor; uncovered ⇒ prime (Lemma 3.1); uncovered ⇔ prime on any positively-scaled window (Cor. 3.3, `prime_iff_uncovered_general`) | verified |
 | `ZeroForce.lean`       | Zero Effective Force; composites covered by 𝒫' (Lemma 4.1) | verified |
 | `Weight.lean`          | Structural weight w ≥ 1; M' < P·φ(M') (Lemma 4.3) | verified |
 | `SelfContained.lean`   | Self-containment fixes the window reach (why the constant) | verified |

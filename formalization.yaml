@@ -5,26 +5,29 @@ license: "Apache-2.0"
 project:
   name: "StructuralSieve"
   description: >
-    One structural fact about a generative prime sieve, stated at two base minimums, plus
-    Bertrand's postulate as a corollary of the sieve mechanism it describes (not of either
-    statement by name): (1) an exact characterization of primality via sieve-coverage on
-    the standard prime base's own window (P_k, 2*P_k]
+    One structural fact about a generative prime sieve, stated on two windows of
+    differently-scaled reach, plus Bertrand's postulate as a corollary of the sieve
+    mechanism it describes (not of either statement by name): (1) an exact
+    characterization of primality via sieve-coverage on the standard prime base's own
+    window (P_k, 2*P_k]
     (StructuralSieve.prime_iff_uncovered_by_prev): n is prime iff not covered by the base of
-    primes below P_k; and (2) the identical characterization for a base whose minimum
-    element need not be 2 -- on the window (P_max, P_min*P_max], n is prime iff not covered
-    by the base below P_max (StructuralSieve.prime_iff_uncovered_by_prev_general,
+    primes below P_k; and (2) the identical characterization on a window (P_max,
+    P_min*P_max] whose upper reach is scaled by any positive P_min <= P_max instead of the
+    fixed factor 2 -- coverage is still by the same full base as (1), every prime <= P_max
+    (Definition 2.1), not a base restricted to start at P_min
+    (StructuralSieve.prime_iff_uncovered_by_prev_general,
     LPF.lean). (2) is not a different phenomenon that happens to resemble (1); it is the
     same structural invariant -- "what the base cannot build is exactly what is prime" --
-    restated at whatever minimum the base actually starts from, with (1) as the special
-    case P_min = 2. Both directions were already available as separate lemmas before this
-    equivalence was assembled: the forward direction is the same minFac-of-a-prime fact
-    ZeroForce.lean uses for (1); the backward direction is LPF.lean's least-prime-factor
-    bound, already stated for a general base minimum. The originating question is not
+    restated on a window whose reach is a free parameter instead of fixed at 2*P_k, with (1)
+    as the special case P_min = 2. Both directions were already available as separate lemmas
+    before this equivalence was assembled: the forward direction is the same minFac-of-a-prime
+    fact ZeroForce.lean uses for (1); the backward direction is LPF.lean's least-prime-factor
+    bound, already stated for this general window. The originating question is not
     Bertrand's ("is there a prime here?") but "up to where can sieve-coverage certify
-    primality without appeal to counting, for a base starting anywhere?" Bertrand's
+    primality without appeal to counting, on a window of any scaled reach?" Bertrand's
     postulate (Chebyshev's strengthened form: for every N > 1 there is a prime p with
     N < p <= 2N) is a corollary of the sieve's survivor mechanism, the same "uncovered =
-    prime" invariant (1) and (2) state at two different base minimums, not of either result
+    prime" invariant (1) and (2) state on two differently-scaled windows, not of either result
     by name and not built by literally chaining (1) or (2) as proof-term lemmas: the
     proof term goes through the sieve's own survivor lemma and a separate quantitative
     closure whose core bottoms out in the central binomial coefficient -- the same object
@@ -43,18 +46,19 @@ project:
 
     On the notability of (2) specifically: it is not exposition on (1) or a restatement of
     the same fact under a different name -- it extends the range of validity of the
-    "uncovered = prime" invariant from the single base minimum 2 to an arbitrary prime base
-    minimum, a genuine generalization proved once and holding uniformly, not a family of
-    separate instances checked one at a time. That neither the generalization's forward
-    direction (already used for (1)) nor its backward direction (LPF.lean's
-    least-prime-factor bound, already stated for a general base minimum) required new proof
-    technique is not a caveat on the result's interest: the content of (2) is that the same
-    elementary argument, unmodified, already reaches every base minimum at once -- the
-    generalization was available the moment the two pieces were stated for a general
-    minimum, and simply had not been assembled into the equivalence before. A determinism
-    claim resting on bare Peano arithmetic inherits no risk from deeper machinery, is
-    checked by a decision procedure rather than a chain of estimates, and holds with the
-    same certainty as `2 + 2 = 4` at every base minimum simultaneously. The relevant
+    "uncovered = prime" invariant from the single fixed window reach 2*P_k to a window
+    whose reach is any positive scaling factor P_min of P_max, a genuine generalization
+    proved once and holding uniformly, not a family of separate instances checked one at a
+    time. That neither the generalization's forward direction (already used for (1)) nor
+    its backward direction (LPF.lean's least-prime-factor bound, already stated for this
+    general window) required new proof technique is not a caveat on the result's interest:
+    the content of (2) is that the same elementary argument, unmodified, already reaches
+    every scaled window at once -- the generalization was available the moment the two
+    pieces were stated for a general window, and simply had not been assembled into the
+    equivalence before. A determinism claim resting on bare Peano arithmetic inherits no
+    risk from deeper machinery, is checked by a decision procedure rather than a chain of
+    estimates, and holds with the same certainty as `2 + 2 = 4` at every window scale
+    simultaneously. The relevant
     question is not how hard this was to prove, but whether this exact generalization had
     been identified and stated as a single equivalence before -- to the author's knowledge,
     within the bounded literature search recorded in `sources` below (which cannot rule out
@@ -154,29 +158,32 @@ status:
     coefficient.
 
     (2) StructuralSieve.prime_iff_uncovered_by_prev_general (LPF.lean) — the same
-    equivalence as (1), for a base whose minimum element need not be 2. On the window
-    (P_max, P_min*P_max] built from a base whose smallest element is P_min, n is prime iff
-    n is not covered by the base below P_max (n.minFac <= P_max). Not a different phenomenon
-    from (1) that happens to resemble it -- the same structural invariant, "what the base
-    cannot build is exactly what is prime," restated at whatever minimum the base actually
-    starts from; (1) is the special case P_min = 2. Proved by exact divisibility, the same
-    way as (1): the forward direction is the minFac-of-a-prime fact ZeroForce.lean already
-    uses for (1); the backward direction is LPF.lean's least-prime-factor bound, which was
-    already stated for a general base minimum.
+    equivalence as (1), on a window (P_max, P_min*P_max] whose upper reach is scaled by any
+    positive P_min <= P_max instead of the fixed factor 2. Coverage is still by the same
+    full base as (1) -- every prime <= P_max (Definition 2.1) -- so P_min names a
+    window-width multiplier here, not a lower cutoff on which primes count as covering:
+    n is prime iff n is not covered by that base below P_max (n.minFac <= P_max). Not a
+    different phenomenon from (1) that happens to resemble it -- the same structural
+    invariant, "what the base cannot build is exactly what is prime," restated on a window
+    whose reach is a free parameter instead of fixed at 2*P_max; (1) is the special case
+    P_min = 2. Proved by exact divisibility, the same way as (1): the forward direction is
+    the minFac-of-a-prime fact ZeroForce.lean already uses for (1); the backward direction
+    is LPF.lean's least-prime-factor bound, which was already stated for this general
+    window.
 
     On notability: (2) is not exposition on (1) or a restatement of the same fact under a
     different name -- it extends the "uncovered = prime" invariant's range of validity from
-    the single base minimum 2 to an arbitrary prime base minimum, a genuine generalization
-    proved once and holding uniformly. Neither direction required new proof technique to
-    reach the general case; the content of (2) is that the same elementary argument,
-    unmodified, already reaches every base minimum at once, and simply had not been
-    assembled into a single equivalence before. See project.description for the fuller
-    argument.
+    the single fixed window reach 2*P_k to any positively-scaled reach P_min*P_max, a
+    genuine generalization proved once and holding uniformly. Neither direction required
+    new proof technique to reach the general case; the content of (2) is that the same
+    elementary argument, unmodified, already reaches every scaled window at once, and
+    simply had not been assembled into a single equivalence before. See project.description
+    for the fuller argument.
 
     (3) StructuralSieve.bertrand_chebyshev (Main.lean) — Bertrand's postulate
     (Chebyshev's strengthened form: for every N > 1 there is a prime p with N < p <= 2N), a
     corollary of the sieve's survivor mechanism, the same generative process (1) and (2)
-    describe from two different angles, not of either result by name and not built by
+    describe on two differently-scaled windows, not of either result by name and not built by
     literally chaining (1) or (2) as proof-term lemmas: the proof term goes through the
     sieve's own survivor lemma and existence -- that the window is not entirely covered --
     is what the quantitative closure below supplies.
@@ -232,10 +239,13 @@ status:
       comparator_config: "comparator.json"
       literature_dependencies: []
       note: >
-        The same equivalence as (1), for a base whose minimum element need not be 2 (see
-        status.scope, item 2, and project.description). On the window (P_max, P_min*P_max],
-        n is prime iff not covered by the base below P_max (n.minFac <= P_max); (1) is the
-        special case P_min = 2. Proved by exact divisibility, the same way as (1). This is
+        The same equivalence as (1), on a window (P_max, P_min*P_max] whose upper reach is
+        scaled by any positive P_min <= P_max instead of the fixed factor 2 (see
+        status.scope, item 2, and project.description). Coverage is still by the same full
+        base as (1), every prime <= P_max -- P_min is a window-width multiplier, not a
+        lower cutoff on which primes count as covering. n is prime iff not covered by that
+        base below P_max (n.minFac <= P_max); (1) is the special case P_min = 2. Proved by
+        exact divisibility, the same way as (1). This is
         the Comparator-audited surface for
         `StructuralSieve.prime_iff_uncovered_by_prev_general` (StructuralSieve/LPF.lean),
         the underlying library declaration `Solution.lean` invokes one-for-one. Axioms
@@ -376,20 +386,23 @@ alignment:
         The project's starting question and its answer (see project.description). Also
         restated in Challenge.lean/Solution.lean as
         Submission.prime_iff_uncovered_by_prev.
-    - source: "Same invariant as the originating result, for a base with any minimum
-        element"
+    - source: "Same invariant as the originating result, on a window scaled by any factor"
       lean: "StructuralSieve.prime_iff_uncovered_by_prev_general"
       module: "StructuralSieve/LPF.lean"
       status: "proved"
       note: >
-        On the window (P_max, P_min*P_max] built from a base whose smallest element is
-        P_min (not necessarily 2), n is prime iff n is not covered by the base below P_max
-        (n.minFac <= P_max). The same structural invariant as the originating result --
-        "what the base cannot build is exactly what is prime" -- restated at whatever
-        minimum the base actually starts from; the originating result is the special case
-        P_min = 2. Proved the same way: the forward direction is the minFac-of-a-prime fact
-        ZeroForce.lean already uses for the originating result; the backward direction is
-        LPF.lean's least-prime-factor bound, already stated for a general base minimum.
+        On a window (P_max, P_min*P_max] whose upper reach is scaled by any positive
+        P_min <= P_max instead of the fixed factor 2 -- coverage is still by the same full
+        base as the originating result, every prime <= P_max (Definition 2.1); P_min is a
+        window-width multiplier here, not a lower cutoff on which primes count as covering
+        -- n is prime iff n is not covered by that base below P_max (n.minFac <= P_max).
+        The same structural invariant as the originating result --
+        "what the base cannot build is exactly what is prime" -- restated on a window
+        whose reach is a free parameter instead of fixed at 2*P_max; the originating result
+        is the special case P_min = 2. Proved the same way: the forward direction is the
+        minFac-of-a-prime fact ZeroForce.lean already uses for the originating result; the
+        backward direction is LPF.lean's least-prime-factor bound, already stated for this
+        general window.
         Restated in Challenge.lean/Solution.lean as
         Submission.prime_iff_uncovered_by_prev_general -- the Comparator-audited surface
         for this development's headline result (2).

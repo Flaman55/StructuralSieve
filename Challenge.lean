@@ -16,20 +16,22 @@ of fame:
    primes below `P_k`. This is proved directly from divisibility (`ZeroForce.lean`'s Zero
    Effective Force lemma plus the least-prime-factor bound), with no appeal to counting or to
    the central binomial coefficient.
-2. `Submission.prime_iff_uncovered_by_prev_general` — the same equivalence as (1), for a
-   base whose minimum element need not be `2`. A window `(P_max, P_min·P_max]` built from a
-   base with smallest element `P_min` (not necessarily `2`) has the identical structure: `n`
-   is prime iff `n` is *not* covered by the base below `P_max` (`n.minFac ≤ P_max`). This is
-   not a different phenomenon from (1) that happens to resemble it — it is the same
-   structural invariant, "what the base cannot build is exactly what is prime," restated at
-   whatever minimum the base actually starts from. (1) is the special case `P_min = 2`.
+2. `Submission.prime_iff_uncovered_by_prev_general` — the same equivalence as (1), on a
+   window `(P_max, P_min·P_max]` whose upper reach is scaled by any positive
+   `P_min ≤ P_max` instead of the fixed factor `2`. Coverage is still by the same base as
+   (1) — every prime `≤ P_max` (Definition 2.1) — so `P_min` is a window-width multiplier
+   here, not a lower cutoff on which primes count as covering: `n` is prime iff `n` is
+   *not* covered by that base below `P_max` (`n.minFac ≤ P_max`). This is the same
+   structural invariant as (1), "what the base cannot build is exactly what is prime,"
+   restated on a window whose reach is a free parameter instead of fixed at `2·P_max`.
+   (1) is the special case `P_min = 2`.
    Proved the same way: the forward direction is the `minFac`-of-a-prime fact `ZeroForce.lean`
    already uses for (1); the backward direction is `LPF.lean`'s least-prime-factor bound,
-   which was already stated for a general base minimum.
+   which was already stated for this general window.
 3. `Submission.bertrand_chebyshev` — Bertrand's postulate in its Chebyshev-strengthened form
    (for every integer `N > 1` there is a prime strictly greater than `N` and at most `2 * N`).
    This is a **corollary of the sieve's survivor mechanism**, the same "uncovered = prime"
-   invariant (1) and (2) state at two different base minimums — not a corollary of either
+   invariant (1) and (2) state on two differently-scaled windows — not a corollary of either
    result by name, and not built by literally chaining (1) or (2) as proof-term lemmas: the
    proof term goes through the sieve's own survivor lemma (`GPS_StateMachine.lean`'s
    `prime_in_window`) and a separate quantitative closure (`BinomialCertificate.lean`'s
@@ -64,10 +66,12 @@ theorem Submission.prime_iff_uncovered_by_prev
     n.Prime ↔ ¬ (n.minFac ≤ P_k) := by
   sorry
 
-/-- **Same invariant as (1), for a base with any minimum element `P_min` (not only `2`).**
-For a window `(P_max, P_min·P_max]` built from a base whose smallest element is `P_min`, `n`
-is prime iff `n` is not covered by the base below `P_max` (`n.minFac ≤ P_max`). (1) is the
-special case `P_min = 2`. Proved by exact divisibility, the same as (1). -/
+/-- **Same invariant as (1), on a window scaled by any factor `P_min` (not only `2`).**
+For a window `(P_max, P_min·P_max]` whose upper reach is scaled by any positive
+`P_min ≤ P_max` — coverage is still by the full base, every prime `≤ P_max` (Definition
+2.1), not a base restricted to start at `P_min` — `n` is prime iff `n` is not covered by
+that base below `P_max` (`n.minFac ≤ P_max`). (1) is the special case `P_min = 2`. Proved
+by exact divisibility, the same as (1). -/
 theorem Submission.prime_iff_uncovered_by_prev_general
     {P_min P_max : ℕ} (hPmin_pos : 0 < P_min) (hPmin_le : P_min ≤ P_max)
     {n : ℕ} (hn_lo : P_max < n) (hn_hi : n ≤ P_min * P_max) (hn2 : 2 ≤ n) :

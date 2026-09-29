@@ -67,18 +67,21 @@ theorem uncovered_is_prime
   exact huncov (least_prime_factor_bound hPmin_pos hPmin_le hn_lo hn_hi hn2 hn_comp)
 
 /--
-**Corollary 3.3** (Uncovered ↔ prime, for an arbitrary base minimum).
+**Corollary 3.3** (Uncovered ↔ prime, on a window scaled by any factor `P_min`).
 
-Generalizes `ZeroForce.lean`'s `prime_iff_uncovered_by_prev` (fixed at base minimum `2`,
-window `(P_k, 2·P_k]`) to a window `(P_max, P_min·P_max]` built from a base whose minimum
-element is any `P_min` (not just `2`): `n` is prime iff `n` is *not* covered by the base
-below `P_max` — the same structural invariant ("what the base cannot build is exactly what
-is prime"), independent of which prime the base happens to start at.
+Generalizes `ZeroForce.lean`'s `prime_iff_uncovered_by_prev` (window `(P_k, 2·P_k]`, upper
+reach fixed at `2·P_k`) to a window `(P_max, P_min·P_max]` whose upper reach is scaled by
+any positive `P_min ≤ P_max` instead of the fixed factor `2`. Coverage is still by the same
+full base as everywhere else in this file — every prime `≤ P_max` (Definition 2.1) — so
+`P_min` names a window-width multiplier here, not a lower cutoff on which primes count as
+covering. `n` is prime iff `n` is *not* covered by that base — the same structural invariant
+as theorem 1 ("what the base cannot build is exactly what is prime"), restated on a window
+whose reach is a free parameter instead of fixed at `2·P_max`.
 
 Both directions were already available separately (the forward direction is the same
 `minFac`-of-a-prime argument `ZeroForce.lean` uses; the backward direction is
-`uncovered_is_prime` above, already stated for general `P_min`) — this packages them as the
-single equivalence.
+`uncovered_is_prime` above, already proved for this general window) — this packages them as
+the single equivalence.
 -/
 theorem prime_iff_uncovered_general
     {P_min P_max : ℕ}
