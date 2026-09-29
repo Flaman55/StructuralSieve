@@ -3,7 +3,7 @@
   "solution_module": "Solution",
   "theorem_names": [
     "Submission.prime_iff_uncovered_by_prev",
-    "Submission.window_reach_self_contained",
+    "Submission.self_contained_bound_independent_of_gap",
     "Submission.bertrand_chebyshev"
   ],
   "definition_names": [],

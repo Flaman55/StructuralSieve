@@ -36,7 +36,7 @@ instance, not reachable from `Main`; see *Extended development* below.)
 This repository serves two purposes, and they are deliberately different in
 size. The **Palomar bounty excerpt** (`Challenge.lean`/`Solution.lean`/
 `comparator.json`) is a narrow, three-theorem slice —
-`prime_iff_uncovered_by_prev`, `window_reach_self_contained`,
+`prime_iff_uncovered_by_prev`, `self_contained_bound_independent_of_gap`,
 `bertrand_chebyshev` — chosen to be the minimal self-contained closure an
 automated reviewer can check statement-by-statement; it never imports
 `Rings.lean`, `Newton.lean`, `Certificate.lean`, or `Erdos.lean`, with or
@@ -52,11 +52,13 @@ contain and why they are kept.
 The structural scaffold is verified with no analytic machinery: divisibility/gcd
 algebra, totient multiplicativity, induction over the prime base, linear/nonlinear
 arithmetic (`omega`, `nlinarith`), and finite-set cardinality (union bound).
-The window's reach is fixed by self-containment (`SelfContained.lean`): for a base
+A window up to `m·P` is always self-contained (`SelfContained.lean`): for a base
 whose minimum element is `m`, the least proper multiple of a new window element
-`q` is `m·q`, and that multiple falls outside the window exactly when the
-window's upper bound is `≤ m·P` — this is why the reach is `2·P_max` for the
-standard base (`m = 2`), and `P_min·P_max` for a base with any other minimum.
+`q` is `m·q`, and `m·P` is always strictly below the true, gap-dependent point
+where that multiple would fall back inside the window
+(`self_contained_bound_independent_of_gap`) — this is why `2·P_max` is always a
+safe reach for the standard base (`m = 2`), and `P_min·P_max` for a base with
+any other minimum; it is not a claim that this is the *widest* safe reach.
 The postulate collapses to a single quantitative atom — *the sieve never covers
 its own window* — closed by the self-contained argument on the central binomial
 coefficient (`binomial_contradiction`, `BinomialCertificate.lean`): the
@@ -82,9 +84,10 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
    condition, **not** by itself a guarantee for a specific window.  [verified]
 
 4. **Self-containment** (`SelfContained.lean`): the window width ≤ P_max (multiplier = the
-   minimal prime) is the maximal self-contained width — the structural reason for the
-   constant, generalized to any base minimum `m` (`window_self_contained_bound_general`,
-   `max_self_contained_bound_general`).  [verified]
+   minimal prime) is always a self-contained width, fixed by the base's own extremes and
+   independent of the irregular gap to the next prime — not a claim that it is the widest
+   such width — generalized to any base minimum `m` (`window_self_contained_bound_general`,
+   `self_contained_bound_independent_of_gap`).  [verified]
 
 5. **Central Positivity** (`BinomialBound.lean`, `Threshold.lean`,
    `BinomialCertificate.lean`, `GPS_StateMachine.lean`):
