@@ -16,41 +16,29 @@ of fame:
    primes below `P_k`. This is proved directly from divisibility (`ZeroForce.lean`'s Zero
    Effective Force lemma plus the least-prime-factor bound), with no appeal to counting or to
    the central binomial coefficient.
-2. `Submission.self_contained_bound_independent_of_gap` — the sieve's self-containment
-   boundary is fixed by the base's own extreme values alone, independent of the irregular
-   gap to the next prime. This is not an existence question and not a divisor-search bound;
-   it is a closure condition on the sieve's own *generative* process. The sieve feeds
-   itself: new primes found in the window extend the base, the extended base extends the
-   next window, and so on. For that hand-off to be well-formed, one round's window should
-   not reach so far that a prime `q` it just found has its own least proper multiple `m·q`
-   fall back *inside the same window* — that would require the round to treat `q`
-   simultaneously as a new discovery (not yet in the base) and as already covered (by `q`
-   itself, as if it already were). `hi ≤ m·P` is a *sufficient* guarantee against this, for
-   a base whose minimum element is any prime `m` (`m = 2` for the standard base starting at
-   the prime `2`). This guarantee is deliberately **not** claimed to be tight: the true
-   point where self-containment fails is `m·q*`, for `q*` the least prime exceeding `P` — a
-   value that depends on the irregular, unbounded gap to the next prime, so it can lie well
-   past `m·P` for some bases (concretely: base `{2,3,5}`, `m·P = 10`, but the window `(5,11]`
-   is still self-contained — it only breaks at `14 = 2·7` inside `(5,15]`). What *is* fixed
-   by the base alone, independent of that gap, is that `m·P` is always strictly below the
-   true failure point `m·q*`: a gap-independent sufficiency guarantee, not an exactness or
-   maximality claim, and its whole content is that no knowledge of where the next prime
-   actually lies is needed to state it.
+2. `Submission.prime_iff_uncovered_by_prev_general` — the same equivalence as (1), for a
+   base whose minimum element need not be `2`. A window `(P_max, P_min·P_max]` built from a
+   base with smallest element `P_min` (not necessarily `2`) has the identical structure: `n`
+   is prime iff `n` is *not* covered by the base below `P_max` (`n.minFac ≤ P_max`). This is
+   not a different phenomenon from (1) that happens to resemble it — it is the same
+   structural invariant, "what the base cannot build is exactly what is prime," restated at
+   whatever minimum the base actually starts from. (1) is the special case `P_min = 2`.
+   Proved the same way: the forward direction is the `minFac`-of-a-prime fact `ZeroForce.lean`
+   already uses for (1); the backward direction is `LPF.lean`'s least-prime-factor bound,
+   which was already stated for a general base minimum.
 3. `Submission.bertrand_chebyshev` — Bertrand's postulate in its Chebyshev-strengthened form
    (for every integer `N > 1` there is a prime strictly greater than `N` and at most `2 * N`).
-   This is a **corollary of the sieve's survivor mechanism**, the same generative process (1)
-   and (2) describe from two different angles — (1) that a window survivor is prime, (2)
-   that the sieve's self-containment boundary is fixed independent of the prime gap — not a
-   corollary of either result by name, and not built by literally chaining (1) or (2) as
-   proof-term lemmas: the proof term goes through the sieve's own survivor lemma
-   (`GPS_StateMachine.lean`'s `prime_in_window`) and a separate quantitative closure
-   (`BinomialCertificate.lean`'s self-contained central-binomial argument, not depending on
-   `Mathlib.NumberTheory.Bertrand`), neither of which invokes `prime_iff_uncovered_by_prev`
-   or `self_contained_bound_independent_of_gap` by name — both are separate, standalone
-   results, proved for their own sake, not lemmas this proof calls. Bertrand asked "is there
-   a prime here?"; this project asked "where does deterministic certainty about primality
-   end, and how is that boundary fixed?" — different questions, proved by different means,
-   that happen to agree on this object.
+   This is a **corollary of the sieve's survivor mechanism**, the same "uncovered = prime"
+   invariant (1) and (2) state at two different base minimums — not a corollary of either
+   result by name, and not built by literally chaining (1) or (2) as proof-term lemmas: the
+   proof term goes through the sieve's own survivor lemma (`GPS_StateMachine.lean`'s
+   `prime_in_window`) and a separate quantitative closure (`BinomialCertificate.lean`'s
+   self-contained central-binomial argument, not depending on `Mathlib.NumberTheory.Bertrand`),
+   neither of which invokes `prime_iff_uncovered_by_prev` or
+   `prime_iff_uncovered_by_prev_general` by name — both are separate, standalone results,
+   proved for their own sake, not lemmas this proof calls. Bertrand asked "is there a prime
+   here?"; this project asked "what can the base build, and what does it leave standing?" —
+   different questions, proved by different means, that happen to agree on this object.
 
 All three are discharged in `Solution.lean` by invoking the fully independent structural
 development in this repository's `StructuralSieve/` directory. That development does
@@ -59,13 +47,12 @@ structural sieve described in the accompanying paper (`LaTex/The Structural Siev
 
 This file itself deliberately imports nothing from `StructuralSieve/` — only Mathlib. A
 canonical challenge file must be checkable in isolation, independent of the submitter's own
-library, so (1) below states its project-specific predicate unfolded to what it literally
-means rather than by name: `StructuralSieve.SieveCovered P n` is `n.minFac ≤ P` (`Defs.lean`).
-The two forms are definitionally equal, so a proof term from the named version still checks
-against this unfolded statement — but Palomar's comparator does a literal statement match
-rather than a `defeq` check, so `Solution.lean` restates (1) here verbatim, unfolded, and only
-calls the named version inside the proof term. (2) is pure arithmetic on naturals, with no
-project-specific predicate to unfold.
+library, so (1) and (2) below state their project-specific predicate unfolded to what it
+literally means rather than by name: `StructuralSieve.SieveCovered P n` is `n.minFac ≤ P`
+(`Defs.lean`). The two forms are definitionally equal, so a proof term from the named version
+still checks against this unfolded statement — but Palomar's comparator does a literal
+statement match rather than a `defeq` check, so `Solution.lean` restates (1) and (2) here
+verbatim, unfolded, and only calls the named versions inside the proof term.
 -/
 
 /-- **Original question: is every composite in the window covered by the preceding base?**
@@ -77,22 +64,14 @@ theorem Submission.prime_iff_uncovered_by_prev
     n.Prime ↔ ¬ (n.minFac ≤ P_k) := by
   sorry
 
-/-- **The sieve's self-containment boundary is fixed by the base's own extremes, independent
-of the prime gap — not an existence bound and not a divisor-search bound.** The sieve feeds
-itself — a new prime found in one window extends the base for the next. For that hand-off to
-be well-formed, no window should reach so far that a prime `q` it just found has its own
-least proper multiple `m·q` fall back inside that same window (which would force the round to
-treat `q` both as a fresh discovery and as already covered by itself). `hi ≤ m·P` is a
-*sufficient* guarantee against this, for a base whose minimum element is any prime `m` (`m = 2`
-is the standard case, always prime since it is `PrimeBase.pMin`). This does not claim `m·P` is
-the largest such bound: the true failure point is `m·q`, for `q` the least prime exceeding
-`P`, which depends on the irregular gap to that prime; what is fixed by the base alone,
-independent of that gap, is that `m·P` is always strictly below it. -/
-theorem Submission.self_contained_bound_independent_of_gap
-    {P m : ℕ} (hm : Nat.Prime m) (hP : 0 < P) :
-    ∃ q, Nat.Prime q ∧ P < q ∧
-      (∀ n, P < n → n ≤ m * P → m * P < m * n) ∧
-      m * P < m * q := by
+/-- **Same invariant as (1), for a base with any minimum element `P_min` (not only `2`).**
+For a window `(P_max, P_min·P_max]` built from a base whose smallest element is `P_min`, `n`
+is prime iff `n` is not covered by the base below `P_max` (`n.minFac ≤ P_max`). (1) is the
+special case `P_min = 2`. Proved by exact divisibility, the same as (1). -/
+theorem Submission.prime_iff_uncovered_by_prev_general
+    {P_min P_max : ℕ} (hPmin_pos : 0 < P_min) (hPmin_le : P_min ≤ P_max)
+    {n : ℕ} (hn_lo : P_max < n) (hn_hi : n ≤ P_min * P_max) (hn2 : 2 ≤ n) :
+    n.Prime ↔ ¬ (n.minFac ≤ P_max) := by
   sorry
 
 /-- **Bertrand–Chebyshev bound** (corollary of the sieve mechanism (1) and (2) describe

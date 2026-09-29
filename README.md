@@ -8,11 +8,11 @@ The entire chain, from the definition of the complete generative base (Def. 2.1)
 to `bertrand_chebyshev`, is machine-checked. Two results head this development,
 in the order that actually motivated it. `StructuralSieve.prime_iff_uncovered_by_prev`
 gives an exact structural equivalence on the window `(P_k, 2·P_k]`, not an
-existence bound. `StructuralSieve.self_contained_bound_independent_of_gap` shows
-that `m·P` is always a self-contained reach (`2·P_max` for the standard base, or
-`P_min·P_max` for a base whose minimum element is any `P_min ≤ P_max`), fixed by
-the base's own extreme values alone, regardless of how irregular the gap to the
-next prime past `P` happens to be. `StructuralSieve.bertrand_chebyshev` falls out as a corollary of the sieve
+existence bound. `StructuralSieve.prime_iff_uncovered_by_prev_general` is the
+same equivalence for a base whose minimum element need not be `2` — the same
+invariant, "what the base cannot build is exactly what is prime," restated at
+whatever minimum the base actually starts from; the first is the special case
+`P_min = 2`. `StructuralSieve.bertrand_chebyshev` falls out as a corollary of the sieve
 mechanism these two describe together, not of either one by name (see *Origin
 of the result* below). Its existence step is closed by a self-contained
 central-binomial certificate (`binomial_contradiction`, `BinomialCertificate.lean`);
@@ -39,53 +39,37 @@ covered by `2`, so `P_k` contributes zero new coverage to its own window; combin
 with the least-prime-factor bound (`LPF.lean`), this gives the equivalence with no
 appeal to counting or to the central binomial coefficient.
 
-**Why `m·P` is always a self-contained reach, regardless of the prime gap.**
-The window `(P_max, 2·P_max]` is where the equivalence above lives:
+**Why (2) is a genuine generalization, not exposition on (1).**
+The window `(P_max, P_min·P_max]` is where the equivalence above lives, for
+any base minimum:
 
-> `StructuralSieve.self_contained_bound_independent_of_gap`, for a base whose
-> minimum element is the prime `m`: `hi ≤ m·P` is a *sufficient* guarantee that
-> the least proper multiple `m·q` of any new window element `q ∈ (P, hi]`
-> always falls strictly outside the window — and this guarantee holds no
-> matter how close or far the next prime past `P` happens to be.
+> `StructuralSieve.prime_iff_uncovered_by_prev_general`, for a base whose
+> minimum element is `P_min` (not necessarily `2`): `n` is prime **iff** `n`
+> is not covered by the base below `P_max` (`n.minFac ≤ P_max`). `(1)` is the
+> special case `P_min = 2`.
 
-This is self-containment: at `m = 2` (the standard base, starting at the prime
-`2`) a window up to `2·P_max` never lets a new element's own least multiple
-fall back inside it (concretely: base `{2,3,5}`, a hypothetical window
-`(5,15]` would contain both the new prime `7` and its own zero-force boundary
-multiple `14 = 2·7` at once). This is deliberately **not** a claim that `2·P_max`
-is the *widest* such reach — it is a claim that it is always a *safe* one,
-independent of the gap to the next prime: the true point where self-containment
-fails is `2·q`, for `q` the least prime exceeding `P_max`, a value that depends
-on that irregular gap and can lie well past `2·P_max` for some bases
-(concretely: base `{2,3,5}` itself stays self-contained up through `(5,11]`,
-breaking only at `14 = 2·7` inside `(5,15]`). What is fixed by the base's own
-extremes alone, independent of that gap, is that `2·P_max` is always strictly
-below the true failure point. The same argument holds for the reach `P_min·P_max`
-for a base whose minimum element is any other prime `P_min ≤ P_max`
-(`SelfContained.lean`'s `window_self_contained_bound_general`, which specializes
-to `window_self_contained_bound` at `m = 2`). This is a fact about the window's
-*size*, the container, rather than about whether it contains a prime, the
-content; it is independent of the void/prime equivalence above, and that
-equivalence never calls on it.
+Both directions were already available separately before this project
+assembled them into a single equivalence: the forward direction is the same
+`minFac`-of-a-prime fact `ZeroForce.lean` uses for `(1)`; the backward
+direction is `LPF.lean`'s least-prime-factor bound (`uncovered_is_prime`),
+already stated for a general base minimum. So `(2)` is not a restatement of
+`(1)` — it extends the range over which the "uncovered = prime" invariant is
+known to hold, from the one case that happens to be the standard base to
+every prime base minimum at once, proved once and holding uniformly.
 
-**Why an elementary proof is a strength here, not a limitation.**
-`window_self_contained_bound_general` and `self_contained_bound_independent_of_gap`
-answer a question about the sieve's own generative process: does a deterministic
-sieving regime have an exact boundary, fixed only by the base's own extreme
-values, independent of how irregular the gaps between primes happen to be? To
-the author's knowledge, within the bounded literature search recorded in
-`formalization.yaml`'s `sources` entry (which cannot rule out unindexed
-sources), no prior result answers this — not because it is hard and
-unattempted, but because the question itself, in this exact form, is not one
-the existence-flavored
-literature on prime gaps and windows asks. Determinism of a generative process
-and existence of an object inside a range are different questions; this
-development is about the first, and about it alone.
+`SelfContained.lean` separately establishes that a window up to `m·P` (or
+`P_min·P_max` for any other base minimum) is always a self-contained reach,
+fixed by the base's own extreme values and independent of how irregular the
+gap to the next prime happens to be — this is a fact about the window's
+*size*, the container, not about whether it contains a prime, the content;
+it is independent of the equivalence above, and that equivalence never calls
+on it. Determinism of a generative process and existence of an object inside a
+range are different questions; `SelfContained.lean` is about the first.
 
-That the proof of this determinism claim needs nothing beyond `omega`, `ring`,
-and `Nat.mul_le_mul` is not a caveat on its value — it is the source of its
-value. A determinism claim resting on deep analytic machinery would be only as
-certain as the weakest estimate buried in that machinery, and an error found
+That the proof of this self-containment claim needs nothing beyond `omega`,
+`ring`, and `Nat.mul_le_mul` is not a caveat on its value — it is the source of
+its value. A determinism claim resting on deep analytic machinery would be only
+as certain as the weakest estimate buried in that machinery, and an error found
 years later in some inequality it depends on would retroactively undermine it.
 A determinism claim resting on bare Peano arithmetic inherits no such risk: it
 is checked by a decision procedure, not by trusting a long chain of estimates,
@@ -151,9 +135,9 @@ This is the same reduction underlying `prime_iff_uncovered_by_prev`, one of the
 two headline results of *Origin of the result* above: LPF bound, Zero Effective
 Force, structural weight `w ≥ 1`, and the sparse regime closed unconditionally
 by a union bound (`Truncated.lean`) are all exercised by `bertrand_chebyshev`'s
-proof term. Self-containment (`self_contained_bound_independent_of_gap`, the other
-headline result) is a separate fact about the window's *size*, established on
-its own terms in `SelfContained.lean` (see *Origin of the result*); it is not
+proof term. Self-containment (`self_contained_bound_independent_of_gap`, proved
+in `SelfContained.lean`) is a separate fact about the window's *size*,
+established on its own terms (see *Origin of the result*); it is not
 part of `bertrand_chebyshev`'s proof term and the corollary does not call on
 it. No
 structural closure of the existence atom in the general (dense) window was
@@ -250,10 +234,10 @@ replayed from Mathlib's own files are expected and harmless).
 | File | Content (paper reference) |
 |---|---|
 | `StructuralSieve/Defs.lean` | Complete generative prime base, sieve coverage, window (Def. 2.1, Prop. 2.2) |
-| `StructuralSieve/LPF.lean` | Least Prime Factor bound; uncovered ⇒ prime (Lemma 3.1, Cor. 3.2) |
+| `StructuralSieve/LPF.lean` | Least Prime Factor bound; uncovered ⇒ prime (Lemma 3.1, Cor. 3.2); **`prime_iff_uncovered_general`**: headline equivalence for any base minimum (Cor. 3.3) |
 | `StructuralSieve/ZeroForce.lean` | Zero Effective Force; composites covered by preceding base; **`prime_iff_uncovered_by_prev`**: headline equivalence (Lemma 4.1, Cor. 4.2) |
 | `StructuralSieve/Weight.lean` | Structural weight `w ≥ 1`; expansion capacity `M' < P·φ(M')` (Lemma 4.3, Cor. 4.5) |
-| `StructuralSieve/SelfContained.lean` | Self-containment boundary, gap-independent; **`self_contained_bound_independent_of_gap`**: headline result (`m·P` always self-contained, generalized to `P_min·P_max`) |
+| `StructuralSieve/SelfContained.lean` | Self-containment boundary, gap-independent; `self_contained_bound_independent_of_gap` (`m·P` always self-contained, generalized to `P_min·P_max`) |
 | `StructuralSieve/Truncated.lean` | Sparse-regime positivity by union bound, unconditional |
 | `StructuralSieve/BinomialBound.lean` | Upper bound `window_centralBinom_le`, reproved from Legendre/Kummer + primorial primitives (no Bertrand import) |
 | `StructuralSieve/Threshold.lean` | Prime-free size inequality `threshold_inequality` (real convexity; adapted from Mathlib's analysis, not its Bertrand file) |

@@ -36,7 +36,7 @@ instance, not reachable from `Main`; see *Extended development* below.)
 This repository serves two purposes, and they are deliberately different in
 size. The **Palomar bounty excerpt** (`Challenge.lean`/`Solution.lean`/
 `comparator.json`) is a narrow, three-theorem slice —
-`prime_iff_uncovered_by_prev`, `self_contained_bound_independent_of_gap`,
+`prime_iff_uncovered_by_prev`, `prime_iff_uncovered_by_prev_general`,
 `bertrand_chebyshev` — chosen to be the minimal self-contained closure an
 automated reviewer can check statement-by-statement; it never imports
 `Rings.lean`, `Newton.lean`, `Certificate.lean`, or `Erdos.lean`, with or
@@ -52,13 +52,14 @@ contain and why they are kept.
 The structural scaffold is verified with no analytic machinery: divisibility/gcd
 algebra, totient multiplicativity, induction over the prime base, linear/nonlinear
 arithmetic (`omega`, `nlinarith`), and finite-set cardinality (union bound).
-A window up to `m·P` is always self-contained (`SelfContained.lean`): for a base
-whose minimum element is `m`, the least proper multiple of a new window element
-`q` is `m·q`, and `m·P` is always strictly below the true, gap-dependent point
-where that multiple would fall back inside the window
-(`self_contained_bound_independent_of_gap`) — this is why `2·P_max` is always a
-safe reach for the standard base (`m = 2`), and `P_min·P_max` for a base with
-any other minimum; it is not a claim that this is the *widest* safe reach.
+On the window `(P_max, P_min·P_max]`, "uncovered" and "prime" coincide exactly
+(`LPF.lean`'s `prime_iff_uncovered_general`): the forward direction is the
+`minFac`-of-a-prime fact, the backward direction is the least-prime-factor
+bound (Lemma 3.1) — this holds for the standard base (`P_min = 2`) and for any
+other base minimum alike; `SelfContained.lean` separately establishes that
+`P_min·P_max` is always a self-contained reach for the window's *size*, a
+distinct fact about the window's boundary, not about which elements in it are
+prime.
 The postulate collapses to a single quantitative atom — *the sieve never covers
 its own window* — closed by the self-contained argument on the central binomial
 coefficient (`binomial_contradiction`, `BinomialCertificate.lean`): the
@@ -74,7 +75,8 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
 
 ### Chain
 1. **LPF** (`LPF.lean`): every composite n ∈ (P_max, P_min·P_max] has n.minFac ≤ P_max,
-   so uncovered elements must be prime.  [verified]
+   so uncovered elements must be prime; packaged as the equivalence
+   `prime_iff_uncovered_general`, for any base minimum P_min.  [verified]
 
 2. **Zero Effective Force** (`ZeroForce.lean`): P_k's only multiple in (P_k, 2·P_k] is
    2·P_k, already covered by 2 ∈ 𝒫'.  Composites in the window ↔ covered by 𝒫'.  [verified]
@@ -87,7 +89,8 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
    minimal prime) is always a self-contained width, fixed by the base's own extremes and
    independent of the irregular gap to the next prime — not a claim that it is the widest
    such width — generalized to any base minimum `m` (`window_self_contained_bound_general`,
-   `self_contained_bound_independent_of_gap`).  [verified]
+   `self_contained_bound_independent_of_gap`). A separate fact about the window's *size*,
+   not part of the Palomar excerpt.  [verified]
 
 5. **Central Positivity** (`BinomialBound.lean`, `Threshold.lean`,
    `BinomialCertificate.lean`, `GPS_StateMachine.lean`):
@@ -103,7 +106,7 @@ between `P_min` and `P_max` without exception.  Omitting one prime breaks the id
 | File | Content | Status |
 |------|---------|--------|
 | `Defs.lean`            | Complete generative base, sieve coverage, window (Def. 2.1) | verified |
-| `LPF.lean`             | Least Prime Factor; uncovered ⇒ prime (Lemma 3.1) | verified |
+| `LPF.lean`             | Least Prime Factor; uncovered ⇒ prime (Lemma 3.1); uncovered ⇔ prime for any base minimum (Cor. 3.3, `prime_iff_uncovered_general`) | verified |
 | `ZeroForce.lean`       | Zero Effective Force; composites covered by 𝒫' (Lemma 4.1) | verified |
 | `Weight.lean`          | Structural weight w ≥ 1; M' < P·φ(M') (Lemma 4.3) | verified |
 | `SelfContained.lean`   | Self-containment fixes the window reach (why the constant) | verified |

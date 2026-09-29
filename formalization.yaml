@@ -5,40 +5,34 @@ license: "Apache-2.0"
 project:
   name: "StructuralSieve"
   description: >
-    Two structural facts about a generative prime sieve, plus Bertrand's postulate as a
-    corollary of the sieve mechanism they describe (not of either fact by name): (1) an
-    exact characterization of primality via sieve-coverage on a prime base's own window
-    (P_k, 2*P_k] (StructuralSieve.prime_iff_uncovered_by_prev): n is prime iff not covered
-    by the base of primes below P_k; and (2) the sieve's self-containment boundary is fixed
-    by the base's own extreme values alone, independent of the irregular gap to the next
-    prime (StructuralSieve.self_contained_bound_independent_of_gap, SelfContained.lean) --
-    not an existence question and not a divisor-search bound, but a closure condition on
-    the sieve's own generative process. The sieve feeds itself: a prime found in one window
-    extends the base for the next. For that hand-off to be well-formed, no window should
-    reach so far that a prime q it just found has its own least proper multiple m*q fall
-    back inside that same window (which would force the round to treat q both as a fresh
-    discovery and as already covered by itself). hi <= m*P is a *sufficient* guarantee
-    against this, for a base whose minimum element is any prime m, not only 2 (m stands for
-    PrimeBase.pMin, Defs.lean, which is always prime by construction -- m = 1 is not a case
-    that occurs). This is deliberately not an exactness or maximality claim: the true
-    failure point is m*q, for q the least prime exceeding P, which depends on the irregular
-    gap to that prime (concretely: base {2,3,5}, m*P = 10, but the window (5,11] is still
-    self-contained -- it only breaks at 14 = 2*7 inside (5,15]); what is fixed by the base
-    alone, independent of that gap, is that m*P is always strictly below the true failure
-    point. The originating question is not Bertrand's ("is there a prime here?") but two
-    different ones: "up to where can sieve-coverage certify primality without appeal to
-    counting?" and "how is the sieve's self-containment boundary fixed, independent of the
-    prime gap?" Bertrand's postulate (Chebyshev's strengthened form: for every N > 1 there
-    is a prime p with N < p <= 2N) is a corollary of the sieve's survivor mechanism, the
-    same generative process (1) and (2) describe from two different angles, not of either
-    result by name and not built by literally chaining (1) or (2) as proof-term lemmas: the
+    One structural fact about a generative prime sieve, stated at two base minimums, plus
+    Bertrand's postulate as a corollary of the sieve mechanism it describes (not of either
+    statement by name): (1) an exact characterization of primality via sieve-coverage on
+    the standard prime base's own window (P_k, 2*P_k]
+    (StructuralSieve.prime_iff_uncovered_by_prev): n is prime iff not covered by the base of
+    primes below P_k; and (2) the identical characterization for a base whose minimum
+    element need not be 2 -- on the window (P_max, P_min*P_max], n is prime iff not covered
+    by the base below P_max (StructuralSieve.prime_iff_uncovered_by_prev_general,
+    LPF.lean). (2) is not a different phenomenon that happens to resemble (1); it is the
+    same structural invariant -- "what the base cannot build is exactly what is prime" --
+    restated at whatever minimum the base actually starts from, with (1) as the special
+    case P_min = 2. Both directions were already available as separate lemmas before this
+    equivalence was assembled: the forward direction is the same minFac-of-a-prime fact
+    ZeroForce.lean uses for (1); the backward direction is LPF.lean's least-prime-factor
+    bound, already stated for a general base minimum. The originating question is not
+    Bertrand's ("is there a prime here?") but "up to where can sieve-coverage certify
+    primality without appeal to counting, for a base starting anywhere?" Bertrand's
+    postulate (Chebyshev's strengthened form: for every N > 1 there is a prime p with
+    N < p <= 2N) is a corollary of the sieve's survivor mechanism, the same "uncovered =
+    prime" invariant (1) and (2) state at two different base minimums, not of either result
+    by name and not built by literally chaining (1) or (2) as proof-term lemmas: the
     proof term goes through the sieve's own survivor lemma and a separate quantitative
     closure whose core bottoms out in the central binomial coefficient -- the same object
     Erdos used for his own, differently-motivated proof of the same postulate; the two
     projects ask different questions and simply arrive at the same underlying quantitative
     fact to close them, which is not a concern to work around, only an observation. Neither
     the survivor lemma nor the quantitative closure invokes prime_iff_uncovered_by_prev or
-    self_contained_bound_independent_of_gap by name, and the closure does not import
+    prime_iff_uncovered_by_prev_general by name, and the closure does not import
     Mathlib's own Bertrand development. The corollary's quantitative closure
     is a finite oracle over small windows (n < 512, chunked kernel-checked `decide`) and,
     for n >= 512, a self-contained factorization-based upper bound on the central binomial
@@ -47,25 +41,24 @@ project:
     `native_decide` in this closure. Zero sorries; depends only on the three
     standard Lean axioms.
 
-    On the notability of (2) specifically: self_contained_bound_independent_of_gap answers a
-    question about the sieve's own generative process -- whether a deterministic sieving
-    regime has a boundary fixed only by the base's own extreme values, independent of how
-    irregular the gaps between consecutive primes happen to be -- not a question the
-    existence-flavored literature on prime gaps and windows asks, and not an exactness or
-    maximality claim: the true failure point depends on the gap and can lie past m*P; the
-    content of this result is that m*P is always strictly below it regardless. That the
-    proof needs nothing beyond `omega`, `ring`, and `Nat.mul_le_mul` is not a caveat on the
-    result's interest; it is the source of its strength. A determinism claim resting on deep
-    analytic machinery is only as certain as the weakest estimate that machinery depends on;
-    a determinism claim resting on bare Peano arithmetic inherits no such risk, is checked by
-    a decision procedure rather than a chain of estimates, and holds with the same certainty
-    as `2 + 2 = 4`. Minimality of a result's assumptions is a measure of its logical strength,
-    not a mark against it -- the more elementary the argument for a genuine structural fact,
-    the better on every axis (certainty, checkability, portability). The relevant question is
-    not how hard this was to prove, but whether this exact, gap-independent guarantee had
-    been identified and proved before -- to the author's knowledge, within the bounded
-    literature search recorded in `sources` below (which cannot rule out unindexed sources),
-    it had not.
+    On the notability of (2) specifically: it is not exposition on (1) or a restatement of
+    the same fact under a different name -- it extends the range of validity of the
+    "uncovered = prime" invariant from the single base minimum 2 to an arbitrary prime base
+    minimum, a genuine generalization proved once and holding uniformly, not a family of
+    separate instances checked one at a time. That neither the generalization's forward
+    direction (already used for (1)) nor its backward direction (LPF.lean's
+    least-prime-factor bound, already stated for a general base minimum) required new proof
+    technique is not a caveat on the result's interest: the content of (2) is that the same
+    elementary argument, unmodified, already reaches every base minimum at once -- the
+    generalization was available the moment the two pieces were stated for a general
+    minimum, and simply had not been assembled into the equivalence before. A determinism
+    claim resting on bare Peano arithmetic inherits no risk from deeper machinery, is
+    checked by a decision procedure rather than a chain of estimates, and holds with the
+    same certainty as `2 + 2 = 4` at every base minimum simultaneously. The relevant
+    question is not how hard this was to prove, but whether this exact generalization had
+    been identified and stated as a single equivalence before -- to the author's knowledge,
+    within the bounded literature search recorded in `sources` below (which cannot rule out
+    unindexed sources), it had not.
   authors: ["Artur Flamandzki"]
   license: "Apache-2.0"
   responsible_maintainers: ["Artur Flamandzki"]
@@ -160,34 +153,25 @@ status:
     Effective Force plus the least-prime-factor bound); no counting, no central binomial
     coefficient.
 
-    (2) StructuralSieve.self_contained_bound_independent_of_gap (SelfContained.lean) — the
-    sieve's self-containment boundary is fixed by the base's own extreme values alone,
-    independent of the irregular gap to the next prime; not an existence question and not a
-    divisor-search bound but a closure condition on the sieve's own generative process: the
-    sieve feeds itself (a prime found in one window extends the base for the next), and for
-    that hand-off to be well-formed, no window should reach so far that a prime q it just
-    found has its own least proper multiple m*q fall back inside that same window. hi <= m*P
-    is a *sufficient* guarantee against this, for a base whose minimum element is any prime m
-    (m stands for PrimeBase.pMin, which is always prime by construction; m = 1 does not occur
-    and would not be a proper multiplier if it did). This is deliberately not an exactness or
-    maximality claim: the true point where self-containment fails is m times the least prime
-    exceeding P, a value that depends on the irregular gap to that prime, so it can lie past
-    m*P for some bases (concretely: base {2,3,5}, m*P = 10, but the window (5,11] is still
-    self-contained -- it only breaks at 14 = 2*7 inside (5,15]). What is fixed by the base
-    alone, independent of that gap, is that m*P is always strictly below the true failure
-    point, regardless of that gap. At m = 2 this specializes to the standard base starting at
-    the prime 2; the same argument holds for any base minimum P_min.
+    (2) StructuralSieve.prime_iff_uncovered_by_prev_general (LPF.lean) — the same
+    equivalence as (1), for a base whose minimum element need not be 2. On the window
+    (P_max, P_min*P_max] built from a base whose smallest element is P_min, n is prime iff
+    n is not covered by the base below P_max (n.minFac <= P_max). Not a different phenomenon
+    from (1) that happens to resemble it -- the same structural invariant, "what the base
+    cannot build is exactly what is prime," restated at whatever minimum the base actually
+    starts from; (1) is the special case P_min = 2. Proved by exact divisibility, the same
+    way as (1): the forward direction is the minFac-of-a-prime fact ZeroForce.lean already
+    uses for (1); the backward direction is LPF.lean's least-prime-factor bound, which was
+    already stated for a general base minimum.
 
-    On notability: this closure condition is not a question the existence-flavored
-    literature on prime gaps asks; it concerns whether the sieve's own generative process
-    has a deterministic regime with a gap-independent guarantee, not whether some
-    object exists in some range, and it is not an exactness claim -- the true boundary
-    depends on the gap and can lie past m*P; the content of this result is that m*P is
-    always strictly below it regardless. The proof's elementary means (omega, ring, basic
-    inequalities on Nat) is not a weakness relative to that claim but evidence of its
-    strength: a result that needs nothing beyond bare Peano arithmetic carries no inherited
-    risk from deeper machinery, and is checked by decision procedure rather than by
-    trusting an estimate. See project.description for the fuller argument.
+    On notability: (2) is not exposition on (1) or a restatement of the same fact under a
+    different name -- it extends the "uncovered = prime" invariant's range of validity from
+    the single base minimum 2 to an arbitrary prime base minimum, a genuine generalization
+    proved once and holding uniformly. Neither direction required new proof technique to
+    reach the general case; the content of (2) is that the same elementary argument,
+    unmodified, already reaches every base minimum at once, and simply had not been
+    assembled into a single equivalence before. See project.description for the fuller
+    argument.
 
     (3) StructuralSieve.bertrand_chebyshev (Main.lean) — Bertrand's postulate
     (Chebyshev's strengthened form: for every N > 1 there is a prime p with N < p <= 2N), a
@@ -198,7 +182,7 @@ status:
     is what the quantitative closure below supplies.
     The proof term goes through the sieve's own survivor lemma
     (GPS_StateMachine.prime_in_window), not through prime_iff_uncovered_by_prev or
-    self_contained_bound_independent_of_gap by name.
+    prime_iff_uncovered_by_prev_general by name.
     Avoids Mathlib.NumberTheory.Bertrand entirely.
     `StructuralSieve.Main` reduces every window (P_k, 2*P_k] for P_k prime to a
     coprimality condition against the primorial of primes below P_k. The quantitative
@@ -216,9 +200,9 @@ status:
     and the `Newton` module are independent alternative closures explored in this
     repository, kept for reference — they are NOT part of the proof term for (3); see their
     own module docstrings and `StructuralSieve.Certificate`'s two named `WindowCertificate`
-    instances. `SelfContained.lean` is likewise not part of (3)'s proof term, but is now
-    load-bearing for (2) above (`self_contained_bound_independent_of_gap`), not merely kept
-    for reference.
+    instances. `LPF.lean` is where (2) above is proved
+    (`prime_iff_uncovered_by_prev_general`); it is not part of (3)'s proof term, but its
+    least-prime-factor bound is load-bearing for both (1) and (2).
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -241,28 +225,22 @@ status:
         `StructuralSieve/`. Axioms assumed identical to the rest of this development
         (built from the same elementary primitives); Artur to confirm via `#print axioms`
         in the real build.
-    - declaration: "Submission.self_contained_bound_independent_of_gap"
+    - declaration: "Submission.prime_iff_uncovered_by_prev_general"
       file: "Challenge.lean / Solution.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
       literature_dependencies: []
       note: >
-        The sieve's self-containment boundary is fixed by the base's own extreme values
-        alone, independent of the irregular gap to the next prime; not an existence
-        question and not a divisor-search bound but a closure condition on the sieve's own
-        generative process (see status.scope, item 2, and project.description). Stated for
-        any base minimum m, required to be prime (m stands for PrimeBase.pMin, Defs.lean,
-        which is always prime by construction -- m = 1 would not be a proper multiplier and
-        does not occur). This is deliberately not an exactness or maximality claim: the
-        true failure point is m times the least prime exceeding P, which depends on the
-        irregular prime gap and can lie past m*P for some bases; what is proved is that
-        m*P is always strictly below it regardless of that gap. This is the
-        Comparator-audited surface for
-        `StructuralSieve.self_contained_bound_independent_of_gap`
-        (StructuralSieve/SelfContained.lean), the underlying library declaration
-        `Solution.lean` invokes one-for-one. Axioms assumed identical to the rest of this
-        development; Artur to confirm via `#print axioms` in the real build.
+        The same equivalence as (1), for a base whose minimum element need not be 2 (see
+        status.scope, item 2, and project.description). On the window (P_max, P_min*P_max],
+        n is prime iff not covered by the base below P_max (n.minFac <= P_max); (1) is the
+        special case P_min = 2. Proved by exact divisibility, the same way as (1). This is
+        the Comparator-audited surface for
+        `StructuralSieve.prime_iff_uncovered_by_prev_general` (StructuralSieve/LPF.lean),
+        the underlying library declaration `Solution.lean` invokes one-for-one. Axioms
+        assumed identical to the rest of this development; Artur to confirm via
+        `#print axioms` in the real build.
     - declaration: "Submission.bertrand_chebyshev"
       file: "Challenge.lean / Solution.lean"
       sorry_count: 0
@@ -398,25 +376,23 @@ alignment:
         The project's starting question and its answer (see project.description). Also
         restated in Challenge.lean/Solution.lean as
         Submission.prime_iff_uncovered_by_prev.
-    - source: "The sieve's self-containment boundary is fixed by the base's own extremes,
-        independent of the prime gap"
-      lean: "StructuralSieve.self_contained_bound_independent_of_gap"
-      module: "StructuralSieve/SelfContained.lean"
+    - source: "Same invariant as the originating result, for a base with any minimum
+        element"
+      lean: "StructuralSieve.prime_iff_uncovered_by_prev_general"
+      module: "StructuralSieve/LPF.lean"
       status: "proved"
       note: >
-        Not an existence question and not a divisor-search bound. The sieve feeds
-        itself (a prime found in one window extends the base for the next); hi <= m*P is a
-        *sufficient* guarantee that a newly-found prime's own least proper multiple cannot
-        fall back inside the same window, for any prime base minimum m (m stands for
-        PrimeBase.pMin, always prime by construction). This is deliberately not an
-        exactness or maximality claim: the true failure point is m times the least prime
-        exceeding P, which depends on the irregular gap to that prime and can lie past m*P
-        for some bases (concretely: base {2,3,5}, m*P = 10, but the window (5,11] is still
-        self-contained -- it only breaks at 14 = 2*7 inside (5,15]). What this theorem
-        proves is that m*P is always strictly below the true failure point, regardless of
-        that gap. Restated in Challenge.lean/Solution.lean as
-        Submission.self_contained_bound_independent_of_gap -- the Comparator-audited
-        surface for this development's headline result (2).
+        On the window (P_max, P_min*P_max] built from a base whose smallest element is
+        P_min (not necessarily 2), n is prime iff n is not covered by the base below P_max
+        (n.minFac <= P_max). The same structural invariant as the originating result --
+        "what the base cannot build is exactly what is prime" -- restated at whatever
+        minimum the base actually starts from; the originating result is the special case
+        P_min = 2. Proved the same way: the forward direction is the minFac-of-a-prime fact
+        ZeroForce.lean already uses for the originating result; the backward direction is
+        LPF.lean's least-prime-factor bound, already stated for a general base minimum.
+        Restated in Challenge.lean/Solution.lean as
+        Submission.prime_iff_uncovered_by_prev_general -- the Comparator-audited surface
+        for this development's headline result (2).
     - source: "Jacobsthal gap bound, g(210) = 10"
       lean: "StructuralSieve.jacobsthal_210"
       module: "StructuralSieve/Rings.lean"

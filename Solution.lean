@@ -21,12 +21,11 @@ theorem Submission.prime_iff_uncovered_by_prev
     n.Prime ↔ ¬ (n.minFac ≤ P_k) :=
   StructuralSieve.prime_iff_uncovered_by_prev hP hn_lo hn_hi hn2
 
-theorem Submission.self_contained_bound_independent_of_gap
-    {P m : ℕ} (hm : Nat.Prime m) (hP : 0 < P) :
-    ∃ q, Nat.Prime q ∧ P < q ∧
-      (∀ n, P < n → n ≤ m * P → m * P < m * n) ∧
-      m * P < m * q :=
-  StructuralSieve.self_contained_bound_independent_of_gap hm hP
+theorem Submission.prime_iff_uncovered_by_prev_general
+    {P_min P_max : ℕ} (hPmin_pos : 0 < P_min) (hPmin_le : P_min ≤ P_max)
+    {n : ℕ} (hn_lo : P_max < n) (hn_hi : n ≤ P_min * P_max) (hn2 : 2 ≤ n) :
+    n.Prime ↔ ¬ (n.minFac ≤ P_max) :=
+  StructuralSieve.prime_iff_uncovered_general hPmin_pos hPmin_le hn_lo hn_hi hn2
 
 theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime :=
