@@ -1,7 +1,9 @@
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Data.Nat.Choose.Central
-import Mathlib.NumberTheory.Bertrand
-import Mathlib.Tactic
+module
+
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Data.Nat.Choose.Central
+public import Mathlib.NumberTheory.Bertrand
+public import Mathlib.Tactic
 
 /-!
 # Erdos.lean — instance A of the quantitative certificate (via Mathlib)
@@ -34,7 +36,7 @@ namespace StructuralSieve
 
 /-- **Small windows (`2 < n < 512`):** a prime in `(n, 2n]` by a computational oracle — the
     sieve evaluated inside the proof, with no external lemma. -/
-lemma small_window_prime :
+public lemma small_window_prime :
     ∀ n < 512, 2 < n → ∃ p < 1024, n < p ∧ p ≤ 2 * n ∧ Nat.Prime p := by
   native_decide
 
@@ -42,7 +44,7 @@ lemma small_window_prime :
 **Quantitative kernel (instance A) — closed.** The absence of a prime in `(n, 2n]` leads to a
 contradiction: the lower and upper bounds on `C(2n,n)` are then incompatible.
 -/
-theorem erdos_contradiction {n : ℕ} (hn3 : 2 < n)
+public theorem erdos_contradiction {n : ℕ} (hn3 : 2 < n)
     (h_no_prime : ∀ q, n < q → q ≤ 2 * n → ¬ Nat.Prime q) : False := by
   rcases Nat.lt_or_ge n 512 with hsmall | hbig
   · -- small windows: witness from the oracle

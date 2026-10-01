@@ -1,7 +1,9 @@
-import StructuralSieve.Rings
-import Mathlib.Data.Nat.Choose.Central
-import Mathlib.Data.Nat.Choose.Sum
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.Rings
+public import Mathlib.Data.Nat.Choose.Central
+public import Mathlib.Data.Nat.Choose.Sum
+public import Mathlib.Tactic
 
 /-!
 # Newton.lean — the central binomial coefficient and the window's prime content
@@ -26,21 +28,21 @@ namespace StructuralSieve
 
 /-- Restatement of `window_primes_prod_dvd_centralBinom` for `Nat.centralBinom`: the product of
     the window's new sources divides the central binomial coefficient. -/
-theorem window_primes_prod_dvd_centralBinom' (n : ℕ) :
+public theorem window_primes_prod_dvd_centralBinom' (n : ℕ) :
     (∏ q ∈ (Finset.Ioc n (2 * n)).filter Nat.Prime, q) ∣ Nat.centralBinom n := by
   unfold Nat.centralBinom
   exact window_primes_prod_dvd_centralBinom n
 
 /-- **Product of new sources ≤ C(2n,n).** The product of all new sources of the window does not
     exceed `C(2n,n)` (a divisor of a positive number). -/
-theorem window_primes_prod_le_centralBinom (n : ℕ) :
+public theorem window_primes_prod_le_centralBinom (n : ℕ) :
     (∏ q ∈ (Finset.Ioc n (2 * n)).filter Nat.Prime, q) ≤ Nat.centralBinom n :=
   Nat.le_of_dvd (Nat.centralBinom_pos n) (window_primes_prod_dvd_centralBinom' n)
 
 /-- **Lower bound on C(2n,n).** `4^n = Σ_{k=0}^{2n} C(2n,k)` is a sum of `2n+1` terms, each
     `≤` the central one. Hence `4^n ≤ (2n+1)·C(2n,n)`, proved directly from the expansion of
     `(1+1)^{2n}`. -/
-theorem four_pow_le_newton (n : ℕ) :
+public theorem four_pow_le_newton (n : ℕ) :
     4 ^ n ≤ (2 * n + 1) * Nat.centralBinom n := by
   have h4 : (4 : ℕ) ^ n = 2 ^ (2 * n) := by
     rw [show (4 : ℕ) = 2 ^ 2 from rfl, ← pow_mul]
@@ -60,7 +62,7 @@ theorem four_pow_le_newton (n : ℕ) :
 /-- **Empty window ⇒ every prime factor is an old source.** Every prime factor of `C(2n,n)`
     is `≤ 2n` (it divides `(2n)!`), and with no new sources in `(n, 2n]` it is `≤ n`. This is
     the upper-bound side of the forthcoming contradiction. -/
-theorem centralBinom_prime_factor_le {n p : ℕ}
+public theorem centralBinom_prime_factor_le {n p : ℕ}
     (h_no : ∀ q, n < q → q ≤ 2 * n → ¬ Nat.Prime q)
     (hp : Nat.Prime p) (hdvd : p ∣ Nat.centralBinom n) : p ≤ n := by
   have h1 : Nat.centralBinom n ∣ Nat.factorial (2 * n) := by

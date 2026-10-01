@@ -1,6 +1,8 @@
-import StructuralSieve.GPS_StateMachine
-import Mathlib.Data.Nat.Choose.Dvd
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.GPS_StateMachine
+public import Mathlib.Data.Nat.Choose.Dvd
+public import Mathlib.Tactic
 
 /-!
 # Rings.lean — a residue/divisibility reformulation of the sieve
@@ -25,15 +27,17 @@ residue/divisibility formulation and its equivalence with coprimality.
 namespace StructuralSieve
 
 /-- `aligned p n` holds when `p ∣ n`, i.e. `n ≡ 0 (mod p)`. -/
-def aligned (p n : ℕ) : Prop := p ∣ n
+@[expose]
+public def aligned (p n : ℕ) : Prop := p ∣ n
 
 /-- **Void** at `n` with respect to a set of primes `S`: no `p ∈ S` divides `n`.
     Defined for every `n` — no window, no anchor. -/
-def isVoid (S : Finset ℕ) (n : ℕ) : Prop := ∀ p ∈ S, ¬ aligned p n
+@[expose]
+public def isVoid (S : Finset ℕ) (n : ℕ) : Prop := ∀ p ∈ S, ¬ aligned p n
 
 /-- **Equivalence with coprimality.** Being a void with respect to a set of primes `S` is
     equivalent to coprimality with the product `∏_{p∈S} p`. -/
-lemma isVoid_iff_coprime {S : Finset ℕ} {n : ℕ} (hS : ∀ p ∈ S, Nat.Prime p) :
+public lemma isVoid_iff_coprime {S : Finset ℕ} {n : ℕ} (hS : ∀ p ∈ S, Nat.Prime p) :
     isVoid S n ↔ Nat.Coprime n (∏ p ∈ S, p) := by
   constructor
   · intro h
@@ -48,7 +52,7 @@ lemma isVoid_iff_coprime {S : Finset ℕ} {n : ℕ} (hS : ∀ p ∈ S, Nat.Prime
 /-- **A void in the window is prime.** A void in the GPS window (an `n` not divisible by any
     prime `< Pk`) is prime, by the least-prime-factor argument. Here the anchor and window enter
     the residue formulation. -/
-lemma void_in_window_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public lemma void_in_window_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (hn : n ∈ gps_window Pk)
     (hvoid : isVoid ((Finset.range Pk).filter Nat.Prime) n) :
     Nat.Prime n := by
@@ -61,11 +65,12 @@ lemma void_in_window_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
 /-- **Non-emptiness of the window** = a void exists in `(Pk, 2Pk]`. This is the atom B
     (`dense_sieve_survivor`), stated in the residue/divisibility formulation. A restatement,
     not a new proof. -/
-def windowHasVoid (Pk : ℕ) : Prop :=
+@[expose]
+public def windowHasVoid (Pk : ℕ) : Prop :=
   ∃ n ∈ gps_window Pk, isVoid ((Finset.range Pk).filter Nat.Prime) n
 
 /-- A void in the window ⟺ nonempty `gps_free`; the two formulations agree. -/
-lemma windowHasVoid_iff_gps_free_nonempty {Pk : ℕ} (_hPk : Nat.Prime Pk) (_hPk3 : 2 < Pk) :
+public lemma windowHasVoid_iff_gps_free_nonempty {Pk : ℕ} (_hPk : Nat.Prime Pk) (_hPk3 : 2 < Pk) :
     windowHasVoid Pk ↔ (gps_free Pk).Nonempty := by
   constructor
   · rintro ⟨n, hn, hvoid⟩
@@ -82,39 +87,41 @@ lemma windowHasVoid_iff_gps_free_nonempty {Pk : ℕ} (_hPk : Nat.Prime Pk) (_hPk
 /-! ## Residues and the successor map -/
 
 /-- **Offset** of `p` at `n` = `n mod p`, the residue of `n` modulo `p`. -/
-def offset (p n : ℕ) : ℕ := n % p
+@[expose]
+public def offset (p n : ℕ) : ℕ := n % p
 
 /-- `p ∣ n` ⟺ `n mod p = 0`. -/
-lemma aligned_iff_offset_zero (p n : ℕ) : aligned p n ↔ offset p n = 0 := by
+public lemma aligned_iff_offset_zero (p n : ℕ) : aligned p n ↔ offset p n = 0 := by
   unfold aligned offset
   exact Nat.dvd_iff_mod_eq_zero
 
 /-- **Void ⟺ all residues nonzero.** `n` is a void for `S` iff `n mod p ≠ 0` for every
     `p ∈ S`. -/
-lemma isVoid_iff_offsets_nonzero (S : Finset ℕ) (n : ℕ) :
+public lemma isVoid_iff_offsets_nonzero (S : Finset ℕ) (n : ℕ) :
     isVoid S n ↔ ∀ p ∈ S, offset p n ≠ 0 := by
   simp only [isVoid, aligned_iff_offset_zero]
 
 /-- **Successor map**: `n ↦ n+1` sends every residue `n mod p` to `(n mod p + 1) mod p`. -/
-lemma offset_succ (p n : ℕ) : offset p (n + 1) = (offset p n + 1) % p := by
+public lemma offset_succ (p n : ℕ) : offset p (n + 1) = (offset p n + 1) % p := by
   simp [offset, Nat.add_mod]
 
 /-! ## The base cannot fully cover the window -/
 
 /-- **Full coverage**: every window position is divisible by some prime `< Pk`.
     This is the case "the window contains no new prime" — every position is composite. -/
-def fullCoverage (Pk : ℕ) : Prop :=
+@[expose]
+public def fullCoverage (Pk : ℕ) : Prop :=
   ∀ n ∈ gps_window Pk, ¬ isVoid ((Finset.range Pk).filter Nat.Prime) n
 
 /-- No void ⟺ full coverage (de Morgan, by definition). -/
-lemma not_windowHasVoid_iff_fullCoverage (Pk : ℕ) :
+public lemma not_windowHasVoid_iff_fullCoverage (Pk : ℕ) :
     ¬ windowHasVoid Pk ↔ fullCoverage Pk := by
   simp only [windowHasVoid, fullCoverage, not_exists, not_and]
 
 /-- **The base cannot fully cover the window.** For a prime `Pk > 2` the primes `< Pk` do not
     cover the whole window — a void (a new prime) always remains. Equivalent to
     `dense_sieve_survivor` via `gps_free`; the content still rests on that theorem. -/
-theorem not_fullCoverage {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public theorem not_fullCoverage {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     ¬ fullCoverage Pk := by
   rw [← not_windowHasVoid_iff_fullCoverage, not_not,
       windowHasVoid_iff_gps_free_nonempty hPk hPk3]
@@ -128,7 +135,7 @@ Below that (a linear bound `c·Pk`): the quantitative work begins. -/
 
 /-- **A void above `Pk` (Euclid).** For the base of primes `< Pk` there is always a void above
     `Pk` (the next prime). Independent of the atom. -/
-theorem exists_void_above (Pk : ℕ) :
+public theorem exists_void_above (Pk : ℕ) :
     ∃ n, Pk < n ∧ isVoid ((Finset.range Pk).filter Nat.Prime) n := by
   obtain ⟨q, hq_ge, hq_prime⟩ := Nat.exists_infinite_primes (Pk + 1)
   refine ⟨q, by omega, ?_⟩
@@ -142,7 +149,7 @@ theorem exists_void_above (Pk : ℕ) :
 /-- **Explicit upper bound (primorial).** A void exists in `(Pk, primorial(≤Pk)+1]`.
     Euclid's construction: `M+1` is coprime to all primes `≤ Pk`, so its least prime divisor
     `q > Pk` is a void. Independent of the atom. -/
-theorem exists_void_below_primorial (Pk : ℕ) :
+public theorem exists_void_below_primorial (Pk : ℕ) :
     ∃ n, Pk < n ∧ n ≤ primorial_below (Pk + 1) + 1 ∧
          isVoid ((Finset.range Pk).filter Nat.Prime) n := by
   set M := primorial_below (Pk + 1) with hM
@@ -173,7 +180,7 @@ theorem exists_void_below_primorial (Pk : ℕ) :
     `p` with `p² ≤ 2Pk` (its least factor). Hence the window is covered exclusively by primes
     `≤ √(2Pk)` — finitely many, `O(√Pk/ln)`. This makes the disjoint minFac decomposition of the
     window finite (and telescoping to `Pk·∏(1−1/p)`). Same technique as in `gps_free_prime`. -/
-lemma window_composite_minFac_sq_le {Pk n : ℕ} (_hPk3 : 2 < Pk)
+public lemma window_composite_minFac_sq_le {Pk n : ℕ} (_hPk3 : 2 < Pk)
     (hn : n ∈ gps_window Pk) (hcomp : ¬ Nat.Prime n) :
     n.minFac ^ 2 ≤ 2 * Pk := by
   simp only [gps_window, Finset.mem_Ioc] at hn
@@ -193,7 +200,7 @@ lemma window_composite_minFac_sq_le {Pk n : ℕ} (_hPk3 : 2 < Pk)
     composite NOT buildable from the base is `2·nextprime(Pk) > 2Pk`. This is the structural
     reason WHY `2Pmax`: exactly there buildability of composites from the base ends.
     Elementary, no atom. -/
-theorem window_composite_smooth {Pk n : ℕ}
+public theorem window_composite_smooth {Pk n : ℕ}
     (hn : n ∈ gps_window Pk) (hcomp : ¬ Nat.Prime n) :
     ∀ q, Nat.Prime q → q ∣ n → q ≤ Pk := by
   intro q hq hqn
@@ -214,7 +221,7 @@ theorem window_composite_smooth {Pk n : ℕ}
     `m ≥ Pmin` (Pmin-rough), so `n ≥ (Pmax+1)·Pmin > Pmin·Pmax` — a contradiction. The
     buildability edge for `minFac = Pmin` is exactly `Pmin·Pmax`; the first unbuildable is
     `Pmin·nextprime(Pmax)`. `window_composite_smooth` is the case `Pmin = 2`. -/
-theorem rough_composite_smooth {Pmin Pmax n : ℕ} (hPmin : 2 ≤ Pmin) (hn2 : 2 ≤ n)
+public theorem rough_composite_smooth {Pmin Pmax n : ℕ} (hPmin : 2 ≤ Pmin) (hn2 : 2 ≤ n)
     (hrough : Pmin ≤ n.minFac) (hn_le : n ≤ Pmin * Pmax) (hcomp : ¬ Nat.Prime n) :
     ∀ q, Nat.Prime q → q ∣ n → q ≤ Pmax := by
   intro q hq hqn
@@ -236,7 +243,7 @@ theorem rough_composite_smooth {Pmin Pmax n : ℕ} (hPmin : 2 ≤ Pmin) (hn2 : 2
     `Pk²`: its only prime factor is `Pk`, which is not `< Pk`, so no prime `< Pk` divides it.
     This is the lowest bound reachable by an explicit composite witness: below `Pk²` every void
     is already prime (no free witness), so going lower requires the quantitative argument. -/
-theorem exists_void_below_sq {Pk : ℕ} (hPk : Nat.Prime Pk) :
+public theorem exists_void_below_sq {Pk : ℕ} (hPk : Nat.Prime Pk) :
     ∃ n, Pk < n ∧ n ≤ Pk ^ 2 ∧ isVoid ((Finset.range Pk).filter Nat.Prime) n := by
   have h1 : 1 < Pk := hPk.one_lt
   have hsq : Pk ^ 2 = Pk * Pk := by ring
@@ -259,7 +266,7 @@ at `2Pmax`. -/
 
 /-- Every prime `q > Pk` is a void with respect to the primes `< Pk` (none divides it). The
     converse of the least-factor lemma `void_in_window_prime`. -/
-lemma prime_isVoid_of_lt {Pk q : ℕ} (hq : Nat.Prime q) (hq_lo : Pk < q) :
+public lemma prime_isVoid_of_lt {Pk q : ℕ} (hq : Nat.Prime q) (hq_lo : Pk < q) :
     isVoid ((Finset.range Pk).filter Nat.Prime) q := by
   intro p hp
   rw [Finset.mem_filter, Finset.mem_range] at hp
@@ -271,7 +278,7 @@ lemma prime_isVoid_of_lt {Pk q : ℕ} (hq : Nat.Prime q) (hq_lo : Pk < q) :
 /-- **Determinism of the window.** Inside `(Pk, 2Pk]`: void ⟺ prime.
     The sieve is fully deterministic here — an equivalence, not merely an implication.
     (`→` is the least-factor lemma `void_in_window_prime`; `←` is `prime_isVoid_of_lt`.) -/
-theorem void_iff_prime_in_window {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem void_iff_prime_in_window {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (hn : n ∈ gps_window Pk) :
     isVoid ((Finset.range Pk).filter Nat.Prime) n ↔ Nat.Prime n := by
   constructor
@@ -286,7 +293,7 @@ theorem void_iff_prime_in_window {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < P
     least prime `q > Pk`: `q²` is a void, lies above `2Pk`, and is NOT prime. Note: this is the
     higher boundary, of order `p²`. The sharp determinism edge at `2Pmax` is self-containment
     (`window_self_contained_dvd` below), not this equivalence. -/
-theorem determinism_breaks_above {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public theorem determinism_breaks_above {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     ∃ n, 2 * Pk < n ∧ isVoid ((Finset.range Pk).filter Nat.Prime) n ∧ ¬ Nat.Prime n := by
   obtain ⟨q, hq_ge, hq_prime⟩ := Nat.exists_infinite_primes (Pk + 1)
   have hqq : q ^ 2 = q * q := by ring
@@ -323,7 +330,7 @@ narrowness, not a threshold. -/
 /-- **Self-containment of the window.** In `(Pk, 2Pk]`: `m ∣ n ⟹ m = n`. No proper
     divisibility between window elements — elimination goes only through the base. Universal,
     no threshold. -/
-theorem window_self_contained_dvd {Pk m n : ℕ}
+public theorem window_self_contained_dvd {Pk m n : ℕ}
     (hm : m ∈ gps_window Pk) (hn : n ∈ gps_window Pk) (hdvd : m ∣ n) : m = n := by
   simp only [gps_window, Finset.mem_Ioc] at hm hn
   obtain ⟨hm_lo, hm_hi⟩ := hm
@@ -339,7 +346,7 @@ theorem window_self_contained_dvd {Pk m n : ℕ}
 /-- **Sharp edge — self-containment fails just past 2Pmax.** `Pk+1` lies in the window, but its
     proper multiple `2·(Pk+1)` already lies outside (`> 2Pk`). This is the first such multiple:
     determinism fails immediately past the edge, not at `p²`. -/
-theorem self_containment_breaks_just_above {Pk : ℕ} (hPk1 : 1 ≤ Pk) :
+public theorem self_containment_breaks_just_above {Pk : ℕ} (hPk1 : 1 ≤ Pk) :
     (Pk + 1) ∈ gps_window Pk ∧
     (Pk + 1) ∣ (2 * (Pk + 1)) ∧ Pk + 1 ≠ 2 * (Pk + 1) ∧ 2 * Pk < 2 * (Pk + 1) := by
   refine ⟨?_, ⟨2, by ring⟩, by omega, by omega⟩
@@ -357,14 +364,14 @@ next scale. -/
     EVERY anchor `Pk`. The mechanism does not change with scale: this is the mathematical
     content of "it works the same at the start and at any later point". Proved with no `sorry`
     (the universal quantification `void_iff_prime_in_window`). -/
-theorem mechanism_scale_invariant :
+public theorem mechanism_scale_invariant :
     ∀ (Pk : ℕ), Nat.Prime Pk → 2 < Pk → ∀ n ∈ gps_window Pk,
       isVoid ((Finset.range Pk).filter Nat.Prime) n ↔ Nat.Prime n :=
   fun _Pk hPk hPk3 _n hn => void_iff_prime_in_window hPk hPk3 hn
 
 /-- **A void becomes part of the base.** A survivor `q` in the window `(Pk,2Pk]` is prime and
     `> Pk`, so at its own scale it belongs to the base: `q ∣ primorial_below (q+1)`. No `sorry`. -/
-theorem survivor_absorbed_into_base {Pk q : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem survivor_absorbed_into_base {Pk q : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (hq : q ∈ gps_free Pk) :
     Nat.Prime q ∧ Pk < q ∧ q ∣ primorial_below (q + 1) := by
   have hqp : Nat.Prime q := gps_free_prime hPk hPk3 hq
@@ -385,7 +392,7 @@ enters the recursion. -/
     window has a void (`gps_window_nonempty`), so the recursion (`gps_step_induction`) produces
     the next anchor `Pk' ∈ (Pk, 2Pk]`, whose base includes the previous state. The whole weight
     rests on one atom (`dense_sieve_survivor`), explicitly localized — no new `sorry` here. -/
-theorem mirror_forces_next_anchor {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public theorem mirror_forces_next_anchor {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     ∃ Pk', Nat.Prime Pk' ∧ Pk < Pk' ∧ Pk' ≤ 2 * Pk ∧
       (∀ p ∈ (Finset.range Pk').filter Nat.Prime, p ∣ primorial_below Pk') :=
   gps_step_induction hPk hPk3 (gps_window_nonempty hPk hPk3)
@@ -400,24 +407,26 @@ this inequality. -/
 
 /-- `isVoid` is decidable (a finite conjunction of divisibilities). Hence `coveredCount` is
     computable — the base cases (small `Pk`) go through `decide`. -/
-instance decidableIsVoid (S : Finset ℕ) (n : ℕ) : Decidable (isVoid S n) := by
+@[expose]
+public instance decidableIsVoid (S : Finset ℕ) (n : ℕ) : Decidable (isVoid S n) := by
   unfold isVoid aligned; infer_instance
 
 /-- **Number of covered positions in the window** — aligned by some ring `< Pk` (the
     composites in the window). Disjointly by `minFac` this is `Σ_p A_p`. -/
-def coveredCount (Pk : ℕ) : ℕ :=
+@[expose]
+public def coveredCount (Pk : ℕ) : ℕ :=
   ((gps_window Pk).filter
     (fun n => ¬ isVoid ((Finset.range Pk).filter Nat.Prime) n)).card
 
 /-- Size of the ring window: `|(Pk, 2Pk]| = Pk`. -/
-lemma gps_window_card (Pk : ℕ) : (gps_window Pk).card = Pk := by
+public lemma gps_window_card (Pk : ℕ) : (gps_window Pk).card = Pk := by
   rw [gps_window, Nat.card_Ioc]; omega
 
 /-- **Structural reduction of the atom.** A void in the window exists ⟺ the base primes cover
     STRICTLY fewer than `Pk` positions. Same pigeonhole as in `Truncated`, but WITHOUT the
     sparsity assumption — via the disjoint split of the window into covered/voids.
     From here B = the single inequality `coveredCount Pk < Pk`. -/
-lemma windowHasVoid_iff_coveredCount_lt {Pk : ℕ} :
+public lemma windowHasVoid_iff_coveredCount_lt {Pk : ℕ} :
     windowHasVoid Pk ↔ coveredCount Pk < Pk := by
   simp only [windowHasVoid, coveredCount]
   have hsplit := Finset.card_filter_add_card_filter_not
@@ -440,7 +449,7 @@ lemma windowHasVoid_iff_coveredCount_lt {Pk : ℕ} :
     the window has a survivor (a new prime). This is equivalent to the atom
     `dense_sieve_survivor`, but expressed as a countable inequality — here the telescope
     `Σ A_p ≈ Pk·∏(1−1/p)` enters. -/
-theorem coveredCount_lt_imp_nonempty {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem coveredCount_lt_imp_nonempty {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (h : coveredCount Pk < Pk) : (gps_free Pk).Nonempty :=
   (windowHasVoid_iff_gps_free_nonempty hPk hPk3).mp
     (windowHasVoid_iff_coveredCount_lt.mpr h)
@@ -454,7 +463,7 @@ theorem coveredCount_lt_imp_nonempty {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 <
     `sigma > Pk`. The closure lives in `coveredCount = sigma − overlaps`: the goal
     `coveredCount < Pk` ⟺ `overlaps > sigma − Pk`. This one lower bound on the redundancy
     (growing with Pk — "hardest at the start") is the only remaining step. -/
-lemma coveredCount_le_sigma (Pk : ℕ) :
+public lemma coveredCount_le_sigma (Pk : ℕ) :
     coveredCount Pk ≤ ∑ p ∈ (Finset.range Pk).filter Nat.Prime,
         ((gps_window Pk).filter (fun n => p ∣ n)).card := by
   unfold coveredCount
@@ -483,7 +492,7 @@ This is "the structure counts once" in Lean: every covered position falls into e
 fiber (its own minFac), so there is no double counting (the multiplicity disappears — a
 disjoint sum, not a `Σ` with multiplicity). By `window_composite_minFac_sq_le` only the fibers
 `p ≤ √(2Pk)` are nonzero. -/
-theorem coveredCount_eq_sum_minFac_fiber {Pk : ℕ} (_hPk3 : 2 < Pk) :
+public theorem coveredCount_eq_sum_minFac_fiber {Pk : ℕ} (_hPk3 : 2 < Pk) :
     coveredCount Pk
       = ∑ p ∈ (Finset.range Pk).filter Nat.Prime,
           ((gps_window Pk).filter (fun n => n.minFac = p)).card := by
@@ -532,7 +541,7 @@ theorem coveredCount_eq_sum_minFac_fiber {Pk : ℕ} (_hPk3 : 2 < Pk) :
 /-- **Truncation of the sum to √(2Pk).** Fibers with `p² > 2Pk` are EMPTY (a composite in the
     window has `minFac² ≤ 2Pk`), so coverage sums only over primes `p ≤ √(2Pk)` — finitely
     many, `O(√Pk/ln)`. This is "finitely many rings" in code. -/
-theorem coveredCount_eq_sum_truncated {Pk : ℕ} (hPk3 : 2 < Pk) :
+public theorem coveredCount_eq_sum_truncated {Pk : ℕ} (hPk3 : 2 < Pk) :
     coveredCount Pk
       = ∑ p ∈ (Finset.range Pk).filter (fun p => Nat.Prime p ∧ p ^ 2 ≤ 2 * Pk),
           ((gps_window Pk).filter (fun n => n.minFac = p)).card := by
@@ -566,7 +575,7 @@ theorem coveredCount_eq_sum_truncated {Pk : ℕ} (hPk3 : 2 < Pk) :
     `A_p = #{m ∈ (Pk/p, 2Pk/p] : m coprime to primorial_below p}`.
     This is EXACTLY the same problem one scale down — the recursion engine (scale invariance as
     an equation). Proved with no `sorry`. -/
-theorem coverFiber_eq_scaled {Pk p : ℕ} (hp : Nat.Prime p) :
+public theorem coverFiber_eq_scaled {Pk p : ℕ} (hp : Nat.Prime p) :
     ((gps_window Pk).filter (fun n => n.minFac = p)).card
       = ((Finset.Ioc (Pk / p) (2 * Pk / p)).filter
           (fun m => Nat.Coprime m (primorial_below p))).card := by
@@ -627,7 +636,7 @@ theorem coverFiber_eq_scaled {Pk p : ℕ} (hp : Nat.Prime p) :
 /-- **The first sieve term, exactly: ring 2.** `A_2 = Pk − Pk/2` (the evens in the window),
     since `primorial_below 2 = 1`, so the coprimality condition vanishes and the whole rescaled
     interval `(Pk/2, Pk]` remains. We split off this dominant term from `coveredCount` exactly. -/
-theorem coveredCount_split_two {Pk : ℕ} (hPk3 : 2 < Pk) :
+public theorem coveredCount_split_two {Pk : ℕ} (hPk3 : 2 < Pk) :
     coveredCount Pk
       = (Pk - Pk / 2)
         + ∑ p ∈ ((Finset.range Pk).filter (fun p => Nat.Prime p ∧ p ^ 2 ≤ 2 * Pk)).erase 2,
@@ -648,7 +657,7 @@ theorem coveredCount_split_two {Pk : ℕ} (hPk3 : 2 < Pk) :
 /-- **Step-1 goal halved.** Non-emptiness of the window ⟺ the odd composites do not fill the
     odd half: `Σ_{3≤p≤√(2Pk)} A_p < Pk/2`. Ring 2 handled exactly; what remains is the sieve
     over the ODD active rings. -/
-theorem windowHasVoid_iff_oddSum_lt {Pk : ℕ} (hPk3 : 2 < Pk) :
+public theorem windowHasVoid_iff_oddSum_lt {Pk : ℕ} (hPk3 : 2 < Pk) :
     windowHasVoid Pk ↔
     (∑ p ∈ ((Finset.range Pk).filter (fun p => Nat.Prime p ∧ p ^ 2 ≤ 2 * Pk)).erase 2,
             ((gps_window Pk).filter (fun n => n.minFac = p)).card) < Pk / 2 := by
@@ -666,32 +675,34 @@ Structural note (fact): self-containment (`window_self_contained_dvd`) holds ONL
 therefore carries the most structure, which is exactly the case hardest to establish. -/
 
 /-- Generalized window `(Pmax, Pmin·Pmax]`. `Pmin = 2` is the Bertrand window. -/
-def gwindow (Pmin Pmax : ℕ) : Finset ℕ := Finset.Ioc Pmax (Pmin * Pmax)
+@[expose]
+public def gwindow (Pmin Pmax : ℕ) : Finset ℕ := Finset.Ioc Pmax (Pmin * Pmax)
 
 /-- A void in the generalized window: coprime to the base of primes `< Pmax`. -/
-def gwindowHasVoid (Pmin Pmax : ℕ) : Prop :=
+@[expose]
+public def gwindowHasVoid (Pmin Pmax : ℕ) : Prop :=
   ∃ n ∈ gwindow Pmin Pmax, isVoid ((Finset.range Pmax).filter Nat.Prime) n
 
 /-- `Pmin = 2` is exactly the Bertrand window. -/
-theorem gwindow_two_eq_window (Pmax : ℕ) : gwindow 2 Pmax = gps_window Pmax := by
+public theorem gwindow_two_eq_window (Pmax : ℕ) : gwindow 2 Pmax = gps_window Pmax := by
   rw [gwindow, gps_window]
 
 /-- **Bertrand = the instance `Pmin = 2`** of the generalized non-emptiness. We do not prove
     Bertrand separately — it falls out of the family at `Pmin = 2`. -/
-theorem gwindowHasVoid_two_iff (Pmax : ℕ) :
+public theorem gwindowHasVoid_two_iff (Pmax : ℕ) :
     gwindowHasVoid 2 Pmax ↔ windowHasVoid Pmax := by
   rw [gwindowHasVoid, windowHasVoid, gwindow_two_eq_window]
 
 /-- **Wide regime — FREE (the easy end of the family).** When `Pmin·Pmax` reaches the
     primorial, the Euclid witness lies in the window and yields a void — with no atom. -/
-theorem gwindowHasVoid_of_wide {Pmin Pmax : ℕ}
+public theorem gwindowHasVoid_of_wide {Pmin Pmax : ℕ}
     (hwide : primorial_below (Pmax + 1) + 1 ≤ Pmin * Pmax) :
     gwindowHasVoid Pmin Pmax := by
   obtain ⟨n, hlo, hhi, hvoid⟩ := exists_void_below_primorial Pmax
   exact ⟨n, by rw [gwindow, Finset.mem_Ioc]; exact ⟨hlo, le_trans hhi hwide⟩, hvoid⟩
 
 /-- A wider window contains the narrower: `Pmin ≤ Pmin' ⟹ gwindow Pmin ⊆ gwindow Pmin'`. -/
-theorem gwindow_subset {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin') :
+public theorem gwindow_subset {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin') :
     gwindow Pmin Pmax ⊆ gwindow Pmin' Pmax := by
   rw [gwindow, gwindow]
   exact Finset.Ioc_subset_Ioc_right (mul_le_mul_left h Pmax)
@@ -699,7 +710,7 @@ theorem gwindow_subset {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin') :
 /-- **Direction of the family: bottom to top.** A void in the window `Pmin` propagates to
     EVERY wider `Pmin' ≥ Pmin` — the narrower window is a subset of the wider, and the base and
     the void do not change. The implication runs NARROW ⟹ WIDE. -/
-theorem gwindowHasVoid_mono {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin')
+public theorem gwindowHasVoid_mono {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin')
     (hv : gwindowHasVoid Pmin Pmax) : gwindowHasVoid Pmin' Pmax := by
   obtain ⟨n, hn, hvoid⟩ := hv
   exact ⟨n, gwindow_subset h hn, hvoid⟩
@@ -708,7 +719,7 @@ theorem gwindowHasVoid_mono {Pmin Pmin' Pmax : ℕ} (h : Pmin ≤ Pmin')
     in ALL wider ones (`Pmin ≥ 2`). Consequence: the wide regime is free but INDEPENDENT — it
     does not flow downward. The kernel stays at the bottom, at `Pmin = 2` (= the atom
     `windowHasVoid`). The generalization frames the family but does NOT reduce it. -/
-theorem gwindowHasVoid_of_bertrand {Pmin Pmax : ℕ} (h : 2 ≤ Pmin)
+public theorem gwindowHasVoid_of_bertrand {Pmin Pmax : ℕ} (h : 2 ≤ Pmin)
     (hb : windowHasVoid Pmax) : gwindowHasVoid Pmin Pmax :=
   gwindowHasVoid_mono h ((gwindowHasVoid_two_iff Pmax).mpr hb)
 
@@ -727,7 +738,7 @@ Trichotomy of failure: for this to hold, one of the following would have to brea
   • PEANO/offsets — the offsets of the base rings `< Pk` would have to cover all `Pk` positions,
     even though the density of the union is `1 − ∏(1−1/p) < 1`.
 Parts (1)+(2) are proved WITHOUT the atom; the contradiction remains on the atom. -/
-theorem fullCoverage_forces_structure {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem fullCoverage_forces_structure {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (hempty : fullCoverage Pk) :
     (∀ n ∈ gps_window Pk, ∃ p ∈ (Finset.range Pk).filter Nat.Prime, p ∣ n)
     ∧ (∑ p ∈ (Finset.range Pk).filter Nat.Prime,
@@ -752,13 +763,13 @@ theorem fullCoverage_forces_structure {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2
 /-- **A prime position is uncoverable (the "2Pmax" horn).** A prime `q` in the window is not
     divided by any ring `< Pk` — its only ring is itself, `q > Pk`, and `2q > 2Pk` lies outside
     the window. -/
-theorem prime_position_uncoverable {Pk q : ℕ} (hq : Nat.Prime q) (hq_lo : Pk < q) :
+public theorem prime_position_uncoverable {Pk q : ℕ} (hq : Nat.Prime q) (hq_lo : Pk < q) :
     ∀ p ∈ (Finset.range Pk).filter Nat.Prime, ¬ p ∣ q :=
   fun p hp => prime_isVoid_of_lt hq hq_lo p hp
 
 /-- **Contradiction modulo the atom.** Full coverage forces `Σ_{p<Pk} A_p = Pk`, while the
     structural sieve gives `Σ A_p < Pk`. The two cannot hold at once (`not_fullCoverage`). -/
-theorem fullCoverage_iff_sum_eq {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public theorem fullCoverage_iff_sum_eq {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     fullCoverage Pk →
     (∑ p ∈ (Finset.range Pk).filter Nat.Prime,
           ((gps_window Pk).filter (fun n => n.minFac = p)).card) = Pk :=
@@ -771,15 +782,15 @@ theorem fullCoverage_iff_sum_eq {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) 
 `dense_sieve_survivor`. Here the practical generator (`sieve_bertrand_check`) enters the formal
 proof as a base-case tactic. Each such line is one base case closed with no `sorry`. -/
 
-theorem windowHasVoid_3  : windowHasVoid 3  := by
+public theorem windowHasVoid_3  : windowHasVoid 3  := by
   rw [windowHasVoid_iff_coveredCount_lt]; decide
-theorem windowHasVoid_5  : windowHasVoid 5  := by
+public theorem windowHasVoid_5  : windowHasVoid 5  := by
   rw [windowHasVoid_iff_coveredCount_lt]; decide
-theorem windowHasVoid_7  : windowHasVoid 7  := by
+public theorem windowHasVoid_7  : windowHasVoid 7  := by
   rw [windowHasVoid_iff_coveredCount_lt]; decide
-theorem windowHasVoid_11 : windowHasVoid 11 := by
+public theorem windowHasVoid_11 : windowHasVoid 11 := by
   rw [windowHasVoid_iff_coveredCount_lt]; decide
-theorem windowHasVoid_13 : windowHasVoid 13 := by
+public theorem windowHasVoid_13 : windowHasVoid 13 := by
   rw [windowHasVoid_iff_coveredCount_lt]; decide
 
 /-- These base windows are closed INDEPENDENTLY of the atom — by computing the sieve.
@@ -819,7 +830,7 @@ sharpest form. -/
     larger base — it forces exactly: every prime `> Pk` lies `> 2Pk`. The base stays, Pmax
     stays, the bound 2Pmax stays. No purely logical contradiction; the contradiction lives
     solely in the coverage question (the atom). -/
-theorem fullCoverage_means_next_prime_far {Pk : ℕ} (hfull : fullCoverage Pk) :
+public theorem fullCoverage_means_next_prime_far {Pk : ℕ} (hfull : fullCoverage Pk) :
     ∀ q, Nat.Prime q → Pk < q → 2 * Pk < q := by
   intro q hq hlo
   by_contra hle
@@ -832,7 +843,8 @@ theorem fullCoverage_means_next_prime_far {Pk : ℕ} (hfull : fullCoverage Pk) :
 
 /-- **Truncated primorial**: the product of primes `p` with `p² ≤ 2Pk` (the only primes that
     can cover the window at all — `window_composite_minFac_sq_le`). -/
-def truncPrimorial (Pk : ℕ) : ℕ :=
+@[expose]
+public def truncPrimorial (Pk : ℕ) : ℕ :=
   ∏ p ∈ (Finset.range Pk).filter (fun p => Nat.Prime p ∧ p ^ 2 ≤ 2 * Pk), p
 
 /-- **Window determinism, truncated version.** In the window: void with respect to the FULL
@@ -840,7 +852,7 @@ def truncPrimorial (Pk : ℕ) : ℕ :=
     the truncated primorial and divisible by some `p < Pk` would be composite, so its
     `minFac² ≤ 2Pk` — and then `minFac` divides the truncated primorial, a contradiction. No
     `sorry`. -/
-theorem void_iff_coprime_trunc {Pk n : ℕ} (hPk3 : 2 < Pk) (hn : n ∈ gps_window Pk) :
+public theorem void_iff_coprime_trunc {Pk n : ℕ} (hPk3 : 2 < Pk) (hn : n ∈ gps_window Pk) :
     isVoid ((Finset.range Pk).filter Nat.Prime) n ↔ Nat.Coprime n (truncPrimorial Pk) := by
   have htrS : ∀ p ∈ (Finset.range Pk).filter (fun p => Nat.Prime p ∧ p ^ 2 ≤ 2 * Pk),
       Nat.Prime p := fun p hp => (Finset.mem_filter.mp hp).2.1
@@ -889,7 +901,7 @@ theorem void_iff_coprime_trunc {Pk n : ℕ} (hPk3 : 2 < Pk) (hn : n ∈ gps_wind
 /-- **The atom in its sharpest form.** A void in the window ⟺ `(Pk, 2Pk]` contains a number
     coprime to the TRUNCATED primorial (`p² ≤ 2Pk`), not the full one. From here all of Bertrand
     is a question about GAPS of the truncated base, not about primes. -/
-theorem windowHasVoid_iff_trunc_coprime {Pk : ℕ} (hPk3 : 2 < Pk) :
+public theorem windowHasVoid_iff_trunc_coprime {Pk : ℕ} (hPk3 : 2 < Pk) :
     windowHasVoid Pk ↔ ∃ n ∈ gps_window Pk, Nat.Coprime n (truncPrimorial Pk) := by
   constructor
   · rintro ⟨n, hn, hvoid⟩
@@ -899,7 +911,7 @@ theorem windowHasVoid_iff_trunc_coprime {Pk : ℕ} (hPk3 : 2 < Pk) :
 
 /-- Interface to the atom `dense_sieve_survivor`: a number coprime to the TRUNCATED primorial
     in the window ⇒ a survivor in `gps_free`. -/
-theorem survivor_of_trunc_coprime {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem survivor_of_trunc_coprime {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (h : ∃ n ∈ gps_window Pk, Nat.Coprime n (truncPrimorial Pk)) :
     (gps_free Pk).Nonempty :=
   (windowHasVoid_iff_gps_free_nonempty hPk hPk3).mp
@@ -910,7 +922,7 @@ theorem survivor_of_trunc_coprime {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk
     Jacobsthal function `g(truncPrimorial Pk) ≤ Pk`), then the window has a void. This is the
     only place where quantitative content remains after the reduction — and it is pure gap
     geometry, with no primes. -/
-theorem windowHasVoid_of_jacobsthal {Pk : ℕ} (hPk3 : 2 < Pk)
+public theorem windowHasVoid_of_jacobsthal {Pk : ℕ} (hPk3 : 2 < Pk)
     (hJ : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + Pk), Nat.Coprime n (truncPrimorial Pk)) :
     windowHasVoid Pk := by
   rw [windowHasVoid_iff_trunc_coprime hPk3]
@@ -921,14 +933,14 @@ theorem windowHasVoid_of_jacobsthal {Pk : ℕ} (hPk3 : 2 < Pk)
 
 /-- Coprimality depends only on the residue mod M (periodicity): the Jacobsthal condition need
     only be checked on ONE period. -/
-lemma coprime_mod_left (n M : ℕ) : Nat.Coprime (n % M) M ↔ Nat.Coprime n M := by
+public lemma coprime_mod_left (n M : ℕ) : Nat.Coprime (n % M) M ↔ Nat.Coprime n M := by
   unfold Nat.Coprime
   rw [← Nat.gcd_rec, Nat.gcd_comm]
 
 /-- **g(30) = 6, proved for ALL positions** (truncated base {2,3,5}): every run of 6
     consecutive integers contains a number coprime to 30. One period by `decide`, the rest by
     periodicity. No primes, no position. -/
-lemma jacobsthal_thirty (a : ℕ) : ∃ n ∈ Finset.Ioc a (a + 6), Nat.Coprime n 30 := by
+public lemma jacobsthal_thirty (a : ℕ) : ∃ n ∈ Finset.Ioc a (a + 6), Nat.Coprime n 30 := by
   have h : ∀ r < 30, ∃ d < 7, 0 < d ∧ Nat.Coprime ((r + d) % 30) 30 := by decide
   obtain ⟨d, hd7, hd0, hcop⟩ := h (a % 30) (Nat.mod_lt _ (by norm_num))
   refine ⟨a + d, Finset.mem_Ioc.mpr ⟨by omega, by omega⟩, ?_⟩
@@ -939,7 +951,7 @@ lemma jacobsthal_thirty (a : ℕ) : ∃ n ∈ Finset.Ioc a (a + 6), Nat.Coprime 
 /-- **The whole {2,3,5} regime closed by one gap bound.** For every `Pk ≥ 6` with truncated
     base {2,3,5} (i.e. `truncPrimorial Pk = 30`) a void is forced by `g(30)=6 ≤ Pk` — with no
     knowledge of where the window lies, and no counting of primes. -/
-theorem windowHasVoid_of_trunc30 {Pk : ℕ} (hPk3 : 2 < Pk) (h6 : 6 ≤ Pk)
+public theorem windowHasVoid_of_trunc30 {Pk : ℕ} (hPk3 : 2 < Pk) (h6 : 6 ≤ Pk)
     (htr : truncPrimorial Pk = 30) : windowHasVoid Pk := by
   apply windowHasVoid_of_jacobsthal hPk3
   intro a
@@ -950,11 +962,11 @@ theorem windowHasVoid_of_trunc30 {Pk : ℕ} (hPk3 : 2 < Pk) (h6 : 6 ≤ Pk)
 /-- Windows Pk = 13, 17, 19, 23 closed by the gap geometry of the base {2,3,5} (regime
     `25 ≤ 2Pk < 49`, plus the edge `2·13 ≥ 25`): one Jacobsthal inequality instead of four
     sieve computations. -/
-theorem windowHasVoid_17 : windowHasVoid 17 :=
+public theorem windowHasVoid_17 : windowHasVoid 17 :=
   windowHasVoid_of_trunc30 (by norm_num) (by norm_num) (by decide)
-theorem windowHasVoid_19 : windowHasVoid 19 :=
+public theorem windowHasVoid_19 : windowHasVoid 19 :=
   windowHasVoid_of_trunc30 (by norm_num) (by norm_num) (by decide)
-theorem windowHasVoid_23 : windowHasVoid 23 :=
+public theorem windowHasVoid_23 : windowHasVoid 23 :=
   windowHasVoid_of_trunc30 (by norm_num) (by norm_num) (by decide)
 
 /-! ## The deterministic zone Pk² — formalized
@@ -971,7 +983,7 @@ past Pk" — the equivalence renames the atom, it does not prove it. -/
 
 /-- **Deterministic reach of the sieve = Pk².** For `Pk < n < Pk²`: void ⟺ prime.
     Generalizes `void_iff_prime_in_window` from the window `(Pk, 2Pk]` to the whole zone. -/
-theorem void_iff_prime_in_deterministic_zone {Pk n : ℕ} (hPk3 : 2 < Pk)
+public theorem void_iff_prime_in_deterministic_zone {Pk n : ℕ} (hPk3 : 2 < Pk)
     (hlo : Pk < n) (hhi : n < Pk ^ 2) :
     isVoid ((Finset.range Pk).filter Nat.Prime) n ↔ Nat.Prime n := by
   constructor
@@ -1012,7 +1024,7 @@ One statement for the whole staircase at once: `g(truncPrimorial Pk) ≤ Pk` —
 /-- **Periodicity, in general.** A gap law checked on one period `M` transfers to all positions:
     if from every residue `r < M` the nearest coprime is `≤ g < M`, then every run `(a, a+g]`
     contains a number coprime to `M`. -/
-lemma jacobsthal_of_period {M g : ℕ} (hM : 0 < M) (hgM : g < M)
+public lemma jacobsthal_of_period {M g : ℕ} (hM : 0 < M) (hgM : g < M)
     (h : ∀ r < M, ∃ d < g + 1, 0 < d ∧ Nat.Coprime ((r + d) % M) M) :
     ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + g), Nat.Coprime n M := by
   intro a
@@ -1024,7 +1036,7 @@ lemma jacobsthal_of_period {M g : ℕ} (hM : 0 < M) (hgM : g < M)
 
 /-- **A regime closed by the gap law, in general.** `g(M) ≤ g ≤ Pk` on one period
     + `truncPrimorial Pk = M` ⇒ a void in the window. The window's position is unused. -/
-theorem windowHasVoid_of_trunc_gap {Pk M g : ℕ} (hPk3 : 2 < Pk) (hg : g ≤ Pk)
+public theorem windowHasVoid_of_trunc_gap {Pk M g : ℕ} (hPk3 : 2 < Pk) (hg : g ≤ Pk)
     (htr : truncPrimorial Pk = M)
     (hJ : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + g), Nat.Coprime n M) :
     windowHasVoid Pk := by
@@ -1040,7 +1052,7 @@ set_option maxRecDepth 4000 in
     exceeds the default (512) recursion depth even though the computation itself is
     small — this is a stack-depth artifact of structural recursion on the bound,
     not a sign the check is actually expensive. -/
-lemma jacobsthal_210 : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + 10), Nat.Coprime n 210 :=
+public lemma jacobsthal_210 : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + 10), Nat.Coprime n 210 :=
   jacobsthal_of_period (by norm_num) (by norm_num)
     (by decide)
 
@@ -1116,7 +1128,7 @@ private lemma jacobsthal_2310_glue (k : ℕ)
   have hre : 210 * k + (r - 210 * k) = r := by omega
   rwa [hre] at hcop
 
-lemma jacobsthal_2310 : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + 14), Nat.Coprime n 2310 :=
+public lemma jacobsthal_2310 : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + 14), Nat.Coprime n 2310 :=
   jacobsthal_of_period (by norm_num) (by norm_num) (by
     intro r hr
     rcases lt_or_ge r 210 with h0 | h0
@@ -1142,35 +1154,35 @@ lemma jacobsthal_2310 : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + 14), Nat.Coprim
     exact jacobsthal_2310_glue 10 jacobsthal_2310_chunk10 r (by omega) (by omega))
 
 /-- Regime {2,3,5,7} (`49 ≤ 2Pk < 121`): eight windows by the single law g(210)=10. -/
-theorem windowHasVoid_29 : windowHasVoid 29 :=
+public theorem windowHasVoid_29 : windowHasVoid 29 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_31 : windowHasVoid 31 :=
+public theorem windowHasVoid_31 : windowHasVoid 31 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_37 : windowHasVoid 37 :=
+public theorem windowHasVoid_37 : windowHasVoid 37 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_41 : windowHasVoid 41 :=
+public theorem windowHasVoid_41 : windowHasVoid 41 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_43 : windowHasVoid 43 :=
+public theorem windowHasVoid_43 : windowHasVoid 43 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_47 : windowHasVoid 47 :=
+public theorem windowHasVoid_47 : windowHasVoid 47 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_53 : windowHasVoid 53 :=
+public theorem windowHasVoid_53 : windowHasVoid 53 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
-theorem windowHasVoid_59 : windowHasVoid 59 :=
+public theorem windowHasVoid_59 : windowHasVoid 59 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_210
 
 /-- Regime {2,3,5,7,11} (`121 ≤ 2Pk < 169`): six windows by the single law g(2310)=14. -/
-theorem windowHasVoid_61 : windowHasVoid 61 :=
+public theorem windowHasVoid_61 : windowHasVoid 61 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_2310
-theorem windowHasVoid_67 : windowHasVoid 67 :=
+public theorem windowHasVoid_67 : windowHasVoid 67 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_2310
-theorem windowHasVoid_71 : windowHasVoid 71 :=
+public theorem windowHasVoid_71 : windowHasVoid 71 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_2310
-theorem windowHasVoid_73 : windowHasVoid 73 :=
+public theorem windowHasVoid_73 : windowHasVoid 73 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_2310
-theorem windowHasVoid_79 : windowHasVoid 79 :=
+public theorem windowHasVoid_79 : windowHasVoid 79 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_2310
-theorem windowHasVoid_83 : windowHasVoid 83 :=
+public theorem windowHasVoid_83 : windowHasVoid 83 :=
   windowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by decide) jacobsthal_2310
 
 /-- The staircase 13–83 in one place: all windows of the three regimes closed by gap geometry,
@@ -1199,11 +1211,12 @@ closes for ALL Pmin at once by one period (below: {2,3,5} simultaneously closes 
 
 /-- Family truncated primorial: primes `p < Pmax` with `p² ≤ Pmin·Pmax`
     (the only primes able to cover the generalized window). -/
-def gtruncPrimorial (Pmin Pmax : ℕ) : ℕ :=
+@[expose]
+public def gtruncPrimorial (Pmin Pmax : ℕ) : ℕ :=
   ∏ p ∈ (Finset.range Pmax).filter (fun p => Nat.Prime p ∧ p ^ 2 ≤ Pmin * Pmax), p
 
 /-- Truncation in the family: a composite in `(Pmax, Pmin·Pmax]` has `minFac² ≤ Pmin·Pmax`. -/
-lemma gwindow_composite_minFac_sq_le {Pmin Pmax n : ℕ} (hPmax : 0 < Pmax)
+public lemma gwindow_composite_minFac_sq_le {Pmin Pmax n : ℕ} (hPmax : 0 < Pmax)
     (hn : n ∈ gwindow Pmin Pmax) (hcomp : ¬ Nat.Prime n) :
     n.minFac ^ 2 ≤ Pmin * Pmax := by
   simp only [gwindow, Finset.mem_Ioc] at hn
@@ -1219,7 +1232,7 @@ lemma gwindow_composite_minFac_sq_le {Pmin Pmax n : ℕ} (hPmax : 0 < Pmax)
 
 /-- **Truncated determinism in the family.** In `(Pmax, Pmin·Pmax]`: void with respect to the
     full base `< Pmax` ⟺ coprimality with the family truncated primorial. No `sorry`. -/
-theorem gvoid_iff_coprime_trunc {Pmin Pmax n : ℕ} (hPmax : 0 < Pmax)
+public theorem gvoid_iff_coprime_trunc {Pmin Pmax n : ℕ} (hPmax : 0 < Pmax)
     (hn : n ∈ gwindow Pmin Pmax) :
     isVoid ((Finset.range Pmax).filter Nat.Prime) n
       ↔ Nat.Coprime n (gtruncPrimorial Pmin Pmax) := by
@@ -1261,7 +1274,7 @@ theorem gvoid_iff_coprime_trunc {Pmin Pmax n : ℕ} (hPmax : 0 < Pmax)
 
 /-- **Family atom.** A void in `(Pmax, Pmin·Pmax]` ⟺ the window contains a number coprime to
     the family truncated primorial. The whole family = a question about gaps of truncated bases. -/
-theorem gwindowHasVoid_iff_trunc_coprime {Pmin Pmax : ℕ} (hPmax : 0 < Pmax) :
+public theorem gwindowHasVoid_iff_trunc_coprime {Pmin Pmax : ℕ} (hPmax : 0 < Pmax) :
     gwindowHasVoid Pmin Pmax
       ↔ ∃ n ∈ gwindow Pmin Pmax, Nat.Coprime n (gtruncPrimorial Pmin Pmax) := by
   constructor
@@ -1273,7 +1286,7 @@ theorem gwindowHasVoid_iff_trunc_coprime {Pmin Pmax : ℕ} (hPmax : 0 < Pmax) :
 /-- **A family regime closed by the gap law.** `g(M) ≤ g` on the period + `g` fits within the
     window length `(Pmin−1)·Pmax` + `gtruncPrimorial = M` ⇒ a void. For ALL `Pmin` at once —
     the window's position is unused. -/
-theorem gwindowHasVoid_of_trunc_gap {Pmin Pmax M g : ℕ} (hPmax : 0 < Pmax)
+public theorem gwindowHasVoid_of_trunc_gap {Pmin Pmax M g : ℕ} (hPmax : 0 < Pmax)
     (hle : Pmax ≤ Pmin * Pmax) (hg : g ≤ Pmin * Pmax - Pmax)
     (htr : gtruncPrimorial Pmin Pmax = M)
     (hJ : ∀ a : ℕ, ∃ n ∈ Finset.Ioc a (a + g), Nat.Coprime n M) :
@@ -1287,24 +1300,24 @@ theorem gwindowHasVoid_of_trunc_gap {Pmin Pmax M g : ℕ} (hPmax : 0 < Pmax)
 
 /-- Family {2,3,5}: ONE law g(30)=6 closes windows of different `Pmin` simultaneously —
     (11,33], (13,39], (9,36], (7,35]. The descent in Pmin works on a shared mechanism. -/
-theorem gwindowHasVoid_3_11 : gwindowHasVoid 3 11 :=
+public theorem gwindowHasVoid_3_11 : gwindowHasVoid 3 11 :=
   gwindowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by norm_num)
     (by decide) jacobsthal_thirty
-theorem gwindowHasVoid_3_13 : gwindowHasVoid 3 13 :=
+public theorem gwindowHasVoid_3_13 : gwindowHasVoid 3 13 :=
   gwindowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by norm_num)
     (by decide) jacobsthal_thirty
-theorem gwindowHasVoid_4_9 : gwindowHasVoid 4 9 :=
+public theorem gwindowHasVoid_4_9 : gwindowHasVoid 4 9 :=
   gwindowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by norm_num)
     (by decide) jacobsthal_thirty
-theorem gwindowHasVoid_5_7 : gwindowHasVoid 5 7 :=
+public theorem gwindowHasVoid_5_7 : gwindowHasVoid 5 7 :=
   gwindowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by norm_num)
     (by decide) jacobsthal_thirty
 
 /-- Family {2,3,5,7}: g(210)=10 closes e.g. (29,87] and (37,111] at `Pmin = 3`. -/
-theorem gwindowHasVoid_3_29 : gwindowHasVoid 3 29 :=
+public theorem gwindowHasVoid_3_29 : gwindowHasVoid 3 29 :=
   gwindowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by norm_num)
     (by decide) jacobsthal_210
-theorem gwindowHasVoid_3_37 : gwindowHasVoid 3 37 :=
+public theorem gwindowHasVoid_3_37 : gwindowHasVoid 3 37 :=
   gwindowHasVoid_of_trunc_gap (by norm_num) (by norm_num) (by norm_num)
     (by decide) jacobsthal_210
 
@@ -1333,7 +1346,7 @@ P=101→20, 503→72, 1009→137, 5003→559). The partial sums by order oscilla
     with respect to the base `< Pk` (where the anchor is itself a survivor and the smaller base
     does the sieving) are THE SAME set. Reason: the only multiple of `Pk` in the window is `2Pk`,
     which is divisible by `2`. No result of the project depends on the choice of convention. -/
-theorem anchor_idle_in_own_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public theorem anchor_idle_in_own_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     (gps_window Pk).filter (fun n => Nat.Coprime n (primorial_below (Pk + 1)))
       = gps_free Pk := by
   have hins : (Finset.range (Pk + 1)).filter Nat.Prime
@@ -1393,7 +1406,7 @@ theorem anchor_idle_in_own_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk
     `M = ∏S`): the survivors of the system `S∪{p}` in `(a,b]` plus a copy of the problem `S` at
     scale `1/p` = the survivors of the system `S` in `(a,b]`. Exact, no approximation;
     self-similarity of scale as an equation on cardinalities. -/
-theorem interference_step {p : ℕ} (hp : Nat.Prime p) {S : Finset ℕ}
+public theorem interference_step {p : ℕ} (hp : Nat.Prime p) {S : Finset ℕ}
     (hS : ∀ q ∈ S, Nat.Prime q) (hpS : p ∉ S) (a b : ℕ) :
     ((Finset.Ioc a b).filter (fun n => Nat.Coprime n (p * ∏ q ∈ S, q))).card
       + ((Finset.Ioc (a / p) (b / p)).filter (fun m => Nat.Coprime m (∏ q ∈ S, q))).card
@@ -1453,7 +1466,7 @@ theorem interference_step {p : ℕ} (hp : Nat.Prime p) {S : Finset ℕ}
     `Σ_T (−1)^|T| · (⌊b/∏T⌋ − ⌊a/∏T⌋)`. Exact and deterministic — the order-by-order layers are
     its (oscillating) partial sums; the whole is an identity. Proof: unfolding the recursion
     `interference_step` by induction on the base. -/
-theorem interference_formula (S : Finset ℕ) :
+public theorem interference_formula (S : Finset ℕ) :
     (∀ q ∈ S, Nat.Prime q) → ∀ a b : ℕ, a ≤ b →
     (((Finset.Ioc a b).filter (fun n => Nat.Coprime n (∏ q ∈ S, q))).card : ℤ)
       = ∑ T ∈ S.powerset,
@@ -1521,7 +1534,7 @@ exactly once, because its first multiple `2q` exceeds `2n` (`2q > 2n`), and does
 
 /-- The product of DISTINCT primes divides a common multiple
     (induction via coprimality of distinct primes). -/
-lemma prod_primes_dvd (s : Finset ℕ) :
+public lemma prod_primes_dvd (s : Finset ℕ) :
     (∀ p ∈ s, Nat.Prime p) → ∀ n : ℕ, (∀ p ∈ s, p ∣ n) → (∏ p ∈ s, p) ∣ n := by
   classical
   induction s using Finset.induction_on with
@@ -1544,7 +1557,7 @@ lemma prod_primes_dvd (s : Finset ℕ) :
 /-- **Product of new sources divides `C(2n,n)`.** The product of ALL new sources of the window
     (primes in `(n, 2n]`) divides the central binomial coefficient `C(2n, n)` — the window's
     content recorded in its factorization, by the S1 purity law. No `sorry`. -/
-theorem window_primes_prod_dvd_centralBinom (n : ℕ) :
+public theorem window_primes_prod_dvd_centralBinom (n : ℕ) :
     (∏ q ∈ (Finset.Ioc n (2 * n)).filter Nat.Prime, q) ∣ Nat.choose (2 * n) n := by
   apply prod_primes_dvd
   · intro q hq

@@ -1,18 +1,20 @@
-import StructuralSieve.Defs
-import StructuralSieve.LPF
-import StructuralSieve.ZeroForce
-import StructuralSieve.Weight
-import StructuralSieve.GPS_StateMachine
-import StructuralSieve.Main
-import StructuralSieve.Truncated
-import StructuralSieve.SelfContained
-import StructuralSieve.Threshold
-import StructuralSieve.BinomialBound
-import StructuralSieve.BinomialCertificate
-import StructuralSieve.Rings
-import StructuralSieve.Newton
-import StructuralSieve.Certificate
-import StructuralSieve.Erdos
+module
+
+public import StructuralSieve.Defs
+public import StructuralSieve.LPF
+public import StructuralSieve.ZeroForce
+public import StructuralSieve.Weight
+public import StructuralSieve.GPS_StateMachine
+public import StructuralSieve.Main
+public import StructuralSieve.Truncated
+public import StructuralSieve.SelfContained
+public import StructuralSieve.Threshold
+public import StructuralSieve.BinomialBound
+public import StructuralSieve.BinomialCertificate
+public import StructuralSieve.Rings
+public import StructuralSieve.Newton
+public import StructuralSieve.Certificate
+public import StructuralSieve.Erdos
 /-!
 # StructuralSieve — Structural Reduction of Bertrand's Postulate
 
@@ -29,7 +31,8 @@ Based on: "A Structural Reduction of Bertrand's Postulate"
 `Mathlib.NumberTheory.Bertrand` is imported nowhere on `Main`'s path: the atom
 is closed by the self-contained `binomial_contradiction`. (`Erdos.lean` below
 is the one file in the repository that does import it — an off-path reference
-instance, not reachable from `Main`; see *Extended development* below.)
+@[expose]
+public instance, not reachable from `Main`; see *Extended development* below.)
 
 ## Two scopes: the Palomar excerpt and the full development
 

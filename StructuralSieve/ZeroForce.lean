@@ -1,7 +1,9 @@
-import StructuralSieve.Defs
-import StructuralSieve.LPF
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.Defs
+public import StructuralSieve.LPF
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Tactic
 /-!
 # ZeroForce.lean — Lemma 4.3: Zero Effective Force
 
@@ -30,7 +32,7 @@ The only multiple of an odd prime `P_k` in the window `(P_k, 2·P_k]` is `2·P_k
 Since `2 ∣ 2·P_k`, this element is covered by the factor `2` already present in
 the preceding base.  Therefore `P_k` adds no new coverage to its own window.
 -/
-theorem zero_effective_force
+public theorem zero_effective_force
     {P_k : ℕ} (hP : Nat.Prime P_k)
     {n : ℕ}
     (hn_lo  : P_k < n)
@@ -60,7 +62,7 @@ For every composite `n ∈ (P_k, 2·P_k]`, either:
 In either case `n` is sieve-covered by the preceding base `𝒫'`.
 This result is **exact** — it uses only divisibility, not density.
 -/
-theorem composites_covered_by_prev
+public theorem composites_covered_by_prev
     {P_k : ℕ} (hP : Nat.Prime P_k)
     {n : ℕ}
     (hn_lo   : P_k < n)
@@ -87,7 +89,7 @@ Any element `n ∈ (P_k, 2·P_k]` with `n.minFac > P_k` must be prime
 the exact characterization:
   `n ∈ (P_k, 2·P_k]` is prime  ↔  `n` is NOT covered by the preceding base `𝒫'`.
 -/
-theorem prime_iff_uncovered_by_prev
+public theorem prime_iff_uncovered_by_prev
     {P_k : ℕ} (hP : Nat.Prime P_k)
     {n : ℕ}
     (hn_lo : P_k < n)

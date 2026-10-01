@@ -1,10 +1,12 @@
-import StructuralSieve.Defs
-import StructuralSieve.LPF
-import StructuralSieve.ZeroForce
-import StructuralSieve.Weight
-import StructuralSieve.GPS_StateMachine
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.Defs
+public import StructuralSieve.LPF
+public import StructuralSieve.ZeroForce
+public import StructuralSieve.Weight
+public import StructuralSieve.GPS_StateMachine
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Tactic
 /-!
 # Main.lean — Theorem 5.1: Structural Bertrand–Chebyshev Bound
 
@@ -81,7 +83,7 @@ The hypotheses `_hprev_wt`, `_hphi_mult`, `_hphi_pos` characterize the structura
 kernel through `exists_coprime_in_window`; they are present here but not load-bearing for
 this version of the proof.
 -/
-theorem structural_bertrand_chebyshev
+public theorem structural_bertrand_chebyshev
     {P_k M' : ℕ}
     (hPk_prime    : Nat.Prime P_k)
     (hM'_pos      : 0 < M')
@@ -121,7 +123,7 @@ theorem structural_bertrand_chebyshev
 /-! ## Reduction: the largest prime `≤ N` -/
 
 /-- There exists a largest prime `≤ N` (for `N ≥ 2`), with no primes in `(P, N]`. -/
-lemma exists_largest_prime_le {N : ℕ} (hN : 2 ≤ N) :
+public lemma exists_largest_prime_le {N : ℕ} (hN : 2 ≤ N) :
     ∃ P, Nat.Prime P ∧ P ≤ N ∧ ∀ m, P < m → m ≤ N → ¬ Nat.Prime m := by
   have h2mem : 2 ∈ (Finset.range (N + 1)).filter Nat.Prime := by
     rw [Finset.mem_filter, Finset.mem_range]
@@ -149,7 +151,7 @@ Structural proof (without `Nat.bertrand`): let `P_k` be the largest prime `≤ N
 `prime_in_window` gives a prime `q ∈ (P_k, 2·P_k]`; maximality of `P_k` yields `q > N`, and
 `P_k ≤ N` yields `q ≤ 2·N`.
 -/
-theorem bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
+public theorem bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime := by
   obtain ⟨P_k, hP_prime, hP_le, hP_max⟩ := exists_largest_prime_le (by omega : 2 ≤ N)
   rcases eq_or_lt_of_le hP_prime.two_le with h2 | hP3
