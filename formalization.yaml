@@ -5,64 +5,41 @@ license: "Apache-2.0"
 project:
   name: "StructuralSieve"
   description: >
-    One structural fact about a generative prime sieve, stated on two windows of
-    differently-scaled reach, plus Bertrand's postulate as a corollary of the sieve
-    mechanism it describes (not of either statement by name): (1) an exact
-    characterization of primality via sieve-coverage on the standard prime base's own
-    window (P_k, 2*P_k]
-    (StructuralSieve.prime_iff_uncovered_by_prev): n is prime iff not covered by the base of
-    primes below P_k; and (2) the identical characterization on a window (P_max,
-    P_min*P_max] whose upper reach is scaled by any positive P_min <= P_max instead of the
-    fixed factor 2 -- coverage is still by the same full base as (1), every prime <= P_max
-    (Definition 2.1), not a base restricted to start at P_min
-    (StructuralSieve.prime_iff_uncovered_by_prev_general,
-    LPF.lean). (2) is not a different phenomenon that happens to resemble (1); it is the
-    same structural invariant -- "what the base cannot build is exactly what is prime" --
-    restated on a window whose reach is a free parameter instead of fixed at 2*P_k, with (1)
-    as the special case P_min = 2. Both directions were already available as separate lemmas
-    before this equivalence was assembled: the forward direction is the same minFac-of-a-prime
-    fact ZeroForce.lean uses for (1); the backward direction is LPF.lean's least-prime-factor
-    bound, already stated for this general window. The originating question is not
-    Bertrand's ("is there a prime here?") but "up to where can sieve-coverage certify
-    primality without appeal to counting, on a window of any scaled reach?" Bertrand's
-    postulate (Chebyshev's strengthened form: for every N > 1 there is a prime p with
-    N < p <= 2N) is a corollary of the sieve's survivor mechanism, the same "uncovered =
-    prime" invariant (1) and (2) state on two differently-scaled windows, not of either result
-    by name and not built by literally chaining (1) or (2) as proof-term lemmas: the
-    proof term goes through the sieve's own survivor lemma and a separate quantitative
-    closure whose core bottoms out in the central binomial coefficient -- the same object
-    Erdos used for his own, differently-motivated proof of the same postulate; the two
-    projects ask different questions and simply arrive at the same underlying quantitative
-    fact to close them, which is not a concern to work around, only an observation. Neither
-    the survivor lemma nor the quantitative closure invokes prime_iff_uncovered_by_prev or
-    prime_iff_uncovered_by_prev_general by name, and the closure does not import
-    Mathlib's own Bertrand development. The corollary's quantitative closure
-    is a finite oracle over small windows (n < 512, chunked kernel-checked `decide`) and,
-    for n >= 512, a self-contained factorization-based upper bound on the central binomial
-    coefficient combined with a threshold inequality (adapted from Mathlib's Bertrand
-    development) and Mathlib's own lower bound on the central binomial coefficient — no
-    `native_decide` in this closure. Zero sorries; depends only on the three
-    standard Lean axioms.
+    Bertrand's postulate (Chebyshev's strengthened form: for every N > 1 there is a prime
+    p with N < p <= 2N), proved by an independent, from-scratch route
+    (StructuralSieve.bertrand_chebyshev) that avoids Mathlib.NumberTheory.Bertrand
+    entirely: a structural sieve against the primorial of preceding primes, closed
+    quantitatively by a self-contained central-binomial-coefficient argument. This is the
+    sole declaration submitted here for independent Comparator/notability review (see
+    `main_results` and `comparator.json`). Bertrand asked "is there a prime here?"; this
+    project's proof route asks "what can a fixed, finite sieve base build, and what does
+    it leave standing?" -- the central binomial coefficient is the same object Erdos used
+    for his own, differently-motivated proof of the same postulate. The proof's
+    quantitative closure is a finite oracle over small windows (n < 512, chunked
+    kernel-checked `decide`) and, for n >= 512, a self-contained factorization-based upper
+    bound on the central binomial coefficient combined with a threshold inequality
+    (adapted from Mathlib's Bertrand development) and Mathlib's own lower bound on the
+    central binomial coefficient — no `native_decide` in this closure. Zero sorries;
+    depends only on the three standard Lean axioms.
 
-    On the notability of (2) specifically: it is not exposition on (1) or a restatement of
-    the same fact under a different name -- it extends the range of validity of the
-    "uncovered = prime" invariant from the single fixed window reach 2*P_k to a window
-    whose reach is any positive scaling factor P_min of P_max, a genuine generalization
-    proved once and holding uniformly, not a family of separate instances checked one at a
-    time. That neither the generalization's forward direction (already used for (1)) nor
-    its backward direction (LPF.lean's least-prime-factor bound, already stated for this
-    general window) required new proof technique is not a caveat on the result's interest:
-    the content of (2) is that the same elementary argument, unmodified, already reaches
-    every scaled window at once -- the generalization was available the moment the two
-    pieces were stated for a general window, and simply had not been assembled into the
-    equivalence before. A determinism claim resting on bare Peano arithmetic inherits no
-    risk from deeper machinery, is checked by a decision procedure rather than a chain of
-    estimates, and holds with the same certainty as `2 + 2 = 4` at every window scale
-    simultaneously. The relevant
-    question is not how hard this was to prove, but whether this exact generalization had
-    been identified and stated as a single equivalence before -- to the author's knowledge,
-    within the bounded literature search recorded in `sources` below (which cannot rule out
-    unindexed sources), it had not.
+    The sieve also yields two elementary characterizations of primality by sieve-coverage,
+    kept in this repository as supporting internal lemmas and documented in full in the
+    accompanying paper, but not submitted as their own independently-reviewed headline
+    results: (a) on the standard prime base's own window (P_k, 2*P_k]
+    (StructuralSieve.prime_iff_uncovered_by_prev, ZeroForce.lean): n is prime iff not
+    covered by the base of primes below P_k; and (b) the identical characterization on a
+    window (P_max, P_min*P_max] whose upper reach is scaled by any positive P_min <= P_max
+    instead of the fixed factor 2 (StructuralSieve.prime_iff_uncovered_by_prev_general,
+    LPF.lean), with (a) as the special case P_min = 2. Both are proved by exact
+    divisibility -- the minFac-of-a-prime fact ZeroForce.lean uses, and LPF.lean's
+    least-prime-factor bound -- and both restate, for n in their respective ranges, the
+    classical trial-division fact that a composite has a prime factor at most sqrt(n)
+    against a divisor set fixed in advance rather than searched fresh for each n. That
+    restatement is real and used internally (it is load-bearing for the main theorem's
+    reduction step), but on its own it is not independently novel, so it is kept as
+    internal supporting content rather than submitted as a separate Comparator-checked
+    result. Only `bertrand_chebyshev` -- an original, from-scratch proof route for a
+    classical theorem -- is advertised as this submission's headline result.
   authors: ["Artur Flamandzki"]
   license: "Apache-2.0"
   responsible_maintainers: ["Artur Flamandzki"]
@@ -147,40 +124,38 @@ sources:
 
 status:
   scope: >
-    Three declarations are proved, presented in the order that reflects the project's own
-    history rather than fame — see Challenge.lean's header for the full account of why
-    these are different questions with a shared answer.
+    One declaration is submitted for independent Comparator/notability review
+    (StructuralSieve.bertrand_chebyshev, item (3) below); two further declarations are
+    proved and used internally but are not separately submitted -- see
+    project.description and Challenge.lean's header for the rationale. All three are
+    presented below in the order that reflects the project's own history rather than
+    fame.
 
-    (1) StructuralSieve.prime_iff_uncovered_by_prev (ZeroForce.lean) — the originating
-    result. For a prime P_k, on the window (P_k, 2*P_k], n is prime iff n is not covered by
-    the base of primes below P_k (n.minFac <= P_k). Proved directly from divisibility (Zero
+    (1) StructuralSieve.prime_iff_uncovered_by_prev (ZeroForce.lean) — internal
+    supporting lemma, not submitted for independent notability review (see
+    project.description). The originating result that motivated this development. For a
+    prime P_k, on the window (P_k, 2*P_k], n is prime iff n is not covered by the base of
+    primes below P_k (n.minFac <= P_k). Proved directly from divisibility (Zero
     Effective Force plus the least-prime-factor bound); no counting, no central binomial
-    coefficient.
+    coefficient. Load-bearing for the reduction step of (3)'s proof.
 
-    (2) StructuralSieve.prime_iff_uncovered_by_prev_general (LPF.lean) — the same
-    equivalence as (1), on a window (P_max, P_min*P_max] whose upper reach is scaled by any
-    positive P_min <= P_max instead of the fixed factor 2. Coverage is still by the same
-    full base as (1) -- every prime <= P_max (Definition 2.1) -- so P_min names a
-    window-width multiplier here, not a lower cutoff on which primes count as covering:
-    n is prime iff n is not covered by that base below P_max (n.minFac <= P_max). Not a
-    different phenomenon from (1) that happens to resemble it -- the same structural
-    invariant, "what the base cannot build is exactly what is prime," restated on a window
-    whose reach is a free parameter instead of fixed at 2*P_max; (1) is the special case
-    P_min = 2. Proved by exact divisibility, the same way as (1): the forward direction is
-    the minFac-of-a-prime fact ZeroForce.lean already uses for (1); the backward direction
-    is LPF.lean's least-prime-factor bound, which was already stated for this general
-    window.
+    (2) StructuralSieve.prime_iff_uncovered_by_prev_general (LPF.lean) — internal
+    supporting lemma, not submitted for independent notability review (see
+    project.description). The same equivalence as (1), on a window (P_max, P_min*P_max]
+    whose upper reach is scaled by any positive P_min <= P_max instead of the fixed
+    factor 2. Coverage is still by the same full base as (1) -- every prime <= P_max
+    (Definition 2.1) -- so P_min names a window-width multiplier here, not a lower cutoff
+    on which primes count as covering: n is prime iff n is not covered by that base below
+    P_max (n.minFac <= P_max). Not a different phenomenon from (1) that happens to
+    resemble it -- the same structural invariant, "what the base cannot build is exactly
+    what is prime," restated on a window whose reach is a free parameter instead of fixed
+    at 2*P_max; (1) is the special case P_min = 2. Proved by exact divisibility, the same
+    way as (1): the forward direction is the minFac-of-a-prime fact ZeroForce.lean already
+    uses for (1); the backward direction is LPF.lean's least-prime-factor bound, which was
+    already stated for this general window.
 
-    On notability: (2) is not exposition on (1) or a restatement of the same fact under a
-    different name -- it extends the "uncovered = prime" invariant's range of validity from
-    the single fixed window reach 2*P_k to any positively-scaled reach P_min*P_max, a
-    genuine generalization proved once and holding uniformly. Neither direction required
-    new proof technique to reach the general case; the content of (2) is that the same
-    elementary argument, unmodified, already reaches every scaled window at once, and
-    simply had not been assembled into a single equivalence before. See project.description
-    for the fuller argument.
-
-    (3) StructuralSieve.bertrand_chebyshev (Main.lean) — Bertrand's postulate
+    (3) StructuralSieve.bertrand_chebyshev (Main.lean) — the sole Comparator-audited,
+    submitted result (see comparator.json). Bertrand's postulate
     (Chebyshev's strengthened form: for every N > 1 there is a prime p with N < p <= 2N), a
     corollary of the sieve's survivor mechanism, the same generative process (1) and (2)
     describe on two differently-scaled windows, not of either result by name and not built by
@@ -214,43 +189,6 @@ status:
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
   main_results:
-    - declaration: "Submission.prime_iff_uncovered_by_prev"
-      file: "Challenge.lean / Solution.lean"
-      sorry_count: 0
-      axioms: ["propext", "Classical.choice", "Quot.sound"]
-      comparator_config: "comparator.json"
-      literature_dependencies: []
-      note: >
-        The originating result (see project.description and status.scope). Exact
-        equivalence "prime iff not covered by the preceding base" on the window
-        (P_k, 2*P_k]. Proved by divisibility (Zero Effective Force + least-prime-factor
-        bound), independent of counting or the central binomial coefficient. This is the
-        Comparator-audited surface for `StructuralSieve.prime_iff_uncovered_by_prev`
-        (StructuralSieve/ZeroForce.lean), the underlying library declaration
-        `Solution.lean` invokes one-for-one -- same statement, restated under the
-        `Submission` namespace so Challenge.lean can state it without importing
-        `StructuralSieve/`. Axioms assumed identical to the rest of this development
-        (built from the same elementary primitives); Artur to confirm via `#print axioms`
-        in the real build.
-    - declaration: "Submission.prime_iff_uncovered_by_prev_general"
-      file: "Challenge.lean / Solution.lean"
-      sorry_count: 0
-      axioms: ["propext", "Classical.choice", "Quot.sound"]
-      comparator_config: "comparator.json"
-      literature_dependencies: []
-      note: >
-        The same equivalence as (1), on a window (P_max, P_min*P_max] whose upper reach is
-        scaled by any positive P_min <= P_max instead of the fixed factor 2 (see
-        status.scope, item 2, and project.description). Coverage is still by the same full
-        base as (1), every prime <= P_max -- P_min is a window-width multiplier, not a
-        lower cutoff on which primes count as covering. n is prime iff not covered by that
-        base below P_max (n.minFac <= P_max); (1) is the special case P_min = 2. Proved by
-        exact divisibility, the same way as (1). This is
-        the Comparator-audited surface for
-        `StructuralSieve.prime_iff_uncovered_by_prev_general` (StructuralSieve/LPF.lean),
-        the underlying library declaration `Solution.lean` invokes one-for-one. Axioms
-        assumed identical to the rest of this development; Artur to confirm via
-        `#print axioms` in the real build.
     - declaration: "Submission.bertrand_chebyshev"
       file: "Challenge.lean / Solution.lean"
       sorry_count: 0
@@ -376,16 +314,18 @@ alignment:
       note: >
         Corollary of the sieve mechanism (see status.scope), not of either named
         equivalence by itself; the classical Bertrand-Chebyshev theorem, not the
-        project's originating result. Also restated in Challenge.lean/Solution.lean as
-        Submission.bertrand_chebyshev.
+        project's originating result. This is the sole result restated in
+        Challenge.lean/Solution.lean as Submission.bertrand_chebyshev and submitted for
+        independent Comparator/notability review (see comparator.json).
     - source: "Originating result: prime iff uncovered by preceding base"
       lean: "StructuralSieve.prime_iff_uncovered_by_prev"
       module: "StructuralSieve/ZeroForce.lean"
       status: "proved"
       note: >
-        The project's starting question and its answer (see project.description). Also
-        restated in Challenge.lean/Solution.lean as
-        Submission.prime_iff_uncovered_by_prev.
+        The project's starting question and its answer (see project.description).
+        Internal supporting lemma, load-bearing for bertrand_chebyshev's reduction step;
+        not restated in Challenge.lean/Solution.lean and not submitted as its own
+        Comparator-checked result (see Challenge.lean's header for the rationale).
     - source: "Same invariant as the originating result, on a window scaled by any factor"
       lean: "StructuralSieve.prime_iff_uncovered_by_prev_general"
       module: "StructuralSieve/LPF.lean"
@@ -403,9 +343,9 @@ alignment:
         minFac-of-a-prime fact ZeroForce.lean already uses for the originating result; the
         backward direction is LPF.lean's least-prime-factor bound, already stated for this
         general window.
-        Restated in Challenge.lean/Solution.lean as
-        Submission.prime_iff_uncovered_by_prev_general -- the Comparator-audited surface
-        for this development's headline result (2).
+        Internal supporting lemma; not restated in Challenge.lean/Solution.lean and not
+        submitted as its own Comparator-checked result (see Challenge.lean's header for
+        the rationale).
     - source: "Jacobsthal gap bound, g(210) = 10"
       lean: "StructuralSieve.jacobsthal_210"
       module: "StructuralSieve/Rings.lean"

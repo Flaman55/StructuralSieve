@@ -24,6 +24,15 @@ central-binomial certificate (`binomial_contradiction`, `BinomialCertificate.lea
 that does import it, `Erdos.lean`, is an off-path alternative kept only for a
 modularity comparison — see *Non-circularity* for the technical account.
 
+Of these, only `bertrand_chebyshev` is submitted to Palomar's Comparator for
+independent notability review (see `comparator.json`). The two covering-
+equivalence lemmas above are real, proved, and load-bearing for
+`bertrand_chebyshev`'s own reduction step — but on their own they restate the
+classical trial-division criterion against a divisor set fixed in advance,
+so they are documented here and in the accompanying paper as internal
+supporting results rather than independently advertised as a second or
+third headline submission.
+
 ## Origin of the result
 
 The starting observation was not Bertrand's. Bertrand (1845) conjectured, from
@@ -240,8 +249,8 @@ replayed from Mathlib's own files are expected and harmless).
 | File | Content (paper reference) |
 |---|---|
 | `StructuralSieve/Defs.lean` | Complete generative prime base, sieve coverage, window (Def. 2.1, Prop. 2.2) |
-| `StructuralSieve/LPF.lean` | Least Prime Factor bound; uncovered ⇒ prime (Lemma 3.1, Cor. 3.2); **`prime_iff_uncovered_general`**: headline equivalence on any positively-scaled window (Cor. 3.3) |
-| `StructuralSieve/ZeroForce.lean` | Zero Effective Force; composites covered by preceding base; **`prime_iff_uncovered_by_prev`**: headline equivalence (Lemma 4.1, Cor. 4.2) |
+| `StructuralSieve/LPF.lean` | Least Prime Factor bound; uncovered ⇒ prime (Lemma 3.1, Cor. 3.2); **`prime_iff_uncovered_general`**: equivalence on any positively-scaled window (Cor. 3.3) — internal supporting result, not separately submitted to Palomar |
+| `StructuralSieve/ZeroForce.lean` | Zero Effective Force; composites covered by preceding base; **`prime_iff_uncovered_by_prev`**: equivalence (Lemma 4.1, Cor. 4.2) — internal supporting result, not separately submitted to Palomar |
 | `StructuralSieve/Weight.lean` | Structural weight `w ≥ 1`; expansion capacity `M' < P·φ(M')` (Lemma 4.3, Cor. 4.5) |
 | `StructuralSieve/SelfContained.lean` | Self-containment boundary, gap-independent; `self_contained_bound_independent_of_gap` (`m·P` always self-contained, generalized to `P_min·P_max`) |
 | `StructuralSieve/Truncated.lean` | Sparse-regime positivity by union bound, unconditional |

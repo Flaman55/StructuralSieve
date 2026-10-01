@@ -4,82 +4,39 @@ import Mathlib.Data.Finset.Basic
 /-!
 # Advertised statements
 
-This is the small, trusted surface a mathematical reader should audit. It contains three
-declarations, in decreasing order of what motivated this development and increasing order
-of fame:
+This is the small, trusted surface a mathematical reader should audit. It contains one
+declaration: Bertrand's postulate in its Chebyshev-strengthened form.
 
-1. `Submission.prime_iff_uncovered_by_prev` — the original question this project set out to
-   answer. Not "does a prime exist in `(P_k, 2·P_k]`?" (Bertrand's question) but "is every
-   composite in that window already covered by a prime strictly below `P_k` (or by `2`)? —
-   i.e. does the window need any prime factor from *outside* itself?" The answer is an exact
-   equivalence, not an existence bound: `n` is prime iff `n` is *not* covered by the base of
-   primes below `P_k`. This is proved directly from divisibility (`ZeroForce.lean`'s Zero
-   Effective Force lemma plus the least-prime-factor bound), with no appeal to counting or to
-   the central binomial coefficient.
-2. `Submission.prime_iff_uncovered_by_prev_general` — the same equivalence as (1), on a
-   window `(P_max, P_min·P_max]` whose upper reach is scaled by any positive
-   `P_min ≤ P_max` instead of the fixed factor `2`. Coverage is still by the same base as
-   (1) — every prime `≤ P_max` (Definition 2.1) — so `P_min` is a window-width multiplier
-   here, not a lower cutoff on which primes count as covering: `n` is prime iff `n` is
-   *not* covered by that base below `P_max` (`n.minFac ≤ P_max`). This is the same
-   structural invariant as (1), "what the base cannot build is exactly what is prime,"
-   restated on a window whose reach is a free parameter instead of fixed at `2·P_max`.
-   (1) is the special case `P_min = 2`.
-   Proved the same way: the forward direction is the `minFac`-of-a-prime fact `ZeroForce.lean`
-   already uses for (1); the backward direction is `LPF.lean`'s least-prime-factor bound,
-   which was already stated for this general window.
-3. `Submission.bertrand_chebyshev` — Bertrand's postulate in its Chebyshev-strengthened form
-   (for every integer `N > 1` there is a prime strictly greater than `N` and at most `2 * N`).
-   This is a **corollary of the sieve's survivor mechanism**, the same "uncovered = prime"
-   invariant (1) and (2) state on two differently-scaled windows — not a corollary of either
-   result by name, and not built by literally chaining (1) or (2) as proof-term lemmas: the
-   proof term goes through the sieve's own survivor lemma (`GPS_StateMachine.lean`'s
-   `prime_in_window`) and a separate quantitative closure (`BinomialCertificate.lean`'s
-   self-contained central-binomial argument, not depending on `Mathlib.NumberTheory.Bertrand`),
-   neither of which invokes `prime_iff_uncovered_by_prev` or
-   `prime_iff_uncovered_by_prev_general` by name — both are separate, standalone results,
-   proved for their own sake, not lemmas this proof calls. Bertrand asked "is there a prime
-   here?"; this project asked "what can the base build, and what does it leave standing?" —
-   different questions, proved by different means, that happen to agree on this object.
-
-All three are discharged in `Solution.lean` by invoking the fully independent structural
-development in this repository's `StructuralSieve/` directory. That development does
-**not** import `Mathlib.NumberTheory.Bertrand`; the quantitative core for (3) is an original
-structural sieve described in the accompanying paper (`LaTex/The Structural Sieve.pdf`).
+`Submission.bertrand_chebyshev` — for every integer `N > 1` there is a prime strictly
+greater than `N` and at most `2 * N`. This is a classical theorem (Bertrand 1845, Chebyshev
+1852), proved here by an independent, from-scratch route: a structural sieve against the
+primorial of preceding primes (described in the accompanying paper, `LaTex/The Structural
+Sieve.pdf`), closed quantitatively by a self-contained central-binomial-coefficient argument
+(`BinomialCertificate.lean`) that does not depend on `Mathlib.NumberTheory.Bertrand`. Bertrand
+asked "is there a prime here?"; this project's proof route asks "what can a fixed, finite
+sieve base build, and what does it leave standing?" — the central binomial coefficient is the
+same object Erdős used for his own, differently-motivated proof of the same postulate.
 
 This file itself deliberately imports nothing from `StructuralSieve/` — only Mathlib. A
 canonical challenge file must be checkable in isolation, independent of the submitter's own
-library, so (1) and (2) below state their project-specific predicate unfolded to what it
-literally means rather than by name: `StructuralSieve.SieveCovered P n` is `n.minFac ≤ P`
-(`Defs.lean`). The two forms are definitionally equal, so a proof term from the named version
-still checks against this unfolded statement — but Palomar's comparator does a literal
-statement match rather than a `defeq` check, so `Solution.lean` restates (1) and (2) here
-verbatim, unfolded, and only calls the named versions inside the proof term.
+library.
+
+## Why only this one declaration is advertised here
+
+The structural sieve this proof is built on also yields two elementary characterizations of
+primality by sieve-coverage (`StructuralSieve.prime_iff_uncovered_by_prev` and its
+width-generalized form, both in `StructuralSieve/`) — but, on their own, those are a direct
+restatement of the classical trial-division criterion (a composite `n` has a prime factor at
+most `√n`) against a divisor set fixed in advance rather than searched fresh for each `n`.
+That restatement is real, used internally by this development, and documented in the
+accompanying paper and README — but it is not independently novel content, so it is not
+submitted here as its own Comparator-checked headline result. Only the theorem that is
+independently defensible as substantive — an original, from-scratch proof route for a
+classical theorem, avoiding Mathlib's own Bertrand development entirely — is advertised.
 -/
 
-/-- **Original question: is every composite in the window covered by the preceding base?**
-For a prime `P_k` and `n ∈ (P_k, 2·P_k]`, `n` is prime iff `n` is not covered by the base of
-primes below `P_k` (`n.minFac ≤ P_k`). Proved by exact divisibility, not by counting. -/
-theorem Submission.prime_iff_uncovered_by_prev
-    {P_k : ℕ} (hP : Nat.Prime P_k) {n : ℕ}
-    (hn_lo : P_k < n) (hn_hi : n ≤ 2 * P_k) (hn2 : 2 ≤ n) :
-    n.Prime ↔ ¬ (n.minFac ≤ P_k) := by
-  sorry
-
-/-- **Same invariant as (1), on a window scaled by any factor `P_min` (not only `2`).**
-For a window `(P_max, P_min·P_max]` whose upper reach is scaled by any positive
-`P_min ≤ P_max` — coverage is still by the full base, every prime `≤ P_max` (Definition
-2.1), not a base restricted to start at `P_min` — `n` is prime iff `n` is not covered by
-that base below `P_max` (`n.minFac ≤ P_max`). (1) is the special case `P_min = 2`. Proved
-by exact divisibility, the same as (1). -/
-theorem Submission.prime_iff_uncovered_by_prev_general
-    {P_min P_max : ℕ} (hPmin_pos : 0 < P_min) (hPmin_le : P_min ≤ P_max)
-    {n : ℕ} (hn_lo : P_max < n) (hn_hi : n ≤ P_min * P_max) (hn2 : 2 ≤ n) :
-    n.Prime ↔ ¬ (n.minFac ≤ P_max) := by
-  sorry
-
-/-- **Bertrand–Chebyshev bound** (corollary of the sieve mechanism (1) and (2) describe
-jointly, not of either by name). For every `N > 1` there is a prime `p` with
+/-- **Bertrand–Chebyshev bound**, proved by an independent structural-sieve route (not using
+`Mathlib.NumberTheory.Bertrand`). For every `N > 1` there is a prime `p` with
 `N < p ≤ 2 * N`. -/
 theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime := by
