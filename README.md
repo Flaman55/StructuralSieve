@@ -291,5 +291,8 @@ Mathlib only as a library.
 Cite the accompanying paper (see [`CITATION.cff`](CITATION.cff)). The formalization makes
 the logical status of the result unambiguous: the structural reduction is machine-verified
 and independent; the quantitative kernel is closed by a self-contained argument on the
-central binomial coefficient (`binomial_contradiction`), with no dependence anywhere in
-the project on Mathlib's own proof of Bertrand's postulate.
+central binomial coefficient (`binomial_contradiction`), with no dependence, anywhere in
+`bertrand_chebyshev`'s own import closure, on Mathlib's own proof of Bertrand's postulate.
+(`Erdos.lean` does import `Mathlib.NumberTheory.Bertrand`, but is an off-path alternative
+kept only for a modularity comparison — see *Non-circularity* above — and is not reachable
+from `Main`.)
