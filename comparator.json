@@ -2,8 +2,6 @@
   "challenge_module": "Challenge",
   "solution_module": "Solution",
   "theorem_names": [
-    "Submission.prime_iff_uncovered_by_prev",
-    "Submission.void_iff_prime_in_deterministic_zone",
     "Submission.bertrand_chebyshev"
   ],
   "definition_names": [],

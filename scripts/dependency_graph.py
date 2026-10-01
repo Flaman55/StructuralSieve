@@ -3,7 +3,7 @@
 Dependency graph + non-circularity audit for the StructuralSieve Lean project.
 
 The project's headline results (`prime_iff_uncovered_by_prev`,
-`void_iff_prime_in_deterministic_zone`) are unconditional and need no existential
+`window_reach_self_contained`) are unconditional and need no existential
 closure, so this audit does not bear on them. It targets the one place the
 development still reaches for an external existential certificate: recovering
 classical Bertrand's postulate (`bertrand_chebyshev`) as a corollary, closed via
@@ -13,9 +13,9 @@ of the same postulate, or the corollary would be circular.
 Scans `StructuralSieve/*.lean`, extracts `import` edges among the project modules,
 and renders a module dependency graph. The single external dependency of interest,
 `Mathlib.NumberTheory.Bertrand`, is drawn as a highlighted node so that the
-non-circularity property is visible: it is imported only by `Erdos.lean` (instance A,
-off the main path, kept for comparison), and `bertrand_chebyshev`'s own import
-closure does not depend on it.
+non-circularity property is visible: `Erdos.lean` is the sole module in this
+project that imports it (an off-path reference instance, not reachable from
+`Main`), so `bertrand_chebyshev`'s own import closure does not depend on it.
 
 Usage:
     python3 scripts/dependency_graph.py
@@ -36,7 +36,6 @@ OUT_DIR = os.path.join(ROOT, "docs")
 import_re = re.compile(r"^\s*import\s+(\S+)")
 
 # Modules that make up Main.lean's dependency closure (for colouring).
-# Erdos is instance A, off the main path; it is the only importer of Mathlib's Bertrand.
 BERTRAND_IMPORT = "Mathlib.NumberTheory.Bertrand"
 
 
@@ -73,8 +72,8 @@ def audit(files, imports):
     print(f"\nModules importing {BERTRAND_IMPORT}:")
     for m in importers:
         print(f"    {m}")
-    if importers == ["StructuralSieve.Erdos"]:
-        print("  OK: only Erdos.lean (instance A, off the main path).")
+    if not importers:
+        print("  OK: no module in this project imports it.")
     # grep for forbidden *uses* of Mathlib's Bertrand theorem
     pat = re.compile(r"Nat\.bertrand[^_]|exists_prime_lt_and_le_two_mul")
     hits = []
@@ -106,10 +105,6 @@ def build(files, imports):
         fill, col = "#eef3f8", "#1a5f7a"
         if mod == "StructuralSieve.Main":
             fill, col = "#d7f0d7", "#2e7d32"      # main theorem
-        elif mod == "StructuralSieve.Erdos":
-            fill, col = "#fde9d0", "#b5651d"      # instance A, off the main path
-        elif mod == "StructuralSieve.Certificate":
-            fill, col = "#e6e0f0", "#5b3fa0"      # modular interface
         dot.node(mod, label(mod), fillcolor=fill, color=col)
 
     # External Bertrand node (highlighted) — the non-circularity focus.

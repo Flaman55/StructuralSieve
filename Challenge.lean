@@ -4,67 +4,40 @@ import Mathlib.Data.Finset.Basic
 /-!
 # Advertised statements
 
-This is the small, trusted surface a mathematical reader should audit. It contains three
-declarations, in decreasing order of what motivated this development and increasing order
-of fame:
+This is the small, trusted surface a mathematical reader should audit. It contains one
+declaration: Bertrand's postulate in its Chebyshev-strengthened form.
 
-1. `Submission.prime_iff_uncovered_by_prev` — the original question this project set out to
-   answer. Not "does a prime exist in `(P_k, 2·P_k]`?" (Bertrand's question) but "is every
-   composite in that window already covered by a prime strictly below `P_k` (or by `2`)? —
-   i.e. does the window need any prime factor from *outside* itself?" The answer is an exact
-   equivalence, not an existence bound: `n` is prime iff `n` is *not* covered by the base of
-   primes below `P_k`. This is proved directly from divisibility (`ZeroForce.lean`'s Zero
-   Effective Force lemma plus the least-prime-factor bound), with no appeal to counting or to
-   the central binomial coefficient.
-2. `Submission.void_iff_prime_in_deterministic_zone` — the same equivalence, generalized from
-   the window `(P_k, 2·P_k]` to the full deterministic reach of the base, the zone
-   `(P_k, P_k²)`. `Rings.lean`'s `determinism_breaks_above` shows this reach is exact: the
-   equivalence genuinely fails once `n ≥ P_k²`.
-3. `Submission.bertrand_chebyshev` — Bertrand's postulate in its Chebyshev-strengthened form
-   (for every integer `N > 1` there is a prime strictly greater than `N` and at most `2 * N`).
-   This is a **corollary** of (1): given the equivalence, existence of a prime in the window
-   follows once the window is shown not to be *entirely* covered, which is where the
-   quantitative closure (the central binomial coefficient, the same object Erdős used for his
-   own, differently-motivated proof of the same postulate) enters. Bertrand asked "is there a
-   prime here?"; this project asked "where does deterministic certainty about primality end?"
-   — different questions, proved by different means, that happen to agree on this object.
-
-All three are discharged in `Solution.lean` by invoking the fully independent structural
-development in this repository's `StructuralSieve/` directory. That development does
-**not** import `Mathlib.NumberTheory.Bertrand`; the quantitative core for (3) is an original
-structural sieve described in the accompanying paper (`LaTex/The Structural Sieve.pdf`).
+`Submission.bertrand_chebyshev` — for every integer `N > 1` there is a prime strictly
+greater than `N` and at most `2 * N`. This is a classical theorem (Bertrand 1845, Chebyshev
+1852), proved here by an independent, from-scratch route: a structural sieve against the
+primorial of preceding primes (described in the accompanying paper, `LaTex/The Structural
+Sieve.pdf`), closed quantitatively by a self-contained central-binomial-coefficient argument
+(`BinomialCertificate.lean`) that does not depend on `Mathlib.NumberTheory.Bertrand`. Bertrand
+asked "is there a prime here?"; this project's proof route asks "what can a fixed, finite
+sieve base build, and what does it leave standing?" — the central binomial coefficient is the
+same object Erdős used for his own, differently-motivated proof of the same postulate.
 
 This file itself deliberately imports nothing from `StructuralSieve/` — only Mathlib. A
 canonical challenge file must be checkable in isolation, independent of the submitter's own
-library, so (1) and (2) below state the two project-specific predicates unfolded to what they
-literally mean rather than by name: `StructuralSieve.SieveCovered P n` is `n.minFac ≤ P`
-(`Defs.lean`), and `StructuralSieve.isVoid S n` is `∀ p ∈ S, ¬ p ∣ n` (`Rings.lean`, via
-`aligned`). The two forms are definitionally equal, so a proof term from the named versions
-still checks against these unfolded statements — but Palomar's comparator does a literal
-statement match rather than a `defeq` check, so `Solution.lean` restates (1) and (2) here
-verbatim, unfolded, and only calls the named versions inside the proof term.
+library.
+
+## Why only this one declaration is advertised here
+
+The structural sieve this proof is built on also yields two elementary characterizations of
+primality by sieve-coverage (`StructuralSieve.prime_iff_uncovered_by_prev` and its
+width-generalized form, both in `StructuralSieve/`) — but, on their own, those are a direct
+restatement of the classical trial-division criterion (a composite `n` has a prime factor at
+most `√n`) against a divisor set fixed in advance rather than searched fresh for each `n`.
+That restatement is real, used internally by this development, and documented in the
+accompanying paper and README — but it is not independently novel content, so it is not
+submitted here as its own Comparator-checked headline result. Only the theorem that is
+independently defensible as substantive — an original, from-scratch proof route for a
+classical theorem, avoiding Mathlib's own Bertrand development entirely — is advertised.
 -/
 
-/-- **Original question: is every composite in the window covered by the preceding base?**
-For a prime `P_k` and `n ∈ (P_k, 2·P_k]`, `n` is prime iff `n` is not covered by the base of
-primes below `P_k` (`n.minFac ≤ P_k`). Proved by exact divisibility, not by counting. -/
-theorem Submission.prime_iff_uncovered_by_prev
-    {P_k : ℕ} (hP : Nat.Prime P_k) {n : ℕ}
-    (hn_lo : P_k < n) (hn_hi : n ≤ 2 * P_k) (hn2 : 2 ≤ n) :
-    n.Prime ↔ ¬ (n.minFac ≤ P_k) := by
-  sorry
-
-/-- **Generalization: the same equivalence holds throughout the deterministic zone
-`(P_k, P_k²)`**, not only in the window `(P_k, 2·P_k]`. `n` is a void with respect to the
-primes below `P_k` iff `n` is prime. This reach is exact (see `Rings.lean`'s
-`determinism_breaks_above`: the equivalence fails once `n ≥ P_k²`). -/
-theorem Submission.void_iff_prime_in_deterministic_zone
-    {Pk n : ℕ} (hPk3 : 2 < Pk) (hlo : Pk < n) (hhi : n < Pk ^ 2) :
-    (∀ p ∈ (Finset.range Pk).filter Nat.Prime, ¬ p ∣ n) ↔ Nat.Prime n := by
-  sorry
-
-/-- **Bertrand–Chebyshev bound** (corollary of the equivalence above). For every `N > 1`
-there is a prime `p` with `N < p ≤ 2 * N`. -/
+/-- **Bertrand–Chebyshev bound**, proved by an independent structural-sieve route (not using
+`Mathlib.NumberTheory.Bertrand`). For every `N > 1` there is a prime `p` with
+`N < p ≤ 2 * N`. -/
 theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime := by
   sorry
