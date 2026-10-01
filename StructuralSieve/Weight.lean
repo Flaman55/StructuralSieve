@@ -1,7 +1,9 @@
-import StructuralSieve.Defs
-import Mathlib.Data.Nat.Totient
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.Defs
+public import Mathlib.Data.Nat.Totient
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Tactic
 /-!
 # Weight.lean — Lemma 4.4: Structural Weight w(𝒫) ≥ 1
 
@@ -35,7 +37,8 @@ The structural weight condition in integer arithmetic:
 We work with integers to avoid division.  The rational inequality `w ≥ 1`
 is equivalent to `P_max * φ(M) ≥ M` over ℕ.
 -/
-def WeightGeOne (P_max M : ℕ) : Prop :=
+@[expose]
+public def WeightGeOne (P_max M : ℕ) : Prop :=
   M ≤ P_max * Nat.totient M
 
 /-! ## Base case -/
@@ -44,7 +47,7 @@ def WeightGeOne (P_max M : ℕ) : Prop :=
 Base case: for the base `{2}`, `M = 2`, `φ(2) = 1`, `P_max = 2`.
 `w = 2 · 1 / 2 = 1 ≥ 1`. ✓
 -/
-theorem weight_base : WeightGeOne 2 2 := by
+public theorem weight_base : WeightGeOne 2 2 := by
   unfold WeightGeOne
   rw [Nat.totient_prime (by norm_num : Nat.Prime 2)]
 
@@ -64,7 +67,7 @@ Since `P_k ≥ 2`, dividing both sides by `P_k` gives:
   `M' ≤ φ(M') · (P_k − 1)`
 And since `P_k − 1 ≥ P_prev ≥ 1` and `WeightGeOne P_prev M'`, this holds.
 -/
-theorem weight_step
+public theorem weight_step
     {P_prev P_k M' : ℕ}
     (_hPprev_prime : Nat.Prime P_prev)
     (hPk_prime    : Nat.Prime P_k)
@@ -178,7 +181,7 @@ private lemma weight_ge_one_aux :
         (Finset.prod_pos (fun q hq => (hprime' q hq).pos))
         hcop hphi ih'
 
-theorem structural_weight_ge_one
+public theorem structural_weight_ge_one
     (B : PrimeBase) (_ : B.isComplete) :
     WeightGeOne B.pMax B.primorial :=
   weight_ge_one_aux B.carrier.card B.carrier B.nonempty rfl B.all_prime
@@ -195,7 +198,7 @@ and `φ(M') = φ(M) / (P_k − 1)` satisfies:
 In integer form: `M' < P_k · φ(M')`, i.e., the preceding base cannot cover
 all `P_k` elements of the window.
 -/
-theorem prev_base_cannot_cover_window
+public theorem prev_base_cannot_cover_window
     {P_k M' : ℕ}
     (hPk_prime : Nat.Prime P_k)
     (_hM'_pos  : 0 < M')

@@ -1,13 +1,15 @@
-import StructuralSieve.Defs
-import StructuralSieve.Weight
-import StructuralSieve.Truncated
-import StructuralSieve.BinomialCertificate
-import Mathlib.Data.Nat.GCD.Basic
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Nat.Totient
-import Mathlib.NumberTheory.Primorial
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.Defs
+public import StructuralSieve.Weight
+public import StructuralSieve.Truncated
+public import StructuralSieve.BinomialCertificate
+public import Mathlib.Data.Nat.GCD.Basic
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Data.Nat.Totient
+public import Mathlib.NumberTheory.Primorial
+public import Mathlib.Tactic
 
 /-!
 # GPS as a state machine — a purely combinatorial formalization
@@ -29,21 +31,24 @@ quantitative node, self-contained (no import of Mathlib's Bertrand theorem).
 namespace StructuralSieve
 
 /-! ### Definition: primorial of all primes `< n` -/
-noncomputable def primorial_below (n : ℕ) : ℕ :=
+@[expose]
+public noncomputable def primorial_below (n : ℕ) : ℕ :=
   ∏ p ∈ (Finset.range n).filter Nat.Prime, p
 
 /-! ### Definition: the GPS window -/
-def gps_window (Pk : ℕ) : Finset ℕ :=
+@[expose]
+public def gps_window (Pk : ℕ) : Finset ℕ :=
   Finset.Ioc Pk (2 * Pk)
 
 /-! ### Definition: free elements of the window (coprime to `M'`) -/
-noncomputable def gps_free (Pk : ℕ) : Finset ℕ :=
+@[expose]
+public noncomputable def gps_free (Pk : ℕ) : Finset ℕ :=
   (gps_window Pk).filter (fun n => Nat.Coprime n (primorial_below Pk))
 
 /-! ### Properties of GPS -/
 
 -- Every free element of the GPS window is prime
-lemma gps_free_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public lemma gps_free_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (hn : n ∈ gps_free Pk) : Nat.Prime n := by
   simp only [gps_free, gps_window, Finset.mem_filter, Finset.mem_Ioc] at hn
   obtain ⟨⟨hn_lo, hn_hi⟩, hn_cop⟩ := hn
@@ -87,7 +92,7 @@ lemma gps_free_prime {Pk n : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
 /-- Every prime `q ∈ (Pk, 2Pk]` is coprime to `primorial_below Pk` (all its factors are
     primes `r < Pk < q`, and distinct primes are coprime). Purely structural; same proof
     pattern as `Weight.weight_ge_one_aux`. -/
-lemma prime_in_window_coprime_primorial {Pk q : ℕ}
+public lemma prime_in_window_coprime_primorial {Pk q : ℕ}
     (hq : Nat.Prime q) (hq_lo : Pk < q) :
     Nat.Coprime q (primorial_below Pk) := by
   unfold primorial_below
@@ -118,7 +123,7 @@ Dispatch by regime (explicit union-bound threshold from `Truncated`):
 
 /-- Bridge: if `n` is not covered by any prime `< Pk`, then it is coprime to
     `primorial_below Pk`. (Links the language of `Truncated` with that of `gps_free`.) -/
-lemma coprime_primorial_of_uncovered {Pk n : ℕ}
+public lemma coprime_primorial_of_uncovered {Pk n : ℕ}
     (h : ∀ p ∈ (Finset.range Pk).filter Nat.Prime, ¬ p ∣ n) :
     Nat.Coprime n (primorial_below Pk) := by
   unfold primorial_below
@@ -135,7 +140,7 @@ lemma coprime_primorial_of_uncovered {Pk n : ℕ}
     `_hdensity`) -- the dense regime closes directly on `binomial_contradiction` instead.
     The weight chain is correct and this bridge is genuine structural content about the
     setting, but it is not load-bearing for the current proof of Bertrand's postulate. -/
-lemma weight_density_bridge {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public lemma weight_density_bridge {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     primorial_below Pk < Pk * Nat.totient (primorial_below Pk) := by
   set M' := primorial_below Pk with hM'
   have hM'pos : 0 < M' := by
@@ -205,7 +210,7 @@ lemma weight_density_bridge {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     lower bound. This path imports neither `Rings.lean` nor `Newton.lean` -- those modules'
     Jacobsthal-gap and self-contained-window machinery are off-path alternatives, not part
     of this proof term (see their own module docstrings). -/
-theorem dense_sieve_survivor {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem dense_sieve_survivor {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (_hdensity : primorial_below Pk < Pk * Nat.totient (primorial_below Pk)) :
     (gps_free Pk).Nonempty := by
   by_contra hempty
@@ -222,7 +227,7 @@ theorem dense_sieve_survivor {Pk : ℕ} (_hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
 /-- **Goal: closing the structural sieve.** The sieve over the window `(Pk, 2Pk]` always
     leaves a survivor. Regime dispatch: sparse closed structurally (`Truncated`), dense
     handed to the atom `dense_sieve_survivor`. -/
-theorem structural_sieve_survivor {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public theorem structural_sieve_survivor {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (hdensity : primorial_below Pk < Pk * Nat.totient (primorial_below Pk)) :
     (gps_free Pk).Nonempty := by
   classical
@@ -242,13 +247,13 @@ theorem structural_sieve_survivor {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk
 
 /-- Backward compatibility: `gps_window_nonempty` is now a corollary of sieve closure, not a
     delegation to Erdős. The weight is supplied by the bridge `weight_density_bridge`. -/
-lemma gps_window_nonempty {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public lemma gps_window_nonempty {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     (gps_free Pk).Nonempty :=
   structural_sieve_survivor hPk hPk3 (weight_density_bridge hPk hPk3)
 
 /-- Consuming corollary: `(Pk, 2Pk]` contains a prime. From `gps_window_nonempty` (a free
     element) and `gps_free_prime` (free ⇒ prime). -/
-theorem prime_in_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
+public theorem prime_in_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     ∃ q, Pk < q ∧ q ≤ 2 * Pk ∧ Nat.Prime q := by
   obtain ⟨n, hn⟩ := gps_window_nonempty hPk hPk3
   have hnp : Nat.Prime n := gps_free_prime hPk hPk3 hn
@@ -256,7 +261,7 @@ theorem prime_in_window {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
   exact ⟨n, hn.1.1, hn.1.2, hnp⟩
 
 /-! ### Bridge to Main: Case 3 (`M' = primorial_below Pk`) -/
-lemma exists_coprime_in_window_case3 {P_k M' : ℕ}
+public lemma exists_coprime_in_window_case3 {P_k M' : ℕ}
     (hPk_prime : Nat.Prime P_k)
     (hPk3 : 2 < P_k)
     (hM'_eq : M' = primorial_below P_k) :
@@ -271,7 +276,7 @@ lemma exists_coprime_in_window_case3 {P_k M' : ℕ}
 /-- Auxiliary phase-shift theorem (parity block). Shows that the critical point at which a
     new territory opens (`P_max + 2`) has a least prime factor that is strictly bounded in
     size. -/
-theorem prime_factor_bound_for_window_start (P_max p_i c : Nat)
+public theorem prime_factor_bound_for_window_start (P_max p_i c : Nat)
     (h_p_max : P_max.Prime)
     (h_odd_p : 3 ≤ P_max)
     (h_div : P_max + 2 = c * p_i)
@@ -315,7 +320,7 @@ theorem prime_factor_bound_for_window_start (P_max p_i c : Nat)
     the state `P_{k+1}` as the maximum of the set of free elements. The lemma proves that the
     width of the new window (`next_P_max`) grows strictly faster than the ability of the new
     primorial to create gaps at the start of the new CRT period. -/
-lemma gps_step_induction {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
+public lemma gps_step_induction {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk)
     (h_nonempty : (gps_free Pk).Nonempty) :
     ∃ (next_Pk : ℕ), next_Pk.Prime ∧ Pk < next_Pk ∧ next_Pk ≤ 2 * Pk ∧
     (∀ p ∈ (Finset.range next_Pk).filter Nat.Prime, p ∣ primorial_below next_Pk) := by

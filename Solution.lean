@@ -1,5 +1,7 @@
-import StructuralSieve.Main
-import StructuralSieve.SelfContained
+module
+
+public import StructuralSieve.Main
+public import StructuralSieve.SelfContained
 
 /-!
 # Proved solutions
@@ -15,6 +17,6 @@ depending on `Mathlib.NumberTheory.Bertrand`. That development contains zero `so
 `native_decide`/`Lean.ofReduceBool`.
 -/
 
-theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
+public theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime :=
   StructuralSieve.bertrand_chebyshev N hN

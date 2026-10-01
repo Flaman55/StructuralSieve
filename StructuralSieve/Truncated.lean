@@ -1,6 +1,8 @@
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Tactic
+module
+
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Tactic
 
 /-!
 # Truncated.lean — Truncated arithmetic: the sparse-base regime (closed, no `sorry`)
@@ -32,7 +34,7 @@ If, in the window `(lo, hi]`, the total number of multiples of the base elements
 smaller than the size of the window, then some window element is uncovered by every element
 of `B` (irreducible with respect to `B`). Purely combinatorial, with no size estimate.
 -/
-theorem exists_uncovered_of_card_lt
+public theorem exists_uncovered_of_card_lt
     {B : Finset ℕ} {lo hi : ℕ}
     (hcard : ∑ p ∈ B, ((Finset.Ioc lo hi).filter (fun n => p ∣ n)).card
               < (Finset.Ioc lo hi).card) :
@@ -79,7 +81,7 @@ For `P_min = 2` (Bertrand) the hypothesis `hsparse` fails — the sum meets or e
 window size, since `Σ 1/p` diverges — so this lemma does not yield Bertrand. This is the
 precise formal description of the regime boundary.
 -/
-theorem truncated_not_sieve_closed
+public theorem truncated_not_sieve_closed
     {P_min P_max : ℕ} {B : Finset ℕ}
     (hsparse : ∑ p ∈ B, ((Finset.Ioc P_max (P_min * P_max)).filter (fun n => p ∣ n)).card
                 < (Finset.Ioc P_max (P_min * P_max)).card) :
@@ -90,7 +92,7 @@ theorem truncated_not_sieve_closed
 
 /-- Size of the truncated window: `|(P_max, P_min·P_max]| = P_min·P_max − P_max`.
     Auxiliary for checking the hypothesis `hsparse`. -/
-theorem card_truncated_window (P_min P_max : ℕ) :
+public theorem card_truncated_window (P_min P_max : ℕ) :
     (Finset.Ioc P_max (P_min * P_max)).card = P_min * P_max - P_max := by
   rw [Nat.card_Ioc]
 

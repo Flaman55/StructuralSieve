@@ -1,5 +1,7 @@
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Data.Finset.Basic
+module
+
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Data.Finset.Basic
 
 /-!
 # Advertised statements
@@ -38,6 +40,6 @@ classical theorem, avoiding Mathlib's own Bertrand development entirely — is a
 /-- **Bertrand–Chebyshev bound**, proved by an independent structural-sieve route (not using
 `Mathlib.NumberTheory.Bertrand`). For every `N > 1` there is a prime `p` with
 `N < p ≤ 2 * N`. -/
-theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
+public theorem Submission.bertrand_chebyshev (N : ℕ) (hN : 1 < N) :
     ∃ p : ℕ, N < p ∧ p ≤ 2 * N ∧ p.Prime := by
   sorry

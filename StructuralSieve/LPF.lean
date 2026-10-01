@@ -1,7 +1,9 @@
-import StructuralSieve.Defs
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Data.Nat.GCD.Basic
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.Defs
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Data.Nat.GCD.Basic
+public import Mathlib.Tactic
 /-!
 # LPF.lean — Lemma 3.1: Least Prime Factor
 
@@ -26,7 +28,7 @@ If `n ∈ (P_max, P_min · P_max]` is composite, then `n.minFac ≤ P_max`.
 
 The proof uses only: `n.minFac ^ 2 ≤ n` (standard) and `n ≤ P_min · P_max ≤ P_max²`.
 -/
-theorem least_prime_factor_bound
+public theorem least_prime_factor_bound
     {P_min P_max : ℕ}
     (hPmin_pos : 0 < P_min)
     (hPmin_le  : P_min ≤ P_max)
@@ -52,7 +54,7 @@ theorem least_prime_factor_bound
 
 Any `n ∈ (P_max, P_min · P_max]` with `n.minFac > P_max` must be prime.
 -/
-theorem uncovered_is_prime
+public theorem uncovered_is_prime
     {P_min P_max : ℕ}
     (hPmin_pos : 0 < P_min)
     (hPmin_le  : P_min ≤ P_max)
@@ -83,7 +85,7 @@ Both directions were already available separately (the forward direction is the 
 `uncovered_is_prime` above, already proved for this general window) — this packages them as
 the single equivalence.
 -/
-theorem prime_iff_uncovered_general
+public theorem prime_iff_uncovered_general
     {P_min P_max : ℕ}
     (hPmin_pos : 0 < P_min)
     (hPmin_le  : P_min ≤ P_max)

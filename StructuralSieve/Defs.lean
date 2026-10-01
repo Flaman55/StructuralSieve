@@ -1,6 +1,8 @@
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Data.Finset.Basic
-import Mathlib.Tactic
+module
+
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Tactic
 /-!
 # Defs.lean — Definition 2.1: Complete Generative Prime Base
 
@@ -18,7 +20,7 @@ namespace StructuralSieve
 /--
 A `PrimeBase` is a nonempty finite set of primes.
 -/
-structure PrimeBase where
+public structure PrimeBase where
   /-- The underlying finite set of natural numbers -/
   carrier   : Finset ℕ
   /-- Every element is prime -/
@@ -27,11 +29,13 @@ structure PrimeBase where
   nonempty  : carrier.Nonempty
 
 /-- The minimal element of a prime base -/
-def PrimeBase.pMin (B : PrimeBase) : ℕ :=
+@[expose]
+public def PrimeBase.pMin (B : PrimeBase) : ℕ :=
   B.carrier.min' B.nonempty
 
 /-- The maximal element of a prime base -/
-def PrimeBase.pMax (B : PrimeBase) : ℕ :=
+@[expose]
+public def PrimeBase.pMax (B : PrimeBase) : ℕ :=
   B.carrier.max' B.nonempty
 
 /--
@@ -45,14 +49,16 @@ This is the structural axiom of the proof.  Any base omitting even one prime
 `p₀ ∈ (P_min, P_max)` is not a complete generative base; its primorial identity
 fails and all subsequent structural arguments break down.
 -/
-def PrimeBase.isComplete (B : PrimeBase) : Prop :=
+@[expose]
+public def PrimeBase.isComplete (B : PrimeBase) : Prop :=
   ∀ p : ℕ, Nat.Prime p → B.pMin ≤ p → p ≤ B.pMax → p ∈ B.carrier
 
 /--
 The *preceding base* obtained by removing P_max from a complete base.
 Used in Zero Force and Weight arguments.
 -/
-def PrimeBase.prev (B : PrimeBase) : Finset ℕ :=
+@[expose]
+public def PrimeBase.prev (B : PrimeBase) : Finset ℕ :=
   B.carrier.erase B.pMax
 
 /-! ## Sieve coverage -/
@@ -63,20 +69,23 @@ def PrimeBase.prev (B : PrimeBase) : Finset ℕ :=
 `n` is covered iff its least prime factor `n.minFac ≤ P`,
 i.e., some prime in the base divides `n`.
 -/
-def SieveCovered (P n : ℕ) : Prop :=
+@[expose]
+public def SieveCovered (P n : ℕ) : Prop :=
   n.minFac ≤ P
 
 /--
 `n` is sieve-covered by base `B` iff `SieveCovered B.pMax n`.
 -/
-def SieveCoveredBy (B : PrimeBase) (n : ℕ) : Prop :=
+@[expose]
+public def SieveCoveredBy (B : PrimeBase) (n : ℕ) : Prop :=
   SieveCovered B.pMax n
 
 /--
 The *window* of a prime base: the interval `(P_max, P_min · P_max]`.
 In the standard setting with `P_min = 2` this is `(P_max, 2 · P_max]`.
 -/
-def window (P_min P_max : ℕ) : Finset ℕ :=
+@[expose]
+public def window (P_min P_max : ℕ) : Finset ℕ :=
   (Finset.Ioc P_max (P_min * P_max))
 
 /-! ## Proposition 2.1: Primorial identity -/
@@ -86,10 +95,11 @@ The *primorial* of a complete generative base: `M = ∏ p ∈ B.carrier, p`.
 Because `B` is complete, every prime factor of `M` appears exactly once,
 and `φ(M)/M = ∏_{p ∈ B} (1 − 1/p)` holds exactly by multiplicativity of `φ`.
 -/
-def PrimeBase.primorial (B : PrimeBase) : ℕ :=
+@[expose]
+public def PrimeBase.primorial (B : PrimeBase) : ℕ :=
   B.carrier.prod id
 
-theorem PrimeBase.primorial_pos (B : PrimeBase) : 0 < B.primorial := by
+public theorem PrimeBase.primorial_pos (B : PrimeBase) : 0 < B.primorial := by
   apply Finset.prod_pos
   intro p hp
   exact (B.all_prime p hp).pos

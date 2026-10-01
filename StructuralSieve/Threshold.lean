@@ -1,7 +1,9 @@
-import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
-import Mathlib.Tactic
-import Mathlib.Tactic.NormNum.Prime
+module
+
+public import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+public import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
+public import Mathlib.Tactic
+public import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # Threshold.lean — the generic size inequality (prime-free)
@@ -24,7 +26,7 @@ open Real
 
 /-- Real form of the threshold inequality (adapted from Mathlib's `Bertrand.real_main_inequality`,
     Apache-2.0, P. Stevens & B. Bailey). Prime-free. -/
-theorem real_threshold_inequality {x : ℝ} (x_large : (512 : ℝ) ≤ x) :
+public theorem real_threshold_inequality {x : ℝ} (x_large : (512 : ℝ) ≤ x) :
     x * (2 * x) ^ √(2 * x) * 4 ^ (2 * x / 3) ≤ 4 ^ x := by
   let f : ℝ → ℝ := fun x => log x + √(2 * x) * log (2 * x) - log 4 / 3 * x
   have hf' : ∀ x, 0 < x → 0 < x * (2 * x) ^ √(2 * x) / 4 ^ (x / 3) := fun x h =>
@@ -83,7 +85,7 @@ open Nat
 /-- **The threshold inequality (prime-free), in ℕ.** For `n ≥ 512`,
     `n · (2n)^√(2n) · 4^(2n/3) ≤ 4^n`. Adapted from Mathlib's `bertrand_main_inequality`
     (Apache-2.0), placed here to avoid importing `Mathlib.NumberTheory.Bertrand`. -/
-theorem threshold_inequality {n : ℕ} (n_large : 512 ≤ n) :
+public theorem threshold_inequality {n : ℕ} (n_large : 512 ≤ n) :
     n * (2 * n) ^ sqrt (2 * n) * 4 ^ (2 * n / 3) ≤ 4 ^ n := by
   -- Rebuilt (Mathlib bump to v4.28.0): the old `gcongr`-with-bullets proof relied on a goal
   -- order/count that changed upstream. This version proves the two exponent-cast bridges

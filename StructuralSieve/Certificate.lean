@@ -1,7 +1,9 @@
-import StructuralSieve.GPS_StateMachine
-import StructuralSieve.Erdos
-import StructuralSieve.BinomialCertificate
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.GPS_StateMachine
+public import StructuralSieve.Erdos
+public import StructuralSieve.BinomialCertificate
+public import Mathlib.Tactic
 
 /-!
 # Certificate.lean — the quantitative atom as a pluggable interface
@@ -25,26 +27,27 @@ namespace StructuralSieve
 /-- **The quantitative atom, abstracted.** A *window certificate* is any proof that an empty
     window is impossible: for every `n > 2`, if `(n, 2n]` contains no prime, a contradiction
     follows. -/
-def WindowCertificate : Prop :=
+@[expose]
+public def WindowCertificate : Prop :=
   ∀ n : ℕ, 2 < n → (∀ q, n < q → q ≤ 2 * n → ¬ Nat.Prime q) → False
 
 /-- **Instance A — the binomial certificate via Mathlib.** `erdos_contradiction` is exactly a
     `WindowCertificate` (it imports Mathlib's two inequalities on `C(2n,n)`). -/
-theorem erdos_certificate : WindowCertificate :=
+public theorem erdos_certificate : WindowCertificate :=
   fun _n hn h => erdos_contradiction hn h
 
 /-- **Instance B — the self-contained binomial certificate.** `binomial_contradiction`
     (`BinomialCertificate.lean`) is a `WindowCertificate` built from the two bounds on
     `C(2n,n)` plus a local oracle, WITHOUT importing `Mathlib.NumberTheory.Bertrand`. Two
     independent instances closing the same atom — modularity as a fact. -/
-theorem binomial_certificate : WindowCertificate :=
+public theorem binomial_certificate : WindowCertificate :=
   fun _n hn h => binomial_contradiction hn h
 
 /-- **Modularity, as a theorem.** Given ANY window certificate, the structural sieve leaves a
     survivor in every window `(Pk, 2Pk]`. The proof body is identical to `dense_sieve_survivor`
     except that the quantitative step is supplied by the `cert` argument, not hard-wired to
     Erdős. -/
-theorem dense_sieve_survivor_of_certificate (cert : WindowCertificate)
+public theorem dense_sieve_survivor_of_certificate (cert : WindowCertificate)
     {Pk : ℕ} (hPk3 : 2 < Pk) :
     (gps_free Pk).Nonempty := by
   by_contra hempty
@@ -60,7 +63,7 @@ theorem dense_sieve_survivor_of_certificate (cert : WindowCertificate)
 
 /-- **Consuming corollary, parameterized.** Any window certificate yields a prime in
     `(Pk, 2Pk]`. Plugging `erdos_certificate` recovers the existing `prime_in_window`. -/
-theorem prime_in_window_of_certificate (cert : WindowCertificate)
+public theorem prime_in_window_of_certificate (cert : WindowCertificate)
     {Pk : ℕ} (hPk : Nat.Prime Pk) (hPk3 : 2 < Pk) :
     ∃ q, Pk < q ∧ q ≤ 2 * Pk ∧ Nat.Prime q := by
   obtain ⟨n, hn⟩ := dense_sieve_survivor_of_certificate cert hPk3

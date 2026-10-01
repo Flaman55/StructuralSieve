@@ -1,7 +1,9 @@
-import Mathlib.Data.Nat.Choose.Central
-import Mathlib.Data.Nat.Choose.Factorization
-import Mathlib.NumberTheory.Primorial
-import Mathlib.Tactic
+module
+
+public import Mathlib.Data.Nat.Choose.Central
+public import Mathlib.Data.Nat.Choose.Factorization
+public import Mathlib.NumberTheory.Primorial
+public import Mathlib.Tactic
 
 /-!
 # BinomialBound.lean — the self-contained empty-window upper bound
@@ -32,7 +34,7 @@ namespace StructuralSieve
 /-- **Empty window ⇒ all prime factors are `≤ 2n/3`.** If `(n, 2n]` contains no prime, then
     every prime factor of `C(2n,n)` is `≤ 2n/3` (ranges 1–2 only): range 3 has valuation `0`,
     and ranges 4–5 are empty. -/
-theorem window_centralBinom_factorization_small (n : ℕ) (n_large : 2 < n)
+public theorem window_centralBinom_factorization_small (n : ℕ) (n_large : 2 < n)
     (no_prime : ¬∃ p : ℕ, p.Prime ∧ n < p ∧ p ≤ 2 * n) :
     centralBinom n = ∏ p ∈ Finset.range (2 * n / 3 + 1), p ^ (centralBinom n).factorization p := by
   refine (Eq.trans ?_ n.prod_pow_factorization_centralBinom).symm
@@ -53,7 +55,7 @@ theorem window_centralBinom_factorization_small (n : ℕ) (n_large : 2 < n)
     `C(2n,n) ≤ (2n)^{√(2n)} · 4^{2n/3}`. Range 1 contributes `≤ (2n)^{√(2n)}`, range 2
     contributes `≤ 4^{2n/3}` (primorial), ranges 3–5 contribute a factor `1`. Reproved from
     Legendre/Kummer + primorial primitives; independent of Mathlib's Bertrand. -/
-theorem window_centralBinom_le (n : ℕ) (n_large : 2 < n)
+public theorem window_centralBinom_le (n : ℕ) (n_large : 2 < n)
     (no_prime : ¬∃ p : ℕ, Nat.Prime p ∧ n < p ∧ p ≤ 2 * n) :
     centralBinom n ≤ (2 * n) ^ sqrt (2 * n) * 4 ^ (2 * n / 3) := by
   have n_pos : 0 < n := (Nat.zero_le _).trans_lt n_large

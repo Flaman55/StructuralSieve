@@ -1,7 +1,9 @@
-import StructuralSieve.BinomialBound
-import StructuralSieve.Threshold
-import Mathlib.Data.Nat.Choose.Central
-import Mathlib.Tactic
+module
+
+public import StructuralSieve.BinomialBound
+public import StructuralSieve.Threshold
+public import Mathlib.Data.Nat.Choose.Central
+public import Mathlib.Tactic
 
 /-!
 # BinomialCertificate.lean — the self-contained binomial contradiction
@@ -52,7 +54,7 @@ set_option maxRecDepth 8000 in
     `n < p ≤ 2n`), cutting per-case cost from up to 172 `decide` attempts down to exactly
     one. (Same statement as `Erdos.small_window_prime`, redefined here so this file stays
     free of the Bertrand import.) -/
-lemma small_window_oracle :
+public lemma small_window_oracle :
     ∀ n < 512, 2 < n → ∃ p < 1024, n < p ∧ p ≤ 2 * n ∧ Nat.Prime p := by
   intro n hn h2
   rcases lt_or_ge n 32 with hc0 | hc0
@@ -600,7 +602,7 @@ lemma small_window_oracle :
     contradiction follows: the lower bound `4^n < n · C(2n,n)` and the empty-window upper bound
     `window_centralBinom_le` on the same integer `C(2n,n)` are incompatible. Built without
     Mathlib's Bertrand theorem. -/
-theorem binomial_contradiction {n : ℕ} (hn3 : 2 < n)
+public theorem binomial_contradiction {n : ℕ} (hn3 : 2 < n)
     (h_no_prime : ∀ q, n < q → q ≤ 2 * n → ¬ Nat.Prime q) : False := by
   rcases Nat.lt_or_ge n 512 with hsmall | hbig
   · -- small windows: witness from the oracle

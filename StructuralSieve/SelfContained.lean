@@ -1,4 +1,6 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
 
 /-!
 # SelfContained.lean — Window-width lemma (why the constant is `2` / why width `≤ P_max`)
@@ -23,7 +25,7 @@ In the window `(P, P+W]` with `W ≤ P`, the least proper multiple `2·q` of any
 guarantees self-containment: no in-window element re-enters its own window through a proper
 multiple of itself.
 -/
-theorem window_self_contained_bound {P W q : ℕ}
+public theorem window_self_contained_bound {P W q : ℕ}
     (hW : W ≤ P) (hq_lo : P < q) (_hq_hi : q ≤ P + W) :
     P + W < 2 * q := by
   omega
@@ -35,7 +37,7 @@ Contrapositive of the previous lemma: if the least proper multiple `2·q` of som
 `q ∈ (P, P+W]` falls inside the window (`2·q ≤ P + W`), then the width must exceed `P`.
 Equivalently, self-containment fails once the multiplier exceeds `2`.
 -/
-theorem width_gt_of_overlap {P W q : ℕ}
+public theorem width_gt_of_overlap {P W q : ℕ}
     (hq_lo : P < q) (hover : 2 * q ≤ P + W) :
     P < W := by
   omega
@@ -48,7 +50,7 @@ The maximal self-contained window anchored at `P_max` is `(P_max, 2·P_max]` (wi
 self-containment holds (`window_self_contained_bound`). The constant `2` is therefore not a
 choice: it is the maximal width of a self-contained window.
 -/
-theorem max_self_contained_width {P q : ℕ}
+public theorem max_self_contained_width {P q : ℕ}
     (hq_lo : P < q) (_hq_hi : q ≤ 2 * P) :
     2 * P < 2 * q := by
   omega
@@ -76,7 +78,7 @@ element `q ∈ (P, hi]` built from that minimum is `m·q`. If the window's upper
 `hi ≤ m·P`, this multiple always falls strictly outside the window. Generalizes
 `window_self_contained_bound` (`m = 2`, `hi = P + W`) to any base minimum `m` (any prime).
 -/
-theorem window_self_contained_bound_general {P hi q m : ℕ}
+public theorem window_self_contained_bound_general {P hi q m : ℕ}
     (hm : Nat.Prime m) (hhi : hi ≤ m * P) (hq_lo : P < q) (_hq_hi : q ≤ hi) :
     hi < m * q := by
   have hm0 : 0 < m := hm.pos
@@ -92,7 +94,7 @@ Contrapositive companion to the previous lemma: if the least proper multiple `m�
 `q ∈ (P, hi]` falls inside the window (`m·q ≤ hi`), then `hi` must exceed `m·P`. Generalizes
 `width_gt_of_overlap`.
 -/
-theorem window_bound_gt_of_overlap_general {P hi q m : ℕ}
+public theorem window_bound_gt_of_overlap_general {P hi q m : ℕ}
     (hm : Nat.Prime m) (hq_lo : P < q) (hover : m * q ≤ hi) :
     m * P < hi := by
   have hm0 : 0 < m := hm.pos
@@ -109,7 +111,7 @@ The maximal self-contained window anchored at `P` for a base with minimum `m` is
 `m` (which is `2` in the standard base starting at the prime `2`) is not a choice — it is the
 maximal reach of a self-contained window for a base whose own minimum element is `m`.
 -/
-theorem max_self_contained_bound_general {P q m : ℕ}
+public theorem max_self_contained_bound_general {P q m : ℕ}
     (hm : Nat.Prime m) (hq_lo : P < q) (_hq_hi : q ≤ m * P) :
     m * P < m * q := by
   have hm0 : 0 < m := hm.pos
@@ -143,7 +145,7 @@ below this true failure point (`m·P < m·q`, from `P < q` and `m > 0`), so it i
 guarantee: the window stays self-contained up to and including `m·P` no matter how close or far
 the next prime happens to be.
 -/
-theorem self_contained_bound_independent_of_gap {P m : ℕ}
+public theorem self_contained_bound_independent_of_gap {P m : ℕ}
     (hm : Nat.Prime m) (hP : 0 < P) :
     ∃ q, Nat.Prime q ∧ P < q ∧
       (∀ n, P < n → n ≤ m * P → m * P < m * n) ∧
