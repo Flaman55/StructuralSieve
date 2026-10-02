@@ -148,9 +148,14 @@ main theorem does not depend on Mathlib's Bertrand theorem.
 **1. The structural reduction (independent, this project).**
 This is the same reduction underlying `prime_iff_uncovered_by_prev`, one of the
 two headline results of *Origin of the result* above: LPF bound, Zero Effective
-Force, structural weight `w ≥ 1`, and the sparse regime closed unconditionally
-by a union bound (`Truncated.lean`) are all exercised by `bertrand_chebyshev`'s
-proof term. Self-containment (`self_contained_bound_independent_of_gap`, proved
+Force, and the sparse regime closed unconditionally by a union bound
+(`Truncated.lean`) are exercised by `bertrand_chebyshev`'s proof term via a
+direct least-prime-factor argument. Structural weight `w ≥ 1` (`Weight.lean`)
+appears in upstream hypotheses threaded through the chain but is not consumed
+by any proof step that closes a goal in the submitted theorem — the dense
+existence step below closes on the central binomial certificate alone,
+independent of the weight/density value. Self-containment
+(`self_contained_bound_independent_of_gap`, proved
 in `SelfContained.lean`) is a separate fact about the window's *size*,
 established on its own terms (see *Origin of the result*); it is not
 part of `bertrand_chebyshev`'s proof term and the corollary does not call on

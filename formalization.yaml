@@ -303,10 +303,13 @@ alignment:
         The signature carries three explicit hypotheses (_hprev_wt, _hphi_mult, _hphi_pos)
         characterizing the average-density/weight setting; they are underscore-prefixed
         because this theorem's own proof does not use them (it derives everything through
-        exists_coprime_in_window instead, which recomputes the needed facts internally via
-        GPS_StateMachine.weight_density_bridge). The weight chain they name is real,
-        proved content (Weight.lean), but not load-bearing for this version of the proof --
-        do not read their presence as the argument depending on them.
+        exists_coprime_in_window instead, which in the dense case threads
+        GPS_StateMachine.weight_density_bridge's output through unused parameters down to
+        dense_sieve_survivor -- whose own proof does not consume it either, closing directly
+        on BinomialCertificate.binomial_contradiction instead). The weight chain they name is
+        real, proved content (Weight.lean), but not load-bearing for this version of the
+        proof -- do not read their presence, or the bridge's invocation, as the argument
+        depending on them.
     - source: "Corollary 6.1 (Classical Bertrand-Chebyshev)"
       lean: "StructuralSieve.bertrand_chebyshev"
       module: "StructuralSieve/Main.lean"
